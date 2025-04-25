@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.global.config;
+package com.example.Tokkit_server.config;
 
 import java.util.List;
 
