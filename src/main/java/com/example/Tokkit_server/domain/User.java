@@ -1,5 +1,7 @@
 package com.example.Tokkit_server.domain;
 
+import com.example.Tokkit_server.domain.common.BaseEntity;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -16,20 +18,21 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class User {
+public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String name;
 
-    private String phoneNumber;
-
     @Column(nullable = false)
     private String email;
 
-    @Column(nullable = true)
-    private String nickname;
+    @Column(nullable = false)
+    private String password;
 
+    private String phoneNumber;
 
+    @Column(nullable = false)
+    private Integer simplePassword;
 }
