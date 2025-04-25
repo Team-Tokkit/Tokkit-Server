@@ -38,14 +38,42 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 		User user = userRepository.findById(userId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-		List<Notification> notifications = (categories == null || categories.isEmpty())
-			? notificationRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId)
-			: notificationRepository.findByUserIdAndCategoryInAndIsDeletedFalseOrderByCreatedAtDesc(userId, categories);
+		NotificationSetting setting = settingRepository.findByUser(user)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_SETTING_NOT_FOUND));
+
+		List<NotificationCategory> allowedCategories = getAllowedCategories(setting);
+
+		if (categories != null && !categories.isEmpty()) {
+			allowedCategories.retainAll(categories);
+		}
+
+		List<Notification> notifications = allowedCategories.isEmpty()
+			? List.of()
+			: notificationRepository.findByUserIdAndCategoryInAndIsDeletedFalseOrderByCreatedAtDesc(userId, allowedCategories);
 
 		return notifications.stream()
 			.map(NotificationResDto::from)
 			.toList();
 	}
+
+	private List<NotificationCategory> getAllowedCategories(NotificationSetting setting) {
+		List<NotificationCategory> allowed = new java.util.ArrayList<>();
+
+		if (setting.isNotificationSystem()) {
+			allowed.add(NotificationCategory.SYSTEM);
+		}
+		if (setting.isNotificationPayment()) {
+			allowed.add(NotificationCategory.PAYMENT);
+		}
+		if (setting.isNotificationVoucher()) {
+			allowed.add(NotificationCategory.VOUCHER);
+		}
+		if (setting.isNotificationToken()) {
+			allowed.add(NotificationCategory.TOKEN);
+		}
+		return allowed;
+	}
+
 
 	@Override
 	public void deleteNotificationByNotificationIdAndUserId(Long userId, Long id) {

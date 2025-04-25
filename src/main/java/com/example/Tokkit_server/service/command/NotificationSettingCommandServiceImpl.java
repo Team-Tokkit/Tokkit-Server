@@ -54,7 +54,7 @@ public class NotificationSettingCommandServiceImpl implements NotificationSettin
 	public void createDefaultSetting(User user) {
 		NotificationSetting setting = NotificationSetting.builder()
 			.user(user)
-			.build(); // true 기본값 사용
+			.build();
 		settingRepository.save(setting);
 	}
 }
