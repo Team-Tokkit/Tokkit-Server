@@ -40,4 +40,9 @@ public class Notification extends BaseEntity {
 	private String content;
 
 	private boolean isDeleted = false;
+
+	public void markAsDeleted() {
+		this.isDeleted = true;
+	}
+
 }

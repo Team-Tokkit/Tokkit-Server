@@ -8,4 +8,6 @@ import com.example.Tokkit_server.dto.NotificationResDto;
 
 public interface NotificationCommandService {
 	List<NotificationResDto> getNotifications(Long userId, List<NotificationCategory> categories);
+
+	void deleteNotificationByNotificationIdAndUserId(Long userId, Long notificationId);
 }

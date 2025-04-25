@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,5 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 	// 알림 카테고리가 존재하면 해당 카테고리만 조회
 	List<Notification> findByUserIdAndCategoryInAndIsDeletedFalseOrderByCreatedAtDesc(Long userId, List<NotificationCategory> categories);
 
+	Optional<Notification> findByIdAndUserId(Long id, Long userId);
 }

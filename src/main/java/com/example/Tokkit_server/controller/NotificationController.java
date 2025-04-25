@@ -2,6 +2,7 @@ package com.example.Tokkit_server.controller;
 
 import java.util.List;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -33,4 +34,12 @@ public class NotificationController {
 		return ApiResponse.onSuccess(notifications);
 	}
 
+	@DeleteMapping()
+	public ApiResponse<?> deleteNotification(
+		@RequestParam Long userId,
+		@RequestParam Long notificationId
+	) {
+		notificationCommandService.deleteNotificationByNotificationIdAndUserId(userId, notificationId);
+		return ApiResponse.onSuccess(null);
+	}
 }
