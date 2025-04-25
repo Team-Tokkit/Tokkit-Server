@@ -35,6 +35,9 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
 	@Override
 	public List<NotificationResDto> getNotifications(Long userId, List<NotificationCategory> categories) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
 		List<Notification> notifications = (categories == null || categories.isEmpty())
 			? notificationRepository.findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(userId)
 			: notificationRepository.findByUserIdAndCategoryInAndIsDeletedFalseOrderByCreatedAtDesc(userId, categories);
@@ -46,6 +49,9 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
 	@Override
 	public void deleteNotificationByNotificationIdAndUserId(Long userId, Long id) {
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
 		Notification notification = notificationRepository
 			.findByIdAndUserId(id, userId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_NOT_FOUND));

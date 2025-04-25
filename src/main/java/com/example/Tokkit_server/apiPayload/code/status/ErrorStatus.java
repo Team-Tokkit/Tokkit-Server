@@ -23,7 +23,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
 	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404", "해당 알림을 찾을 수 없습니다."),
 
-	NOTIFICATION_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATIONSETTING404", "해당 유저의 알림 설정이 존재하지 않습니다.");
+	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER404", "해당 유저가 존재하지 않습니다."),
+	NOTIFICATION_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATIONSETTING404", "알림 설정 정보가 존재하지 않습니다.");
 
 
 	private final HttpStatus httpStatus;

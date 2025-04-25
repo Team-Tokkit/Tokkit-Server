@@ -27,9 +27,12 @@ public class NotificationSettingCommandServiceImpl implements NotificationSettin
 
 	public NotificationSettingDto getSetting(Long userId) {
 
-		User user = userRepository.findById(userId).orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_SETTING_NOT_FOUND));
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
 		NotificationSetting setting = settingRepository.findByUser(user)
-			.orElseThrow(() -> new RuntimeException("설정 없음"));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_SETTING_NOT_FOUND));
+
 		return NotificationSettingDto.builder()
 			.system(setting.isNotificationSystem())
 			.payment(setting.isNotificationPayment())
@@ -39,9 +42,12 @@ public class NotificationSettingCommandServiceImpl implements NotificationSettin
 	}
 
 	public void updateSetting(Long userId, NotificationSettingDto dto) {
-		User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("사용자 없음"));
+		User user = userRepository.findById(userId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
 		NotificationSetting setting = settingRepository.findByUser(user)
-			.orElseThrow(() -> new RuntimeException("설정 없음"));
+			.orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_SETTING_NOT_FOUND));
+
 		setting.updateSettings(dto.isSystem(), dto.isPayment(), dto.isVoucher(), dto.isToken());
 	}
 
@@ -51,5 +57,4 @@ public class NotificationSettingCommandServiceImpl implements NotificationSettin
 			.build(); // true 기본값 사용
 		settingRepository.save(setting);
 	}
-
 }
