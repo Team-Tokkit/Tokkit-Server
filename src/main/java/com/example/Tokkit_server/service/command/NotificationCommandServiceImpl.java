@@ -10,9 +10,12 @@ import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Notification;
 import com.example.Tokkit_server.domain.NotificationCategory;
+import com.example.Tokkit_server.domain.NotificationSetting;
 import com.example.Tokkit_server.domain.User;
 import com.example.Tokkit_server.dto.NotificationResDto;
+import com.example.Tokkit_server.dto.NotificationSettingDto;
 import com.example.Tokkit_server.repository.NotificationRepository;
+import com.example.Tokkit_server.repository.NotificationSettingRepository;
 import com.example.Tokkit_server.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -26,6 +29,9 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
 	@Autowired
 	private final NotificationRepository notificationRepository;
+
+	@Autowired
+	private final NotificationSettingRepository settingRepository;
 
 	@Override
 	public List<NotificationResDto> getNotifications(Long userId, List<NotificationCategory> categories) {
@@ -45,8 +51,5 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 			.orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_NOT_FOUND));
 
 		notificationRepository.deleteById(id);
-
-		// Soft Delete 처리
-		notification.markAsDeleted();
 	}
 }

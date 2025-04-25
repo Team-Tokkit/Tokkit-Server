@@ -34,7 +34,7 @@ public class NotificationController {
 		return ApiResponse.onSuccess(notifications);
 	}
 
-	@DeleteMapping()
+	@DeleteMapping
 	public ApiResponse<?> deleteNotification(
 		@RequestParam Long userId,
 		@RequestParam Long notificationId
