@@ -36,6 +36,7 @@ public class Notification extends BaseEntity {
 	private NotificationCategory category;
 
 	private String title;
+
 	private String content;
 
 	private boolean isDeleted = false;

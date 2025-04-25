@@ -27,6 +27,4 @@ public class Merchant {
 	private String ownerPhoneNumber;
 
 	private String businessNumber;
-
-	private String businessImage;
 }
