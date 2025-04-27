@@ -44,4 +44,14 @@ public class VoucherController {
         return ResponseEntity.ok(voucherService.findByDetails(id));
     }
 
+    // 바우처 신청하기
+    @PostMapping("/apply/{voucherId}")
+    public ResponseEntity<String> applyVoucher(
+            @PathVariable Long voucherId,
+            @RequestParam Long userId
+    ) {
+        voucherService.applyVoucher(userId, voucherId);
+        return ResponseEntity.ok("바우처 신청 완료");
+    }
+
 }

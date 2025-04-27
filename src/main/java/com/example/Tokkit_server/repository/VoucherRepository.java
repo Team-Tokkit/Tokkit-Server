@@ -7,9 +7,6 @@ import java.util.List;
 
 public interface VoucherRepository extends JpaRepository<Voucher, Long> {
 
-    // 바우처 상세 조회
-    List<Voucher> findAllById(Long id);
-
     // 바우처 카테고리 별 필터링
     List<Voucher> findByCategory(Voucher.Category category);
 
