@@ -5,6 +5,7 @@ import com.example.Tokkit_server.domain.VoucherOwnership;
 import com.example.Tokkit_server.dto.voucher.VoucherOwnershipResponseDto;
 import com.example.Tokkit_server.repository.UserRepository;
 import com.example.Tokkit_server.repository.VoucherOwnershipRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -37,6 +38,38 @@ public class VoucherOwnershipService {
         VoucherOwnership ownership = voucherOwnershipRepository.findByIdAndUserId(voucherOwnershipId, userId)
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 소유하지 않은 바우처입니다."));
         return VoucherOwnershipResponseDto.from(ownership);
+    }
+
+    // 바우처 신청 철회
+    @Transactional
+    public void cancelVoucher(Long userId, Long voucherOwnershipId) {
+        VoucherOwnership ownership = voucherOwnershipRepository.findByIdAndUserId(voucherOwnershipId, userId)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 소유하지 않은 바우처입니다."));
+
+        switch (ownership.getStatus()) {
+            case WAITING:
+                voucherOwnershipRepository.delete(ownership);
+                break;
+
+            case AVAILABLE:
+                Long field = ownership.getField();
+                Long totalSupportAmount = ownership.getVoucher().getTotalSupportAmount().longValue();
+
+                double remainingRate = (field.doubleValue() / totalSupportAmount.doubleValue()) * 100.0;
+
+                if (remainingRate >= 80.0) {
+                    voucherOwnershipRepository.delete(ownership);
+                } else {
+                    throw new IllegalArgumentException("바우처 금액의 20% 이하만 사용한 경우에만 환불 가능합니다.");
+                }
+                break;
+
+            case EXPIRED:
+                throw new IllegalArgumentException("만료된 바우처는 환불할 수 없습니다.");
+
+            default:
+                throw new IllegalStateException("잘못된 바우처 상태입니다.");
+        }
     }
 
 }

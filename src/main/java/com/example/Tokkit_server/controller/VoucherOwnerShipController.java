@@ -38,4 +38,12 @@ public class VoucherOwnerShipController {
         return ResponseEntity.ok(detail);
     }
 
+    // 바우처 신청 철회
+    @DeleteMapping("/delete")
+    public ResponseEntity<String> cancelVoucher(
+            @RequestParam Long userId,
+            @RequestParam Long voucherOwnershipId) {
+        voucherOwnershipService.cancelVoucher(userId, voucherOwnershipId);
+        return ResponseEntity.ok("바우처 신청이 철회되었습니다.");
+    }
 }
