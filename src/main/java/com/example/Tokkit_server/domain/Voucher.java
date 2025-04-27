@@ -58,7 +58,7 @@ public class Voucher {
     private String contact;
 
     // 가맹점 연관관계 (ManyToOne)
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "merchant_id", nullable = false)
-//    pricate Merchant merchant;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "merchant_id", nullable = false)
+    private Merchant merchant;
 }

@@ -16,16 +16,18 @@ public class VoucherResponseDto {
     private String name;
     private String description;
     private Integer price;
+    private Integer totalSupportAmount;
     private String validDate;
-
+    private String contact;
 
     public static VoucherResponseDto from(Voucher voucher) {
         return VoucherResponseDto.builder()
                 .name(voucher.getName())
                 .description(voucher.getDescription())
                 .price(voucher.getPrice())
+                .totalSupportAmount(voucher.getTotalSupportAmount())
                 .validDate(voucher.getValidDate().toString())
+                .contact(voucher.getContact())
                 .build();
     }
-
 }
