@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.example.Tokkit_server.Enum.TransactionType;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Transaction;
@@ -30,11 +31,21 @@ public class WalletQueryService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
 
         if (wallet.getDepositBalance() < request.getAmount()) {
-            throw new GeneralException(ErrorStatus._BAD_REQUEST);
+            throw new GeneralException(ErrorStatus._BAD_REQUEST); // 잔액 부족 에러 처리
         }
 
         wallet.updateBalance(wallet.getDepositBalance() - request.getAmount(),
                                wallet.getTokenBalance() + request.getAmount());
+
+        // 2. 거래내역
+        Transaction transaction =  Transaction.builder()
+            .wallet(wallet)
+            .type(TransactionType.CONVERT)
+            .amount(request.getAmount())
+            .description("예금 ➝ 토큰 변환")
+            .build();
+
+        transactionRepository.save(transaction);
     }
 
     @Transactional
@@ -48,6 +59,16 @@ public class WalletQueryService {
 
         wallet.updateBalance(wallet.getDepositBalance() + request.getAmount(),
                                wallet.getTokenBalance() - request.getAmount());
+
+        // 2. 거래내역 저장
+        Transaction transaction = Transaction.builder()
+            .wallet(wallet)
+            .type(TransactionType.CONVERT) // 변환 타입
+            .amount(request.getAmount())
+            .description("토큰 ➝ 예금 변환")
+            .build();
+
+        transactionRepository.save(transaction);
     }
 
     public List<TransactionHistoryResponse> getRecentTransactions(Long userId) {
@@ -68,5 +89,7 @@ public class WalletQueryService {
             transaction.getCreatedAt()
         );
     }
+
+
 
 }
