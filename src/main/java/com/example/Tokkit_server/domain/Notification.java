@@ -1,7 +1,7 @@
 package com.example.Tokkit_server.domain;
 
 import com.example.Tokkit_server.Enum.NotificationCategory;
-import com.example.Tokkit_server.domain.common.BaseEntity;
+import com.example.Tokkit_server.domain.common.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +24,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Notification extends BaseEntity {
+public class Notification extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

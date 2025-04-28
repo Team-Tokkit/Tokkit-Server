@@ -28,6 +28,10 @@ public class Wallet {
 	@JoinColumn(name = "user_id")
 	private User user;
 
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "mechant_id")
+	private Merchant merchant;
+
 	@Column(nullable = false)
 	private Long depositBalance; // 예금 잔액
 
