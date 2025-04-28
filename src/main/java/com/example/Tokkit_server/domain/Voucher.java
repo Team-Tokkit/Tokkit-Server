@@ -49,18 +49,9 @@ public class Voucher extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer price;
 
-    // 지원 금액
-    private Integer supportAmount;
-
-
-    // 총 지원 금액
-    private Integer totalSupportAmount;
-
-
     // 유효기간
     @Column(nullable = false)
     private LocalDateTime validDate;
-
 
     // 발급처 (문의처)
     private String contact;
