@@ -8,6 +8,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -20,13 +21,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class User extends BaseTimeEntity {
-
+public class Merchant extends BaseTimeEntity {
+    // 가맹점주 ID
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    // 대표자명
     private String name;
+
+    // 전화번호
+    private String phoneNumber;
 
     @Column(nullable = false)
     private String email;
@@ -34,14 +39,16 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String password;
 
-    private String phoneNumber;
-
     @Column(nullable = false)
     private Integer simplePassword;
 
-    private Boolean isDormant; // 휴면 계정 여부
-
-    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
+    @Column(nullable = false)
+    private String businessNumber;
+
+    // 휴면 상태
+    private Boolean isDormant;
 }
