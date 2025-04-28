@@ -3,7 +3,7 @@ package com.example.Tokkit_server.dto.response;
 import java.time.LocalDateTime;
 
 import com.example.Tokkit_server.domain.Notification;
-import com.example.Tokkit_server.domain.Enum.NotificationCategory;
+import com.example.Tokkit_server.Enum.NotificationCategory;
 
 import lombok.Builder;
 import lombok.Getter;

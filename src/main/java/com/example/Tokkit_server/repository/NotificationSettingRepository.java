@@ -4,7 +4,7 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import com.example.Tokkit_server.domain.Enum.NotificationCategory;
+import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
 import com.example.Tokkit_server.domain.User;
 

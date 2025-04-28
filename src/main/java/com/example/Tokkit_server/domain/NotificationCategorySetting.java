@@ -1,6 +1,6 @@
 package com.example.Tokkit_server.domain;
 
-import com.example.Tokkit_server.domain.Enum.NotificationCategory;
+import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.common.BaseEntity;
 
 import jakarta.persistence.Column;

@@ -15,7 +15,9 @@ import lombok.NoArgsConstructor;
 
 @Entity
 @Getter
+@AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
+@Builder
 public class User extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,13 +36,5 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private Integer simplePassword;
 
-    @Builder
-    public User(String name, String email, String password, String phoneNumber, Integer simplePassword) {
-        this.name = name;
-        this.email = email;
-        this.password = password;
-        this.phoneNumber = phoneNumber;
-        this.simplePassword = simplePassword;
-    }
-
+    private Boolean isDormant; // 휴면 계정 여부
 }

@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.Enum.NotificationCategory;
+import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
 import com.example.Tokkit_server.domain.User;
 import com.example.Tokkit_server.dto.response.NotificationCategorySettingResDto;

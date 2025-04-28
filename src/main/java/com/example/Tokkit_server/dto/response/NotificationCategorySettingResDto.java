@@ -1,6 +1,6 @@
 package com.example.Tokkit_server.dto.response;
 
-import com.example.Tokkit_server.domain.Enum.NotificationCategory;
+import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
 
 import lombok.Builder;
