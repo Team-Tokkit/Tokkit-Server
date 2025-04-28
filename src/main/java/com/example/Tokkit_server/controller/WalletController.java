@@ -35,6 +35,7 @@ public class WalletController {
     private final WalletQueryService queryService;
     private final WalletCommandService commandService;
 
+
     @GetMapping("/balance")
     @Operation(summary = "잔액 조회", description = "예금 및 토큰 잔액을 조회합니다.")
     public ApiResponse<WalletBalanceResponse> getBalance(@RequestParam Long userId) {
