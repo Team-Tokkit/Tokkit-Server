@@ -1,12 +1,15 @@
 package com.example.Tokkit_server.service.command;
 
-import com.example.Tokkit_server.domain.User;
-import com.example.Tokkit_server.dto.NotificationSettingDto;
+import java.util.List;
+
+import com.example.Tokkit_server.dto.response.NotificationCategorySettingResDto;
+import com.example.Tokkit_server.dto.request.NotificationCategoryUpdateReqDto;
 
 public interface NotificationSettingCommandService {
-	NotificationSettingDto getSetting(Long userId);
 
-	void updateSetting(Long userId, NotificationSettingDto dto);
+	List<NotificationCategorySettingResDto> getSettings(Long userId);
 
-	void createDefaultSetting(User user);
+	void updateSetting(Long userId, List<NotificationCategoryUpdateReqDto> updateReqDtos);
+
+	// void updateAllSettings(Long userId, boolean enabled);
 }

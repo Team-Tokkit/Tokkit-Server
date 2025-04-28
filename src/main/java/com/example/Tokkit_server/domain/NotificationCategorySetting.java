@@ -23,27 +23,24 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Notification extends BaseEntity {
+public class NotificationCategorySetting extends BaseEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, optional = false)
 	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@Enumerated(EnumType.STRING)
+	@Column(nullable = false)
 	private NotificationCategory category;
 
-	private String title;
+	@Column(nullable = false)
+	private boolean enabled;
 
-	private String content;
-
-	private boolean deleted = false;
-
-	// soft delete 용 메서드
-	public void softDelete() {
-		this.deleted = true;
+	public void update(boolean enabled) {
+		this.enabled = enabled;
 	}
 }

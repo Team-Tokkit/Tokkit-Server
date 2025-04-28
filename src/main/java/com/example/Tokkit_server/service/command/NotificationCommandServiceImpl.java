@@ -1,89 +1,68 @@
 package com.example.Tokkit_server.service.command;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Notification;
 import com.example.Tokkit_server.domain.NotificationCategory;
-import com.example.Tokkit_server.domain.NotificationSetting;
+import com.example.Tokkit_server.domain.NotificationCategorySetting;
 import com.example.Tokkit_server.domain.User;
-import com.example.Tokkit_server.dto.NotificationResDto;
-import com.example.Tokkit_server.dto.NotificationSettingDto;
+import com.example.Tokkit_server.dto.response.NotificationResDto;
 import com.example.Tokkit_server.repository.NotificationRepository;
 import com.example.Tokkit_server.repository.NotificationSettingRepository;
-import com.example.Tokkit_server.repository.UserRepository;
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
 public class NotificationCommandServiceImpl implements NotificationCommandService {
 
-	@Autowired
-	private final UserRepository userRepository;
-
-	@Autowired
 	private final NotificationRepository notificationRepository;
+	private final NotificationSettingRepository notificationSettingRepository;
 
-	@Autowired
-	private final NotificationSettingRepository settingRepository;
+	@Transactional
+	public List<NotificationResDto> getAllNotifications(User user) {
+		List<NotificationCategory> enabledCategories = notificationSettingRepository.findByUserAndEnabledTrue(user)
+			.stream()
+			.map(NotificationCategorySetting::getCategory)
+			.collect(Collectors.toList());
 
-	@Override
-	public List<NotificationResDto> getNotifications(Long userId, List<NotificationCategory> categories) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
-		NotificationSetting setting = settingRepository.findByUser(user)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_SETTING_NOT_FOUND));
-
-		List<NotificationCategory> allowedCategories = getAllowedCategories(setting);
-
-		if (categories != null && !categories.isEmpty()) {
-			allowedCategories.retainAll(categories);
-		}
-
-		List<Notification> notifications = allowedCategories.isEmpty()
-			? List.of()
-			: notificationRepository.findByUserIdAndCategoryInAndIsDeletedFalseOrderByCreatedAtDesc(userId, allowedCategories);
-
-		return notifications.stream()
+		return notificationRepository.findByUserAndCategoriesAndDeletedFalse(user, enabledCategories)
+			.stream()
 			.map(NotificationResDto::from)
-			.toList();
+			.collect(Collectors.toList());
 	}
 
-	private List<NotificationCategory> getAllowedCategories(NotificationSetting setting) {
-		List<NotificationCategory> allowed = new java.util.ArrayList<>();
+	@Transactional
+	public List<NotificationResDto> getNotificationsByCategory(User user, NotificationCategory category) {
+		// 카테고리 설정 확인
+		NotificationCategorySetting setting = notificationSettingRepository.findByUserAndCategory(user, category);
+		if (setting == null || !setting.isEnabled()) {
+			throw new GeneralException(ErrorStatus._FORBIDDEN); // 알림 꺼놓은 카테고리 접근 차단
+		}
 
-		if (setting.isNotificationSystem()) {
-			allowed.add(NotificationCategory.SYSTEM);
-		}
-		if (setting.isNotificationPayment()) {
-			allowed.add(NotificationCategory.PAYMENT);
-		}
-		if (setting.isNotificationVoucher()) {
-			allowed.add(NotificationCategory.VOUCHER);
-		}
-		if (setting.isNotificationToken()) {
-			allowed.add(NotificationCategory.TOKEN);
-		}
-		return allowed;
+		return notificationRepository.findByUserAndCategoryAndDeletedFalse(user, category)
+			.stream()
+			.map(NotificationResDto::from)
+			.collect(Collectors.toList());
 	}
 
 
-	@Override
-	public void deleteNotificationByNotificationIdAndUserId(Long userId, Long id) {
-		User user = userRepository.findById(userId)
-			.orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
-		Notification notification = notificationRepository
-			.findByIdAndUserId(id, userId)
+	@Transactional
+	public void deleteNotification(Long notificationId, User user) {
+		Notification notification = notificationRepository.findByIdAndUser(notificationId, user)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.NOTIFICATION_NOT_FOUND));
 
-		notificationRepository.deleteById(id);
+		if (!notification.getUser().getId().equals(user.getId())) {
+			throw new GeneralException(ErrorStatus._FORBIDDEN);
+		}
+
+		notification.softDelete();
+		notificationRepository.save(notification);
 	}
 }

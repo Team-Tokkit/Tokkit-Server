@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.dto;
+package com.example.Tokkit_server.dto.response;
 
 import java.time.LocalDateTime;
 
