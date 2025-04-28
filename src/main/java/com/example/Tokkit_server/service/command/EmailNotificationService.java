@@ -10,7 +10,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import com.example.Tokkit_server.domain.Notification;
-import com.example.Tokkit_server.domain.User;
+import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.repository.NotificationRepository;
 import com.example.Tokkit_server.repository.UserRepository;
 import com.example.Tokkit_server.util.SseEmitters;

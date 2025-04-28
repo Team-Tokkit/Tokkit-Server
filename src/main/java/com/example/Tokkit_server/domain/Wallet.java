@@ -1,5 +1,7 @@
 package com.example.Tokkit_server.domain;
 
+import com.example.Tokkit_server.domain.user.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;

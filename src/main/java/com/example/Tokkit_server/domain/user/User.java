@@ -1,5 +1,6 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.domain.user;
 
+import com.example.Tokkit_server.domain.Wallet;
 import com.example.Tokkit_server.domain.common.BaseTimeEntity;
 
 import jakarta.persistence.Column;
@@ -38,7 +39,7 @@ public class User extends BaseTimeEntity {
     private String phoneNumber;
 
     @Column(nullable = false)
-    private Integer simplePassword;
+    private String simplePassword;
 
     private Boolean isDormant; // 휴면 계정 여부
 

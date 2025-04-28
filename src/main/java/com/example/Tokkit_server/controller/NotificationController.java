@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Tokkit_server.apiPayload.ApiResponse;
 import com.example.Tokkit_server.Enum.NotificationCategory;
-import com.example.Tokkit_server.domain.User;
+import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.dto.response.NotificationResDto;
 import com.example.Tokkit_server.service.command.NotificationCommandService;
 

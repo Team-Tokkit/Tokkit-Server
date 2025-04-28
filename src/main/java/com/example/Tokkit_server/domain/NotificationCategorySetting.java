@@ -2,6 +2,7 @@ package com.example.Tokkit_server.domain;
 
 import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.common.BaseTimeEntity;
+import com.example.Tokkit_server.domain.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;

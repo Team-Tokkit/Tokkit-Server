@@ -10,7 +10,7 @@ import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Notification;
 import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
-import com.example.Tokkit_server.domain.User;
+import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.dto.response.NotificationResDto;
 import com.example.Tokkit_server.repository.NotificationRepository;
 import com.example.Tokkit_server.repository.NotificationSettingRepository;

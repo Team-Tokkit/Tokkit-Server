@@ -2,7 +2,7 @@ package com.example.Tokkit_server.dto.request;
 
 import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
-import com.example.Tokkit_server.domain.User;
+import com.example.Tokkit_server.domain.user.User;
 
 import lombok.Getter;
 

@@ -9,7 +9,7 @@ import org.springframework.data.repository.query.Param;
 
 import com.example.Tokkit_server.domain.Notification;
 import com.example.Tokkit_server.Enum.NotificationCategory;
-import com.example.Tokkit_server.domain.User;
+import com.example.Tokkit_server.domain.user.User;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
 
