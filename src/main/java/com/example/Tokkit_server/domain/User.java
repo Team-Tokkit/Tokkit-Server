@@ -2,6 +2,7 @@ package com.example.Tokkit_server.domain;
 
 import com.example.Tokkit_server.domain.common.BaseTimeEntity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -27,11 +28,16 @@ public class User extends BaseTimeEntity {
 
     private String name;
 
+    @Column(nullable = false)
     private String email;
 
+    @Column(nullable = false)
     private String password;
 
     private String phoneNumber;
+
+    @Column(nullable = false)
+    private Integer simplePassword;
 
     private Boolean isDormant; // 휴면 계정 여부
 
