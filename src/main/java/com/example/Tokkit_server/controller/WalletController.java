@@ -13,8 +13,12 @@ import org.springframework.web.bind.annotation.RestController;
 import com.example.Tokkit_server.apiPayload.ApiResponse;
 import com.example.Tokkit_server.dto.request.DepositToTokenRequest;
 import com.example.Tokkit_server.dto.request.TokenToDepositRequest;
+import com.example.Tokkit_server.dto.request.VoucherPaymentRequest;
+import com.example.Tokkit_server.dto.request.VoucherPurchaseRequest;
 import com.example.Tokkit_server.dto.response.TransactionDetailResponse;
 import com.example.Tokkit_server.dto.response.TransactionHistoryResponse;
+import com.example.Tokkit_server.dto.response.VoucherPaymentResponse;
+import com.example.Tokkit_server.dto.response.VoucherPurchaseResponse;
 import com.example.Tokkit_server.dto.response.WalletBalanceResponse;
 import com.example.Tokkit_server.service.command.WalletCommandService;
 import com.example.Tokkit_server.service.query.WalletQueryService;
@@ -70,4 +74,16 @@ public class WalletController {
         return ApiResponse.onSuccess(queryService.getTransactionDetail(id));
     }
 
+    @PostMapping("/pay")
+    @Operation(summary = "바우처 결제", description = "보유한 바우처를 통해 결제합니다.")
+    public ApiResponse<VoucherPaymentResponse> payWithVoucher(@RequestBody VoucherPaymentRequest request) {
+        return ApiResponse.onSuccess(commandService.payWithVoucher(request));
+    }
+
+
+    @PostMapping("/voucher/purchase")
+    @Operation(summary = "바우처 구매", description = "토큰으로 바우처를 구매합니다.")
+    public ApiResponse<VoucherPurchaseResponse> purchaseVoucher(@RequestBody VoucherPurchaseRequest request) {
+        return ApiResponse.onSuccess(commandService.purchaseVoucher(request));
+    }
 }
