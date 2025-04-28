@@ -17,3 +17,19 @@ spring:
         hbm2ddl:
           auto: update
         default_batch_fetch_size: 1000
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: teamtokkit@gmail.com
+    password: ${EMAIL_KEY}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+

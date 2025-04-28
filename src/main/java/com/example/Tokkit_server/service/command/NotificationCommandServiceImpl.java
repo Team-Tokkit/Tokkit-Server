@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Notification;
-import com.example.Tokkit_server.domain.NotificationCategory;
+import com.example.Tokkit_server.domain.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
 import com.example.Tokkit_server.domain.User;
 import com.example.Tokkit_server.dto.response.NotificationResDto;
@@ -24,6 +24,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
 	private final NotificationRepository notificationRepository;
 	private final NotificationSettingRepository notificationSettingRepository;
+	private final EmailNotificationService emailService;
 
 	@Transactional
 	public List<NotificationResDto> getAllNotifications(User user) {

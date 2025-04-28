@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.example.Tokkit_server.domain.Notification;
-import com.example.Tokkit_server.domain.NotificationCategory;
+import com.example.Tokkit_server.domain.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.User;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
@@ -22,4 +22,6 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 	List<Notification> findByUserAndCategoryAndDeletedFalse(@Param("user") User user, @Param("category") NotificationCategory category);
 
 	Optional<Notification> findByIdAndUser(Long id, User user);
+
+	List<Notification> findByUserAndSentFalseAndDeletedFalse(User user);
 }

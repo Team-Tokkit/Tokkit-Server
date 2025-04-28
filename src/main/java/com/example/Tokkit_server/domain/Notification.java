@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.domain;
 
+import com.example.Tokkit_server.domain.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.common.BaseEntity;
 
 import jakarta.persistence.Column;
@@ -42,8 +43,17 @@ public class Notification extends BaseEntity {
 
 	private boolean deleted = false;
 
+	@Column(nullable = false)
+	private boolean sent = false;
+
 	// soft delete 용 메서드
 	public void softDelete() {
 		this.deleted = true;
 	}
+
+	// 알림 발송 여부 확인용 메서드
+	public void markAsSent() {
+		this.sent = true;
+	}
+
 }

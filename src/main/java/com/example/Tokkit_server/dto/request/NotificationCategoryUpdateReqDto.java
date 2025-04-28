@@ -1,6 +1,6 @@
 package com.example.Tokkit_server.dto.request;
 
-import com.example.Tokkit_server.domain.NotificationCategory;
+import com.example.Tokkit_server.domain.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
 import com.example.Tokkit_server.domain.User;
 
