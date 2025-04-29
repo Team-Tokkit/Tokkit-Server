@@ -36,7 +36,7 @@ public class SwaggerConfig {
 
         // 서버 URL에 /api 추가
         Server localServer = new Server();
-        localServer.setUrl("http://localhost:8080/api");
+        localServer.setUrl("http://localhost:8080");
 
         return new OpenAPI()
                 .components(new Components()
