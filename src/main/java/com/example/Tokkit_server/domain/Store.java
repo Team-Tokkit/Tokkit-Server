@@ -3,19 +3,15 @@ package com.example.Tokkit_server.domain;
 import com.example.Tokkit_server.Enum.StoreCategory;
 import com.example.Tokkit_server.domain.common.BaseTimeEntity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.OneToOne;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Entity
@@ -29,10 +25,10 @@ public class Store extends BaseTimeEntity {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
-
 	@Column(nullable = false)
 	private String name;
 
+	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private StoreCategory storeCategory;
 
@@ -41,6 +37,14 @@ public class Store extends BaseTimeEntity {
 	private Merchant merchant;
 
 	@Column(nullable = false)
-	private String adress;
+	private String address;
+
+	@ManyToMany(fetch = FetchType.LAZY)
+	@JoinTable(
+			name = "voucher_store",
+			joinColumns = @JoinColumn(name = "store_id"),
+			inverseJoinColumns = @JoinColumn(name = "voucher_id")
+	)
+	private List<Voucher> vouchers = new ArrayList<>();
 
 }
