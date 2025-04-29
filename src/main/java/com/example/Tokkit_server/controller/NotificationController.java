@@ -2,6 +2,7 @@ package com.example.Tokkit_server.controller;
 
 import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.apiPayload.ApiResponse;
+import com.example.Tokkit_server.apiPayload.code.status.SuccessStatus;
 import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.dto.response.NotificationResDto;
 import com.example.Tokkit_server.service.command.NotificationCommandService;
@@ -43,7 +44,7 @@ public class NotificationController {
 		@PathVariable Long notificationId) {
 
 		notificationCommandService.deleteNotification(notificationId, user);
-		return ApiResponse.onSuccess(null);
+		return ApiResponse.onSuccess(SuccessStatus.NOTIFICATION_DELETE_OK);
 	}
 
 	// SSE 구독
@@ -56,6 +57,6 @@ public class NotificationController {
 	@PostMapping("/send")
 	public ApiResponse<?> sendUnsentNotifications(@RequestAttribute("user") User user) {
 		notificationService.subscribe(user.getId());
-		return ApiResponse.onSuccess(null);
+		return ApiResponse.onSuccess(SuccessStatus.NOTIFICATION_SEND_OK);
 	}
 }

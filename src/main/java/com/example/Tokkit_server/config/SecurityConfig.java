@@ -18,6 +18,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.example.Tokkit_server.auth.CustomUserDetailsService;
 import com.example.Tokkit_server.filter.CustomLoginFilter;
 import com.example.Tokkit_server.filter.JwtAuthenticationFilter;
 import com.example.Tokkit_server.utils.JwtUtil;
@@ -30,6 +31,7 @@ import java.util.List;
 public class SecurityConfig {
 
 	private final AuthenticationConfiguration authenticationConfiguration;
+	private final CustomUserDetailsService customUserDetailsService;
 	private final JwtUtil jwtUtil;
 
 	private final String[] allowedUrls = {
@@ -89,9 +91,7 @@ public class SecurityConfig {
 			.cors(cors -> cors.configurationSource(apiConfigurationSource()))
 			.csrf(AbstractHttpConfigurer::disable)
 			.formLogin(AbstractHttpConfigurer::disable)
-			.logout(configurer -> configurer
-				.logoutUrl("/api/users/logout")
-				.deleteCookies("JSESSIONID"))
+			.logout(AbstractHttpConfigurer::disable)
 			.exceptionHandling(configurer -> configurer
 				.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
 			.httpBasic(AbstractHttpConfigurer::disable)
@@ -106,7 +106,7 @@ public class SecurityConfig {
 		loginFilter.setFilterProcessesUrl("/api/users/login");
 
 		http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
-		http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil), CustomLoginFilter.class);
+		http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailsService), CustomLoginFilter.class);
 
 		return http.build();
 	}

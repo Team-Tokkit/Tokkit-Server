@@ -19,12 +19,15 @@ public class UserResponse {
 
 	public String email;
 
+	public String phoneNumber;
+
 	//User Entity -> ResponseDto 변환 메서드
 	public static UserResponse from(User user) {
 		return UserResponse.builder()
 			.id(user.getId())
 			.name(user.getName())
 			.email(user.getEmail())
+			.phoneNumber(user.getPhoneNumber())
 			.build();
 	}
 }
