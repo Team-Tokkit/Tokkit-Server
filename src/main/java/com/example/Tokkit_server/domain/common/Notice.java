@@ -17,6 +17,8 @@ public class Notice extends BaseEntity {
     private String title;
     private String content;
 
+    private boolean isDeleted = false;
+
     @ManyToOne
     @JoinColumn(name = "admin_id")
     private Admin admin;
@@ -26,4 +28,9 @@ public class Notice extends BaseEntity {
         this.title = title;
         this.content = content;
     }
+
+    public void setDeleted(boolean deleted) {
+        this.isDeleted = deleted;
+    }
+
 }
