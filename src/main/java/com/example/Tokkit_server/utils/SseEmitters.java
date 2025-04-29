@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.util;
+package com.example.Tokkit_server.utils;
 
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;

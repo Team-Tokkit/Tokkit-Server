@@ -4,18 +4,19 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Notification;
-import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
 import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.dto.response.NotificationResDto;
 import com.example.Tokkit_server.repository.NotificationRepository;
 import com.example.Tokkit_server.repository.NotificationSettingRepository;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -24,7 +25,7 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
 	private final NotificationRepository notificationRepository;
 	private final NotificationSettingRepository notificationSettingRepository;
-	private final EmailNotificationService emailService;
+	private final NotificationService notificationService;
 
 	@Transactional
 	public List<NotificationResDto> getAllNotifications(User user) {
@@ -41,10 +42,9 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
 	@Transactional
 	public List<NotificationResDto> getNotificationsByCategory(User user, NotificationCategory category) {
-		// 카테고리 설정 확인
 		NotificationCategorySetting setting = notificationSettingRepository.findByUserAndCategory(user, category);
 		if (setting == null || !setting.isEnabled()) {
-			throw new GeneralException(ErrorStatus._FORBIDDEN); // 알림 꺼놓은 카테고리 접근 차단
+			throw new GeneralException(ErrorStatus._FORBIDDEN);
 		}
 
 		return notificationRepository.findByUserAndCategoryAndDeletedFalse(user, category)
@@ -52,7 +52,6 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 			.map(NotificationResDto::from)
 			.collect(Collectors.toList());
 	}
-
 
 	@Transactional
 	public void deleteNotification(Long notificationId, User user) {
@@ -65,5 +64,10 @@ public class NotificationCommandServiceImpl implements NotificationCommandServic
 
 		notification.softDelete();
 		notificationRepository.save(notification);
+	}
+
+	@Transactional
+	public SseEmitter subscribe(Long userId) {  // 🔥 추가
+		return notificationService.subscribe(userId);
 	}
 }
