@@ -135,21 +135,27 @@ public class JwtUtil {
 
 	// 제공된 리프레시 토큰을 기반으로 JwtDto 쌍을 다시 발급
 	public JwtDto reissueToken(String refreshToken) throws SignatureException {
+		Claims claims = parseToken(refreshToken);
 
-		// refreshToken 에서 user 정보를 가져와서 새로운 토큰을 발급 (발급 시간, 유효 시간(reset)만 새로 적용)
+		Long id = claims.get("id", Long.class);         // id 꺼내기
+		String email = claims.getSubject();              // email 꺼내기
+		String role = claims.get("role", String.class);  // role 꺼내기
+
 		CustomUserDetails userDetails = new CustomUserDetails(
-			getEmail(refreshToken),
+			id,
+			email,
 			null,
-			getRoles(refreshToken)
+			role
 		);
+
 		log.info("[ JwtUtil ] 새로운 토큰을 재발급 합니다.");
 
-		// 재발급
 		return new JwtDto(
 			createJwtAccessToken(userDetails),
 			createJwtRefreshToken(userDetails)
 		);
 	}
+
 
 	// HTTP 요청의 'Authorization' 헤더에서 JWT 액세스 토큰을 검색
 	public String resolveAccessToken(HttpServletRequest request) {

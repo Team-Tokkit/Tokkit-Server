@@ -1,15 +1,13 @@
-package com.example.Tokkit_server.service.command;
+package com.example.Tokkit_server.service;
 
+import com.example.Tokkit_server.utils.SseEmitters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-
-import com.example.Tokkit_server.utils.SseEmitters;
 
 @Slf4j
 @Service
@@ -27,7 +25,7 @@ public class SseNotificationService {
 					.data(title + ": " + content, MediaType.valueOf("text/plain;charset=UTF-8")));
 			} catch (IOException e) {
 				sseEmitters.remove(userId);
-				log.error("SSE 전송 실패. 연결 제거됨: {}", e.getMessage());
+				log.error("[SseNotificationService] SSE 전송 실패 - 연결 제거됨: {}", e.getMessage());
 			}
 		}
 	}

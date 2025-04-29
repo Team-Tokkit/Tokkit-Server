@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.service.command;
+package com.example.Tokkit_server.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,13 +16,14 @@ public class EmailNotificationService {
 	public void sendEmail(String to, String subject, String text) {
 		try {
 			SimpleMailMessage message = new SimpleMailMessage();
-			message.setFrom("teamtokkit@gmail.com");  // yml에 설정한 이메일
 			message.setTo(to);
 			message.setSubject(subject);
 			message.setText(text);
+
 			mailSender.send(message);
+			log.info("[EmailNotificationService] 이메일 전송 성공: to={}, subject={}", to, subject);
 		} catch (Exception e) {
-			log.error("이메일 전송 실패: {}", e.getMessage());
+			log.error("[EmailNotificationService] 이메일 전송 실패: {}", e.getMessage());
 		}
 	}
 }

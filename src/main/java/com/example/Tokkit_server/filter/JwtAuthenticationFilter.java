@@ -15,15 +15,16 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
 import com.example.Tokkit_server.auth.CustomUserDetails;
-import com.example.Tokkit_server.auth.CustomUserDetailsService;
+import com.example.Tokkit_server.domain.user.User;
+import com.example.Tokkit_server.repository.UserRepository;
 import com.example.Tokkit_server.utils.JwtUtil;
 
-@Component
 @RequiredArgsConstructor
+@Component
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
-	private final CustomUserDetailsService customUserDetailsService;
+	private final UserRepository userRepository;
 
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -36,23 +37,30 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 			try {
 				Claims claims = jwtUtil.parseToken(token);
-				String email = claims.getSubject(); // subject는 이메일이니까 그대로 사용
+				String email = claims.getSubject();
 
-				// 이메일로 유저 조회
-				CustomUserDetails userDetails = (CustomUserDetails) customUserDetailsService.loadUserByUsername(email);
+				User user = userRepository.findByEmail(email)
+					.orElseThrow(() -> new RuntimeException("User not found from token"));
 
-				// 인증 객체 생성해서 SecurityContext에 넣기
+				CustomUserDetails userDetails = new CustomUserDetails(
+					user.getId(),
+					user.getEmail(),
+					user.getPassword(),
+					user.getRoles()
+				);
+
 				UsernamePasswordAuthenticationToken authentication =
 					new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
 
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
-
 			} catch (Exception e) {
-				logger.warn("[ JwtAuthenticationFilter ] 인증 실패: {}" + e.getMessage());
+				logger.warn("[JwtAuthenticationFilter] 인증 실패: {}" + e.getMessage());
 			}
 		}
 
 		filterChain.doFilter(request, response);
 	}
+
 }
+

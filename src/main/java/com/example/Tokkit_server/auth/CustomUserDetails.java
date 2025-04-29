@@ -8,13 +8,17 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import com.example.Tokkit_server.domain.user.User;
+
 public class CustomUserDetails implements UserDetails {
 
+	private final Long id;
 	private final String email;
 	private final String password;
 	private final String roles;
 
-	public CustomUserDetails(String email, String password, String roles) {
+	public CustomUserDetails(Long id, String email, String password, String roles) {
+		this.id = id;
 		this.email = email;
 		this.password = password;
 		this.roles = roles;
@@ -27,6 +31,8 @@ public class CustomUserDetails implements UserDetails {
 		authorities.add(new SimpleGrantedAuthority(roles));
 		return authorities;
 	}
+
+	public Long getId() { return id; }
 
 	@Override
 	public String getUsername() {
@@ -61,5 +67,14 @@ public class CustomUserDetails implements UserDetails {
 	public boolean isEnabled() {
 		// User Entity 에서 Status 가져온 후 true? false? 검사
 		return true;
+	}
+
+	public User toUser() {
+		return User.builder()
+			.id(this.id)
+			.email(this.email)
+			.password(this.password)
+			.roles(this.roles)
+			.build();
 	}
 }

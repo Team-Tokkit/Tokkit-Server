@@ -21,6 +21,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import com.example.Tokkit_server.auth.CustomUserDetailsService;
 import com.example.Tokkit_server.filter.CustomLoginFilter;
 import com.example.Tokkit_server.filter.JwtAuthenticationFilter;
+import com.example.Tokkit_server.repository.UserRepository;
 import com.example.Tokkit_server.utils.JwtUtil;
 
 import java.util.List;
@@ -31,8 +32,8 @@ import java.util.List;
 public class SecurityConfig {
 
 	private final AuthenticationConfiguration authenticationConfiguration;
-	private final CustomUserDetailsService customUserDetailsService;
 	private final JwtUtil jwtUtil;
+	private final UserRepository userRepository;
 
 	private final String[] allowedUrls = {
 		"/api/users/login",
@@ -100,13 +101,12 @@ public class SecurityConfig {
 				.requestMatchers(allowedUrls).permitAll()
 				.anyRequest().authenticated());
 
-		// Login Filter 설정
 		CustomLoginFilter loginFilter = new CustomLoginFilter(
 			authenticationManager(authenticationConfiguration), jwtUtil);
 		loginFilter.setFilterProcessesUrl("/api/users/login");
 
 		http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
-		http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, customUserDetailsService), CustomLoginFilter.class);
+		http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository), CustomLoginFilter.class); // ⭐ 이렇게
 
 		return http.build();
 	}
