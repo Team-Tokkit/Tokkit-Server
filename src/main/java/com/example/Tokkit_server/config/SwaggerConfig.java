@@ -34,7 +34,7 @@ public class SwaggerConfig {
                 .addList("accessTokenAuth")
                 .addList("refreshTokenAuth");
 
-        //  실제 로컬 서버 주소로 변경
+        // 서버 URL에 /api 추가
         Server localServer = new Server();
         localServer.setUrl("http://localhost:8080");
 
