@@ -1,0 +1,34 @@
+name: Build and Deploy on Self-Hosted Runner
+
+on:
+  push:
+    branches:
+      - develop
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: 코드 가져오기 (pull)
+        run: |
+          cd /home/tokkit/Tokkit-Server
+          git pull origin develop
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Docker Compose Down
+        run: |
+          cd /home/tokkit
+          docker compose down
+
+      - name: Docker Compose Build
+        run: |
+          cd /home/tokkit
+          docker compose build
+
+      - name: Docker Compose Up
+        run: |
+          cd /home/tokkit
+          docker compose up -d
