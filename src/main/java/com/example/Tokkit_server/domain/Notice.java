@@ -1,5 +1,6 @@
-package com.example.Tokkit_server.domain.common;
+package com.example.Tokkit_server.domain;
 
+import com.example.Tokkit_server.domain.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -8,7 +9,7 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
-public class Notice extends BaseEntity {
+public class Notice extends BaseTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,11 +18,9 @@ public class Notice extends BaseEntity {
     private String title;
     private String content;
 
-    private boolean isDeleted = false;
+    private boolean isDeleted;
 
-    @ManyToOne
-    @JoinColumn(name = "admin_id")
-    private Admin admin;
+
 
     // Notice 수정용 메서드
     public void update(String title, String content) {

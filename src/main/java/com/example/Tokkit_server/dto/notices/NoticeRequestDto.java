@@ -1,6 +1,6 @@
 package com.example.Tokkit_server.dto.notices;
 
-import com.example.Tokkit_server.domain.common.Notice;
+import com.example.Tokkit_server.domain.Notice;
 import lombok.Getter;
 import lombok.Setter;
 
