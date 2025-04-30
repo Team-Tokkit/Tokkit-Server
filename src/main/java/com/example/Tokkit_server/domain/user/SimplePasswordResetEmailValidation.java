@@ -25,6 +25,6 @@ public class SimplePasswordResetEmailValidation {
 	private boolean isVerified;
 
 	public void setVerified(boolean isVerified) {
-		isVerified = this.isVerified;
+		this.isVerified = isVerified;
 	}
 }

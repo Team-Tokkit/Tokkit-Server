@@ -38,36 +38,36 @@ public class UserService {
     @Transactional
     public UserResponse createUser(CreateUserRequestDto createUserRequestDto) {
         if (userRepository.findByEmail(createUserRequestDto.getEmail()).isPresent()) {
-            throw new RuntimeException("이미 존재하는 유저입니다.");
+            throw new GeneralException(ErrorStatus.USER_ALREADY_EXISTS);
         }
 
         // 이메일 인증 여부 확인
         EmailValidation emailValidation = emailValidationRepository.findById(createUserRequestDto.getEmail())
-            .orElseThrow(() -> new RuntimeException("이메일 인증을 진행하세요."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
 
         if (!emailValidation.isVerified()) {
-            throw new RuntimeException("이메일 인증이 완료되지 않았습니다.");
+            throw new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED);
         }
 
-        // 유저 엔티티 생성 및 저장
+        // 유저 생성
         User user = createUserRequestDto.toEntity(passwordEncoder);
         userRepository.save(user);
 
-        // 알림 설정 생성
+        // 알림 설정
         for (NotificationCategory category : NotificationCategory.values()) {
             NotificationCategorySetting setting = NotificationCategorySetting.builder()
-                .user(user)
-                .category(category)
-                .enabled(true)
-                .build();
+                    .user(user)
+                    .category(category)
+                    .enabled(true)
+                    .build();
             notificationSettingRepository.save(setting);
         }
 
-        // 지갑 생성
         walletCommandService.createInitialWallet(user.getId());
 
         return UserResponse.from(user);
     }
+
 
 
     public UserResponse getUser(String email) {
@@ -110,17 +110,18 @@ public class UserService {
     @Transactional
     public void verifySimplePasswordCode(String email, String code) {
         SimplePasswordResetEmailValidation validation = passwordResetEmailValidationRepository.findById(email)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
 
         if (new Date().after(validation.getExp())) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR); // 만료
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
         }
 
         if (!validation.getCode().equals(code)) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR); // 코드 틀림
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
         }
 
         validation.setVerified(true);
+        passwordResetEmailValidationRepository.save(validation);
     }
 
     @Transactional
