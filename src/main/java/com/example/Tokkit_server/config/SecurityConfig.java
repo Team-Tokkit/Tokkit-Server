@@ -36,6 +36,7 @@ public class SecurityConfig {
 	private final UserRepository userRepository;
 
 	private final String[] allowedUrls = {
+		"/api/users/ocr/verify-identity",
 		"/api/users/login",
 		"/api/users/register",
 		"/api/users/emailCheck",

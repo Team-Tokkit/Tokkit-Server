@@ -7,7 +7,6 @@ import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.auth.CustomUserDetails;
 import com.example.Tokkit_server.dto.request.CreateUserRequestDto;
 import com.example.Tokkit_server.dto.request.EmailChangeRequest;
-import com.example.Tokkit_server.dto.request.EmailCodeVerificationRequest;
 import com.example.Tokkit_server.dto.request.LoginRequest;
 import com.example.Tokkit_server.dto.request.SimplePasswordResetRequest;
 import com.example.Tokkit_server.dto.request.SimplePasswordVerificationRequest;
@@ -16,16 +15,12 @@ import com.example.Tokkit_server.dto.request.UserInfoUpdateRequest;
 import com.example.Tokkit_server.dto.response.UserResponse;
 import com.example.Tokkit_server.service.EmailService;
 import com.example.Tokkit_server.service.UserService;
-import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Collections;
-import java.util.Map;
 
 @Slf4j
 @RestController

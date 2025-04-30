@@ -11,6 +11,7 @@ import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Transaction;
 import com.example.Tokkit_server.domain.VoucherOwnership;
 import com.example.Tokkit_server.domain.Wallet;
+import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.dto.request.VoucherPaymentRequest;
 import com.example.Tokkit_server.dto.request.VoucherPurchaseRequest;
 import com.example.Tokkit_server.dto.response.TransactionHistoryResponse;
@@ -18,6 +19,7 @@ import com.example.Tokkit_server.dto.response.VoucherPaymentResponse;
 import com.example.Tokkit_server.dto.response.VoucherPurchaseResponse;
 import com.example.Tokkit_server.dto.response.WalletBalanceResponse;
 import com.example.Tokkit_server.repository.TransactionRepository;
+import com.example.Tokkit_server.repository.UserRepository;
 import com.example.Tokkit_server.repository.VoucherOwnershipRepository;
 import com.example.Tokkit_server.repository.WalletRepository;
 
@@ -30,6 +32,27 @@ public class WalletCommandService {
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
     private final VoucherOwnershipRepository voucherOwnershipRepository;
+    private final UserRepository userRepository;
+
+    // 전자 지갑 생성
+    @Transactional
+    public void createInitialWallet(Long userId) {
+        // 이미 전자지갑이 있는지 확인
+        if (walletRepository.existsByUserId(userId)) {
+            return;
+        }
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        Wallet wallet = Wallet.builder()
+            .user(user)
+            .depositBalance(0L)
+            .tokenBalance(0L)
+            .build();
+
+        walletRepository.save(wallet);
+    }
 
     public WalletBalanceResponse getWalletBalance(Long userId) {
         Wallet wallet = walletRepository.findByUserId(userId)

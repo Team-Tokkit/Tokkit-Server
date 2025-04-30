@@ -37,6 +37,7 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+      enabled: true
 
   jwt:
     secret: ${JWT_SECRET}
@@ -56,3 +57,7 @@ springdoc:
     path: /api/v3/api-docs
   swagger-ui:
     path: /api/swagger-ui.html
+
+ocr:
+  secret-key: ${OCR_SECRET_KEY}
+  invoke-url: ${OCR_INVOKE_URL}

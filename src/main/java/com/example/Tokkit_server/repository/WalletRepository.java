@@ -8,4 +8,5 @@ import com.example.Tokkit_server.domain.Wallet;
 
 public interface WalletRepository extends JpaRepository<Wallet, Long> {
     Optional<Wallet> findByUserId(Long userId);
+    boolean existsByUserId(Long userId);
 }

@@ -1,7 +1,6 @@
 package com.example.Tokkit_server.service;
 
 import java.util.Date;
-import java.util.Optional;
 
 import com.example.Tokkit_server.Enum.NotificationCategory;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
@@ -12,15 +11,14 @@ import com.example.Tokkit_server.domain.user.SimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.dto.request.CreateUserRequestDto;
 import com.example.Tokkit_server.dto.request.EmailChangeRequest;
-import com.example.Tokkit_server.dto.request.SimplePasswordResetRequest;
 import com.example.Tokkit_server.dto.request.UpdateUserRequestDto;
 import com.example.Tokkit_server.dto.request.UserInfoUpdateRequest;
 import com.example.Tokkit_server.dto.response.UserResponse;
 import com.example.Tokkit_server.repository.EmailValidationRepository;
 import com.example.Tokkit_server.repository.PasswordResetEmailValidationRepository;
-import com.example.Tokkit_server.utils.JwtUtil;
 import com.example.Tokkit_server.repository.NotificationSettingRepository;
 import com.example.Tokkit_server.repository.UserRepository;
+import com.example.Tokkit_server.service.command.WalletCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -35,6 +33,7 @@ public class UserService {
     private final EmailValidationRepository emailValidationRepository;
     private final PasswordEncoder passwordEncoder;
     private final PasswordResetEmailValidationRepository passwordResetEmailValidationRepository;
+    private final WalletCommandService walletCommandService;
 
     @Transactional
     public UserResponse createUser(CreateUserRequestDto createUserRequestDto) {
@@ -63,6 +62,9 @@ public class UserService {
                 .build();
             notificationSettingRepository.save(setting);
         }
+
+        // 지갑 생성
+        walletCommandService.createInitialWallet(user.getId());
 
         return UserResponse.from(user);
     }
