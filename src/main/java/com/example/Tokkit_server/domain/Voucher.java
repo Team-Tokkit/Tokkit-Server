@@ -57,7 +57,7 @@ public class Voucher extends BaseTimeEntity {
     // 바우처 환불 정책
     @Column(nullable = false)
     private String refundPolicy;
-
+    
     // 발급처 (문의처)
     private String contact;
 
