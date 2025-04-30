@@ -1,11 +1,16 @@
 package com.example.Tokkit_server.filter;
 
+import com.example.Tokkit_server.auth.CustomUserDetails;
+import com.example.Tokkit_server.domain.user.User;
+import com.example.Tokkit_server.repository.UserRepository;
+import com.example.Tokkit_server.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -14,13 +19,8 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
-import com.example.Tokkit_server.auth.CustomUserDetails;
-import com.example.Tokkit_server.domain.user.User;
-import com.example.Tokkit_server.repository.UserRepository;
-import com.example.Tokkit_server.utils.JwtUtil;
-
-@RequiredArgsConstructor
 @Component
+@RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 	private final JwtUtil jwtUtil;
@@ -42,16 +42,22 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 				User user = userRepository.findByEmail(email)
 					.orElseThrow(() -> new RuntimeException("User not found from token"));
 
+				// roles가 null이면 ROLE_USER 기본 세팅
+				String roles = user.getRoles();
+				if (roles == null || roles.isBlank()) {
+					roles = "ROLE_USER";
+				}
+
 				CustomUserDetails userDetails = new CustomUserDetails(
 					user.getId(),
+					user.getName(),
 					user.getEmail(),
 					user.getPassword(),
-					user.getRoles()
+					roles
 				);
 
 				UsernamePasswordAuthenticationToken authentication =
 					new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-
 				authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
 				SecurityContextHolder.getContext().setAuthentication(authentication);
 			} catch (Exception e) {
@@ -61,6 +67,4 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
 		filterChain.doFilter(request, response);
 	}
-
 }
-

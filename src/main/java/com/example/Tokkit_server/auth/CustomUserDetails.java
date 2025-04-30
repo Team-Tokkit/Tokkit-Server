@@ -13,30 +13,36 @@ import com.example.Tokkit_server.domain.user.User;
 public class CustomUserDetails implements UserDetails {
 
 	private final Long id;
+	private final String name;
 	private final String email;
 	private final String password;
 	private final String roles;
 
-	public CustomUserDetails(Long id, String email, String password, String roles) {
+	public CustomUserDetails(Long id, String name, String email, String password, String roles) {
 		this.id = id;
+		this.name = name;
 		this.email = email;
 		this.password = password;
 		this.roles = roles;
 	}
 
-	// 해당 User 의 권한을 return
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		List<GrantedAuthority> authorities = new ArrayList<>();
-		authorities.add(new SimpleGrantedAuthority(roles));
+		if (roles != null && !roles.isBlank()) {
+			for (String role : roles.split(",")) {
+				authorities.add(new SimpleGrantedAuthority(role.trim()));
+			}
+		} else {
+			authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+		}
 		return authorities;
 	}
 
 	public Long getId() { return id; }
 
-	@Override
-	public String getUsername() {
-		return email;
+	public String getName() {
+		return name;
 	}
 
 	@Override
@@ -44,28 +50,28 @@ public class CustomUserDetails implements UserDetails {
 		return password;
 	}
 
-	// Account 가 만료되었는지?
+	@Override
+	public String getUsername() {
+		return email;
+	}
+
 	@Override
 	public boolean isAccountNonExpired() {
 		return true;
 	}
 
-	// Account 가 잠겨있는지?
 	@Override
 	public boolean isAccountNonLocked() {
 		return true;
 	}
 
-	// Credential 만료되지 않았는지?
 	@Override
 	public boolean isCredentialsNonExpired() {
 		return true;
 	}
 
-	// 활성화가 되어있는지?
 	@Override
 	public boolean isEnabled() {
-		// User Entity 에서 Status 가져온 후 true? false? 검사
 		return true;
 	}
 

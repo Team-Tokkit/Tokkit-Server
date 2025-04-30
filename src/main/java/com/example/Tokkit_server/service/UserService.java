@@ -1,15 +1,23 @@
 package com.example.Tokkit_server.service;
 
+import java.util.Date;
 import java.util.Optional;
 
 import com.example.Tokkit_server.Enum.NotificationCategory;
+import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.NotificationCategorySetting;
 import com.example.Tokkit_server.domain.user.EmailValidation;
+import com.example.Tokkit_server.domain.user.SimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.dto.request.CreateUserRequestDto;
+import com.example.Tokkit_server.dto.request.EmailChangeRequest;
+import com.example.Tokkit_server.dto.request.SimplePasswordResetRequest;
 import com.example.Tokkit_server.dto.request.UpdateUserRequestDto;
+import com.example.Tokkit_server.dto.request.UserInfoUpdateRequest;
 import com.example.Tokkit_server.dto.response.UserResponse;
 import com.example.Tokkit_server.repository.EmailValidationRepository;
+import com.example.Tokkit_server.repository.PasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.utils.JwtUtil;
 import com.example.Tokkit_server.repository.NotificationSettingRepository;
 import com.example.Tokkit_server.repository.UserRepository;
@@ -26,7 +34,7 @@ public class UserService {
     private final NotificationSettingRepository notificationSettingRepository;
     private final EmailValidationRepository emailValidationRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtUtil jwtUtil;
+    private final PasswordResetEmailValidationRepository passwordResetEmailValidationRepository;
 
     @Transactional
     public UserResponse createUser(CreateUserRequestDto createUserRequestDto) {
@@ -95,5 +103,59 @@ public class UserService {
 
         userRepository.save(user);
         return UserResponse.from(user);
+    }
+
+    @Transactional
+    public void verifySimplePasswordCode(String email, String code) {
+        SimplePasswordResetEmailValidation validation = passwordResetEmailValidationRepository.findById(email)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+
+        if (new Date().after(validation.getExp())) {
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR); // 만료
+        }
+
+        if (!validation.getCode().equals(code)) {
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR); // 코드 틀림
+        }
+
+        validation.setVerified(true);
+    }
+
+    @Transactional
+    public void updateSimplePassword(String email, String newSimplePassword) {
+        SimplePasswordResetEmailValidation validation = passwordResetEmailValidationRepository.findById(email)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+
+        if (!validation.isVerified()) {
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR); // 인증 안됨
+        }
+
+        User user = userRepository.findByEmail(email)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        user.updateSimplePassword(passwordEncoder.encode(newSimplePassword));
+    }
+
+    @Transactional
+    public void updateUserInfo(Long userId, UserInfoUpdateRequest requestDto) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        user.updateNameAndPhoneNumber(requestDto.getName(), requestDto.getPhoneNumber());
+    }
+
+    @Transactional
+    public void updateEmail(Long userId, EmailChangeRequest requestDto) {
+        EmailValidation validation = emailValidationRepository.findById(requestDto.getNewEmail())
+            .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+
+        if (!validation.isVerified()) {
+            throw new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED);
+        }
+
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        user.updateEmail(requestDto.getNewEmail());
     }
 }

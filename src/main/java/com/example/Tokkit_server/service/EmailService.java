@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.service;
 
+import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -14,8 +15,10 @@ import java.util.List;
 import java.util.Random;
 
 import com.example.Tokkit_server.domain.user.EmailValidation;
+import com.example.Tokkit_server.domain.user.SimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.domain.user.User;
 import com.example.Tokkit_server.repository.EmailValidationRepository;
+import com.example.Tokkit_server.repository.PasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.repository.UserRepository;
 
 @Service
@@ -27,6 +30,9 @@ public class EmailService {
 
 	@Autowired
 	private EmailValidationRepository emailRepository;
+
+	@Autowired
+	private PasswordResetEmailValidationRepository passwordResetEmailValidationRepository;
 
 	@Autowired
 	private UserRepository userRepository;
@@ -85,9 +91,42 @@ public class EmailService {
 		msgg+= newPw+"</strong><div><br/> ";
 		msgg+= "</div>";
 		message.setText(msgg, "utf-8", "html");//내용
-		message.setFrom(new InternetAddress("Tookit","토킷"));//보내는 사람
+		message.setFrom(new InternetAddress("Tokkit","토킷")); //보내는 사람
 
 		return message;
+	}
+
+	// 간편 비밀번호 변경
+	public void sendSimplePasswordVerification(String email) throws Exception {
+		String code = createKey();
+		saveVerificationCode(email, code);
+
+		MimeMessage message = emailSender.createMimeMessage();
+		message.addRecipients(Message.RecipientType.TO, email);
+		message.setSubject("토킷(Tokkit) 간편 비밀번호 변경 인증번호입니다.");
+
+		String msgg = "<div style='margin:20px;'>";
+		msgg += "<h1> 토킷(Tokkit) 간편 비밀번호 변경 인증번호입니다. </h1>";
+		msgg += "<br><p>아래 인증번호를 입력해주세요.<p><br>";
+		msgg += "<div align='center' style='border:1px dashed black; font-family:verdana';>";
+		msgg += "<h3 style='color:skyblue;'>인증번호</h3>";
+		msgg += "<div style='font-size:130%'><strong>" + code + "</strong><div><br/></div>";
+
+		message.setText(msgg, "utf-8", "html");
+		message.setFrom(new InternetAddress("Tokkit", "토킷"));
+
+		emailSender.send(message);
+	}
+
+	private void saveVerificationCode(String email, String code) {
+		passwordResetEmailValidationRepository.deleteById(email); // 기존 삭제
+		SimplePasswordResetEmailValidation validation = SimplePasswordResetEmailValidation.builder()
+			.email(email)
+			.code(code)
+			.exp(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
+			.isVerified(false)
+			.build();
+		passwordResetEmailValidationRepository.save(validation);
 	}
 
 
@@ -137,11 +176,15 @@ public class EmailService {
 	}
 
 	public void sendMessage(String to)throws Exception {
-		// TODO Auto-generated method stub
 		MimeMessage message = createMessage(to);
-		try{//예외처리
+		try{
+			//예외처리
+			log.info("[EmailService] 메일 전송 시도중...");
+
 			emailSender.send(message);
-			//TODO : 비밀번호 바꾸기 (DB)
+
+			log.info("[EmailService] 메일 전송 성공!");
+
 		}catch(MailException es){
 			es.printStackTrace();
 			throw new IllegalArgumentException();

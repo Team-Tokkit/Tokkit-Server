@@ -138,11 +138,13 @@ public class JwtUtil {
 		Claims claims = parseToken(refreshToken);
 
 		Long id = claims.get("id", Long.class);         // id 꺼내기
+		String name = claims.get("name", String.class);
 		String email = claims.getSubject();              // email 꺼내기
 		String role = claims.get("role", String.class);  // role 꺼내기
 
 		CustomUserDetails userDetails = new CustomUserDetails(
 			id,
+			name,
 			email,
 			null,
 			role
