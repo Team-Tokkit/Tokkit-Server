@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.dto.notice;
+package com.example.Tokkit_server.dto.response;
 
 import com.example.Tokkit_server.domain.Notice;
 import lombok.AllArgsConstructor;
@@ -10,7 +10,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class NoticeResponseDto {
 
-    private Long noticeId;
+    private Long id;
     private String title;
     private String content;
     private LocalDateTime createdAt;
@@ -18,7 +18,7 @@ public class NoticeResponseDto {
 
     public static NoticeResponseDto from(Notice notice) {
         return new NoticeResponseDto(
-                notice.getNoticeId(),
+                notice.getId(),
                 notice.getTitle(),
                 notice.getContent(),
                 notice.getCreatedAt()
