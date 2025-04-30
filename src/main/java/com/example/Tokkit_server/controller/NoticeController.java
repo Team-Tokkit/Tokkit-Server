@@ -1,8 +1,8 @@
 package com.example.Tokkit_server.controller;
 
 import com.example.Tokkit_server.apiPayload.ApiResponse;
-import com.example.Tokkit_server.dto.notices.NoticeRequestDto;
-import com.example.Tokkit_server.dto.notices.NoticeResponseDto;
+import com.example.Tokkit_server.dto.notice.NoticeRequestDto;
+import com.example.Tokkit_server.dto.notice.NoticeResponseDto;
 import com.example.Tokkit_server.service.command.NoticeCommandService;
 import com.example.Tokkit_server.service.query.NoticeQueryService;
 import lombok.RequiredArgsConstructor;

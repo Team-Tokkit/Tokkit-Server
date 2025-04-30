@@ -3,7 +3,7 @@ package com.example.Tokkit_server.service.command;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Notice;
-import com.example.Tokkit_server.dto.notices.NoticeRequestDto;
+import com.example.Tokkit_server.dto.notice.NoticeRequestDto;
 import com.example.Tokkit_server.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ public class NoticeCommandService {
     private final NoticeRepository noticeRepository;
 
     public Long createNotice(NoticeRequestDto requestDto) {
-        Notice notice = requestDto.toEntity();
+        Notice notice = requestDto.to();
         return noticeRepository.save(notice).getNoticeId();
     }
 
