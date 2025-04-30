@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.dto.notice;
+package com.example.Tokkit_server.dto.request;
 
 import com.example.Tokkit_server.domain.Notice;
 import lombok.Getter;
@@ -11,8 +11,7 @@ public class NoticeRequestDto {
     private String content;
 
     public Notice to() {
-        return Notice.builder()
-                .title(title)
+        return Notice.builder()                .title(title)
                 .content(content)
                 .build();
     }
