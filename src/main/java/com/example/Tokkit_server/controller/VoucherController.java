@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.controller;
 
 import com.example.Tokkit_server.apiPayload.ApiResponse;
+import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
 import com.example.Tokkit_server.dto.response.StoreResponse;
 import com.example.Tokkit_server.dto.response.VoucherDetailResponse;
 import com.example.Tokkit_server.dto.response.VoucherResponse;
@@ -8,10 +9,7 @@ import com.example.Tokkit_server.service.query.VoucherQueryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.data.domain.Pageable;
 
 
@@ -22,11 +20,11 @@ public class VoucherController {
 
     private final VoucherQueryService voucherQueryService;
 
-    // 전체 바우처 조회하기
+    // 전체 바우처 조회하기 , 필터링 및 검색하기
     @GetMapping
-    public ApiResponse<Page<VoucherResponse>> getAllVouchers(Pageable pageable) {
-        Page<VoucherResponse> vouchers = voucherQueryService.getAllVouchers(pageable);
-        return ApiResponse.onSuccess(vouchers);
+    public ApiResponse<Page<VoucherResponse>> getVouchers(@ModelAttribute VoucherSearchRequest request, Pageable pageable) {
+        Page<VoucherResponse> result = voucherQueryService.searchVouchers(request, pageable);
+        return ApiResponse.onSuccess(result);
     }
 
     // 바우처 상세 조회하기
@@ -43,6 +41,5 @@ public class VoucherController {
         Page<StoreResponse> stores = voucherQueryService.getAllStoresByVoucherId(id, pageable);
         return ApiResponse.onSuccess(stores);
     }
-
 
 }

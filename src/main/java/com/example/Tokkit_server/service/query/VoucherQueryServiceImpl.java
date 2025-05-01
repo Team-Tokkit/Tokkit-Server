@@ -3,6 +3,7 @@ package com.example.Tokkit_server.service.query;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Voucher;
+import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
 import com.example.Tokkit_server.dto.response.StoreResponse;
 import com.example.Tokkit_server.dto.response.VoucherDetailResponse;
 import com.example.Tokkit_server.dto.response.VoucherResponse;
@@ -46,5 +47,11 @@ public class VoucherQueryServiceImpl implements VoucherQueryService {
                 .map(StoreResponse::from);
     }
 
+    // 바우처 필터링 및 검색
+    @Override
+    public Page<VoucherResponse> searchVouchers(VoucherSearchRequest request, Pageable pageable) {
+        return voucherRepository.searchVoucher(request,pageable)
+                .map(VoucherResponse::from);
+    }
 
 }

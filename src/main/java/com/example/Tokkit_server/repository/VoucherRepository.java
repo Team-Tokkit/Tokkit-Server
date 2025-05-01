@@ -11,6 +11,5 @@ import org.springframework.data.domain.Pageable;
 import java.util.List;
 
 @Repository
-public interface VoucherRepository extends JpaRepository<Voucher, Long> {
-
+public interface VoucherRepository extends JpaRepository<Voucher, Long>, VoucherRepositoryCustom {
 }

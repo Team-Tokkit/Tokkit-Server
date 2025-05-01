@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.service.query;
 
+import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
 import com.example.Tokkit_server.dto.response.StoreResponse;
 import com.example.Tokkit_server.dto.response.VoucherDetailResponse;
 import com.example.Tokkit_server.dto.response.VoucherResponse;
@@ -16,4 +17,7 @@ public interface VoucherQueryService {
 
     // 바우처 상세 조회 (사용처 전체 조회)
     Page<StoreResponse> getAllStoresByVoucherId(Long id, Pageable pageable);
+
+    // 바우처 필터링 및 검색
+    Page<VoucherResponse> searchVouchers(VoucherSearchRequest request, Pageable pageable);
 }
