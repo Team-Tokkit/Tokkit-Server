@@ -1,6 +1,8 @@
 package com.example.Tokkit_server.domain;
 
-import com.example.Tokkit_server.domain.common.BaseEntity;
+import com.example.Tokkit_server.Enum.NotificationCategory;
+import com.example.Tokkit_server.domain.common.BaseTimeEntity;
+import com.example.Tokkit_server.domain.user.User;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -23,13 +25,14 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Notification extends BaseEntity {
+public class Notification extends BaseTimeEntity {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 
 	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "user_id", nullable = false)
 	private User user;
 
 	@Enumerated(EnumType.STRING)
@@ -39,5 +42,19 @@ public class Notification extends BaseEntity {
 
 	private String content;
 
-	private boolean isDeleted = false;
+	private boolean deleted = false;
+
+	@Column(nullable = false)
+	private boolean sent = false;
+
+	// soft delete 용 메서드
+	public void softDelete() {
+		this.deleted = true;
+	}
+
+	// 알림 발송 여부 확인용 메서드
+	public void markAsSent() {
+		this.sent = true;
+	}
+
 }

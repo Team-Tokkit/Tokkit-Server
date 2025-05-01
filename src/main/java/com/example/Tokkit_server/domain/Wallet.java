@@ -1,5 +1,7 @@
 package com.example.Tokkit_server.domain;
 
+import com.example.Tokkit_server.domain.user.User;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -27,6 +29,10 @@ public class Wallet {
 	@OneToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "user_id")
 	private User user;
+
+	@OneToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "merchant_id")
+	private Merchant merchant;
 
 	@Column(nullable = false)
 	private Long depositBalance; // 예금 잔액

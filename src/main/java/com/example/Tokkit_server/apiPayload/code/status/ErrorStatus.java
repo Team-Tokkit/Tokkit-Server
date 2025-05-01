@@ -19,9 +19,22 @@ public enum ErrorStatus implements BaseErrorCode {
 	_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
 	_BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400","잘못된 요청입니다."),
 	_UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
-	_FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다.");
+	_FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
 
+	NOTICE_NOT_FOUND(HttpStatus.BAD_REQUEST, "NOTICE400","공지사항을 찾을 수 없습니다."),
+	VOUCHER_NOT_FOUND(HttpStatus.BAD_REQUEST, "VOUCHER400","해당 바우처를 찾을 수 없습니다."),
+	INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "VOUCHER4001", "잘못된 카테고리 값입니다."),
 
+	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER404", "해당 유저가 존재하지 않습니다."),
+	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404", "해당 알림을 찾을 수 없습니다."),
+	NOTIFICATION_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATIONSETTING404", "알림 설정 정보가 존재하지 않습니다."),
+
+	EMAIL_NOT_SEND(HttpStatus.INTERNAL_SERVER_ERROR, "EMAILSEND500", "이메일 전송 실패, 관리자에게 문의 바랍니다."),
+
+	VERIFY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "VERIFY500", "이메일 인증 실패, 재시도 바랍니다."),
+	EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAILVERIFY400", "이메일 인증이 완료되지 않았습니다."),
+
+	USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER4091", "이미 존재하는 유저입니다.");
 
 	private final HttpStatus httpStatus;
 	private final String code;

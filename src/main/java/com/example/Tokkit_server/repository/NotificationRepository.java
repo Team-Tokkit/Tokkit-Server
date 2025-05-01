@@ -1,18 +1,27 @@
 package com.example.Tokkit_server.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.example.Tokkit_server.domain.Notification;
-import com.example.Tokkit_server.domain.NotificationCategory;
+import com.example.Tokkit_server.Enum.NotificationCategory;
+import com.example.Tokkit_server.domain.user.User;
 
 public interface NotificationRepository extends JpaRepository<Notification, Long> {
-	// 알림 카테고리가 null이라면 전체 알림 조회(user별로 다르니까 userId로 조회)
-	List<Notification> findByUserIdAndIsDeletedFalseOrderByCreatedAtDesc(Long userId);
 
+	// 설정된 카테고리 목록으로 전체 조회
+	@Query("SELECT n FROM Notification n WHERE n.user = :user AND n.category IN :categories AND n.deleted = false")
+	List<Notification> findByUserAndCategoriesAndDeletedFalse(@Param("user") User user, @Param("categories") List<NotificationCategory> categories);
 
-	// 알림 카테고리가 존재하면 해당 카테고리만 조회
-	List<Notification> findByUserIdAndCategoryInAndIsDeletedFalseOrderByCreatedAtDesc(Long userId, List<NotificationCategory> categories);
+	// 설정된 카테고리 + 특정 카테고리 조회
+	@Query("SELECT n FROM Notification n WHERE n.user = :user AND n.category = :category AND n.deleted = false")
+	List<Notification> findByUserAndCategoryAndDeletedFalse(@Param("user") User user, @Param("category") NotificationCategory category);
 
+	Optional<Notification> findByIdAndUser(Long id, User user);
+
+	List<Notification> findByUserAndSentFalseAndDeletedFalse(User user);
 }

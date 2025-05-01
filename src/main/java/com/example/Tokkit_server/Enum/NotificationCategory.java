@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.Enum;
 
 import lombok.Getter;
 
