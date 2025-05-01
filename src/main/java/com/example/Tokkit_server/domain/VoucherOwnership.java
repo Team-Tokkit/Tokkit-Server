@@ -23,18 +23,17 @@ public class VoucherOwnership extends BaseTimeEntity {
 
     private Long remainingAmount; // 남은 바우처 금액
 
-    private Boolean isUsed; // 전액 소진 여부 (optional)
+    private Boolean isUsed; // 전액 소진 여부
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id")
+    @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
 
-
+    // 남은 금액 차감 메서드
     public void useAmount(Long amount) {
         if (this.remainingAmount < amount) {
             throw new GeneralException(ErrorStatus._BAD_REQUEST);
         }
-
         this.remainingAmount -= amount;
     }
 }
