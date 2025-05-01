@@ -31,7 +31,7 @@ public class Wallet {
 	private User user;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "mechant_id")
+	@JoinColumn(name = "merchant_id")
 	private Merchant merchant;
 
 	@Column(nullable = false)

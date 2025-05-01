@@ -31,16 +31,16 @@ public class Store extends BaseTimeEntity {
 
 
 	@Column(nullable = false)
-	private String name;
+	private String name; // 매장이름i
 
 	@Column(nullable = false)
 	private StoreCategory storeCategory;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "merchant_id")
+	@JoinColumn(name = "merchant_id", unique = true)
 	private Merchant merchant;
 
 	@Column(nullable = false)
-	private String adress;
+	private String adress; // 지역
 
 }

@@ -9,7 +9,6 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
-import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToOne;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -41,15 +40,17 @@ public class Merchant extends BaseTimeEntity {
     private String password;
 
     @Column(nullable = false)
-    private Integer simplePassword;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id")
-    private Wallet wallet;
+    private String simplePassword;
 
     @Column(nullable = false)
     private String businessNumber;
 
     // 휴면 상태
     private Boolean isDormant;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "merchant")
+    private Wallet wallet;
+
+    @OneToOne(mappedBy = "merchant")
+    private Store store;
 }
