@@ -1,6 +1,8 @@
 package com.example.Tokkit_server.controller;
 
 import com.example.Tokkit_server.apiPayload.ApiResponse;
+import com.example.Tokkit_server.dto.request.VoucherOwnershipSearchRequest;
+import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
 import com.example.Tokkit_server.dto.response.StoreResponse;
 import com.example.Tokkit_server.dto.response.VoucherOwnershipDetailResponse;
 import com.example.Tokkit_server.dto.response.VoucherOwnershipResponse;
@@ -21,11 +23,11 @@ public class VoucherOwnershipController {
 
     private final VoucherOwnershipQueryService voucherOwnershipQueryService;
 
-    // 내 바우처 조회하기
+    // 내 바우처 전체 조회하기, 필터링 및 검색하기
     @GetMapping
-    @Operation(summary = "내 바우처 조회하기", description = "내가 보유한 바우처 목록을 조회하는 API입니다.")
-    public ApiResponse<Page<VoucherOwnershipResponse>> getMyVouchers(@RequestParam Long userId, Pageable pageable) {
-        Page<VoucherOwnershipResponse> myVouchers = voucherOwnershipQueryService.getMyVouchers(userId, pageable);
+    @Operation(summary = "내 바우처 조회 및 필터링/검색하기", description = "내가 보유한 바우처 목록을 조회하고 필터링 및 검색할 수 API입니다.")
+    public ApiResponse<Page<VoucherOwnershipResponse>> getMyVouchers(@ModelAttribute VoucherOwnershipSearchRequest request, Pageable pageable) {
+        Page<VoucherOwnershipResponse> myVouchers = voucherOwnershipQueryService.searchMyVouchers(request, pageable);
         return ApiResponse.onSuccess(myVouchers);
     }
 

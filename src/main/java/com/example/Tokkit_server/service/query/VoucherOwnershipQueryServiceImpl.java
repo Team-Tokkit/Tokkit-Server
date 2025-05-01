@@ -9,7 +9,6 @@ import com.example.Tokkit_server.dto.response.VoucherOwnershipDetailResponse;
 import com.example.Tokkit_server.dto.response.VoucherOwnershipResponse;
 import com.example.Tokkit_server.repository.StoreRepository;
 import com.example.Tokkit_server.repository.VoucherOwnershipRepository;
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -56,7 +55,7 @@ public class VoucherOwnershipQueryServiceImpl implements VoucherOwnershipQuerySe
     // 내 바우처 필터링 및 검색하기
     @Override
     public Page<VoucherOwnershipResponse> searchMyVouchers(VoucherOwnershipSearchRequest request, Pageable pageable) {
-        return VoucherOwnershipRepository.searchMyVouchers(request, pageable)
+        return voucherOwnershipRepository.searchMyVoucher(request, pageable)
                 .map(VoucherOwnershipResponse::from);
     }
 

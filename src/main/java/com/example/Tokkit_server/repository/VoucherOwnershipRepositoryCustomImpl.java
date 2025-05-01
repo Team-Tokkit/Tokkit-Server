@@ -17,11 +17,11 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 
-public class VoucherOwnersipRepositoryCustomImpl implements VoucherOwnershipRepositoryCustom {
+public class VoucherOwnershipRepositoryCustomImpl implements VoucherOwnershipRepositoryCustom {
 
     private final JPAQueryFactory queryFactory;
 
-    public VoucherOwnersipRepositoryCustomImpl(JPAQueryFactory queryFactory) {
+    public VoucherOwnershipRepositoryCustomImpl(JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
 
