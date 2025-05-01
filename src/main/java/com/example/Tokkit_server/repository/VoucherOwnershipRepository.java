@@ -8,7 +8,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 import java.util.Optional;
 
-public interface VoucherOwnershipRepository extends JpaRepository<VoucherOwnership, Long> {
+public interface VoucherOwnershipRepository extends JpaRepository<VoucherOwnership, Long>, VoucherOwnershipRepositoryCustom {
 
     // userId로 바우처 소유권 조회
     Page<VoucherOwnership> findByWalletUserId(Long userId, Pageable pageable);

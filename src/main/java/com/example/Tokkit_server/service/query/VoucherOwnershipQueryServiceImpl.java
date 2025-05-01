@@ -3,6 +3,7 @@ package com.example.Tokkit_server.service.query;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.VoucherOwnership;
+import com.example.Tokkit_server.dto.request.VoucherOwnershipSearchRequest;
 import com.example.Tokkit_server.dto.response.StoreResponse;
 import com.example.Tokkit_server.dto.response.VoucherOwnershipDetailResponse;
 import com.example.Tokkit_server.dto.response.VoucherOwnershipResponse;
@@ -52,5 +53,11 @@ public class VoucherOwnershipQueryServiceImpl implements VoucherOwnershipQuerySe
                 .map(StoreResponse::from);
     }
 
+    // 내 바우처 필터링 및 검색하기
+    @Override
+    public Page<VoucherOwnershipResponse> searchMyVouchers(VoucherOwnershipSearchRequest request, Pageable pageable) {
+        return VoucherOwnershipRepository.searchMyVouchers(request, pageable)
+                .map(VoucherOwnershipResponse::from);
+    }
 
 }

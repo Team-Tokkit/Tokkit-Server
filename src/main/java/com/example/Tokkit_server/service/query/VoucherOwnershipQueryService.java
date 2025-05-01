@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.service.query;
 
+import com.example.Tokkit_server.dto.request.VoucherOwnershipSearchRequest;
 import com.example.Tokkit_server.dto.response.StoreResponse;
 import com.example.Tokkit_server.dto.response.VoucherOwnershipDetailResponse;
 import com.example.Tokkit_server.dto.response.VoucherOwnershipResponse;
@@ -18,4 +19,5 @@ public interface VoucherOwnershipQueryService {
     Page<StoreResponse> getAllStoresByVoucherId(Long voucherOwnershipId, Long userId, Pageable pageable);
 
     // 내 바우처 필터링 및 검색하기
+    Page<VoucherOwnershipResponse> searchMyVouchers(VoucherOwnershipSearchRequest request, Pageable pageable);
 }
