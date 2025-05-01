@@ -26,14 +26,14 @@ public class Store extends BaseTimeEntity {
 	private Long id;
 
 	@Column(nullable = false)
-	private String name;
+	private String name; // 매장이름i
 
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private StoreCategory storeCategory;
 
 	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "merchant_id")
+	@JoinColumn(name = "merchant_id", unique = true)
 	private Merchant merchant;
 
 	@Column(nullable = false)
