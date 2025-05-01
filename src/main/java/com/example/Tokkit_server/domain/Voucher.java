@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.domain;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import com.example.Tokkit_server.Enum.StoreCategory;
 import com.example.Tokkit_server.domain.common.BaseTimeEntity;
@@ -15,6 +16,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -61,5 +63,8 @@ public class Voucher extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id", nullable = false)
     private Merchant merchant;
+
+    @OneToMany(mappedBy = "voucher")
+    private List<VoucherOwnership> ownerships;
 
 }

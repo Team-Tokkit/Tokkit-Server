@@ -42,13 +42,15 @@ public class Merchant extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer simplePassword;
 
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "wallet_id")
-    private Wallet wallet;
-
     @Column(nullable = false)
     private String businessNumber;
 
     // 휴면 상태
     private Boolean isDormant;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "merchant")
+    private Wallet wallet;
+
+    @OneToOne(mappedBy = "merchant")
+    private Store store;
 }
