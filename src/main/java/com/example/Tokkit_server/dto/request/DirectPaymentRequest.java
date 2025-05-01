@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 public class DirectPaymentRequest {
     private Long userId;
-    private Integer simplePassword;
+    private String simplePassword;
     private Long merchantId;
     private Long amount;
 }
