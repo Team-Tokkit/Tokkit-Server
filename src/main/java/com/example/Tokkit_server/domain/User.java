@@ -37,7 +37,7 @@ public class User extends BaseTimeEntity {
     private String phoneNumber;
 
     @Column(nullable = false)
-    private Integer simplePassword;
+    private String simplePassword;
 
     private Boolean isDormant; // 휴면 계정 여부
 
