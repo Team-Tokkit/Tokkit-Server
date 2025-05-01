@@ -12,14 +12,19 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.Tokkit_server.apiPayload.ApiResponse;
 import com.example.Tokkit_server.dto.request.DepositToTokenRequest;
+import com.example.Tokkit_server.dto.request.DirectPaymentRequest;
+import com.example.Tokkit_server.dto.request.PasswordVerifyRequest;
 import com.example.Tokkit_server.dto.request.TokenToDepositRequest;
 import com.example.Tokkit_server.dto.request.VoucherPaymentRequest;
 import com.example.Tokkit_server.dto.request.VoucherPurchaseRequest;
+import com.example.Tokkit_server.dto.response.DirectPaymentResponse;
+import com.example.Tokkit_server.dto.response.PasswordVerifyResponse;
 import com.example.Tokkit_server.dto.response.TransactionDetailResponse;
 import com.example.Tokkit_server.dto.response.TransactionHistoryResponse;
 import com.example.Tokkit_server.dto.response.VoucherPaymentResponse;
 import com.example.Tokkit_server.dto.response.VoucherPurchaseResponse;
 import com.example.Tokkit_server.dto.response.WalletBalanceResponse;
+import com.example.Tokkit_server.service.WalletAuthService;
 import com.example.Tokkit_server.service.command.WalletCommandService;
 import com.example.Tokkit_server.service.query.WalletQueryService;
 
@@ -34,6 +39,7 @@ import lombok.RequiredArgsConstructor;
 public class WalletController {
     private final WalletQueryService queryService;
     private final WalletCommandService commandService;
+    private final WalletAuthService walletAuthService;
 
 
     @GetMapping("/balance")
@@ -63,22 +69,18 @@ public class WalletController {
         return ApiResponse.onSuccess(commandService.getTransactionHistory(userId));
     }
 
-    @GetMapping("/transaction/recent")
+
+    @GetMapping("/transactions/recent")
     @Operation(summary = "최근 거래내역 조회", description = "가장 최근의 거래내역 10건을 조회합니다.")
     public ApiResponse<List<TransactionHistoryResponse>> getRecentTransactions(@RequestParam Long userId) {
         return ApiResponse.onSuccess(queryService.getRecentTransactions(userId));
     }
 
+
     @GetMapping("/transactions/{id}")
     @Operation(summary = "거래 상세 조회", description = "특정 거래 상세 정보를 조회합니다.")
     public ApiResponse<TransactionDetailResponse> getTransactionDetail(@PathVariable Long id) {
         return ApiResponse.onSuccess(queryService.getTransactionDetail(id));
-    }
-
-    @PostMapping("/pay")
-    @Operation(summary = "바우처 결제", description = "보유한 바우처를 통해 결제합니다.")
-    public ApiResponse<VoucherPaymentResponse> payWithVoucher(@RequestBody VoucherPaymentRequest request) {
-        return ApiResponse.onSuccess(commandService.payWithVoucher(request));
     }
 
 
@@ -87,4 +89,27 @@ public class WalletController {
     public ApiResponse<VoucherPurchaseResponse> purchaseVoucher(@RequestBody VoucherPurchaseRequest request) {
         return ApiResponse.onSuccess(commandService.purchaseVoucher(request));
     }
+
+
+    @PostMapping("/pay-with-voucher")
+    @Operation(summary = "QR 기반 바우처로 결제", description = "QR 코드를 통해 바우처로 결제를 진행합니다.")
+    public ApiResponse<VoucherPaymentResponse> payWithVoucher(@RequestBody VoucherPaymentRequest request) {
+        return ApiResponse.onSuccess(commandService.payWithVoucher(request));
+    }
+
+
+    @PostMapping("/pay-with-token")
+    @Operation(summary = "토큰 직접 결제", description = "QR 코드를 통해 토큰으로 결제를 진행합니다.")
+    public ApiResponse<DirectPaymentResponse> payDirectlyWithToken(@RequestBody DirectPaymentRequest request) {
+        return ApiResponse.onSuccess(commandService.payDirectlyWithToken(request));
+    }
+
+
+    @PostMapping("/verify")
+    @Operation(summary = "간편 비밀번호 인증", description = "사용자의 전자지갑 비밀번호를 검증합니다.")
+    public ApiResponse<PasswordVerifyResponse> verifyPassword(@RequestBody PasswordVerifyRequest request) {
+        PasswordVerifyResponse response = walletAuthService.verifyPassword(request);
+        return ApiResponse.onSuccess(response);
+    }
+
 }
