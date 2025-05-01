@@ -16,11 +16,13 @@ public class NoticeQueryService {
     private final NoticeRepository noticeRepository;
     private final int SIZE = 5;
 
+    // 공지사항 목록(전체) 조회
     public Page<NoticeResponseDto> getNotices(int page) {
         Page<Notice> notices = noticeRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, SIZE));
         return notices.map(NoticeResponseDto::from);
     }
 
+    // 공지사항 상세 조회
     public NoticeResponseDto getNotice(Long noticeId) {
         Notice notice = noticeRepository.findById(noticeId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.NOTICE_NOT_FOUND));
