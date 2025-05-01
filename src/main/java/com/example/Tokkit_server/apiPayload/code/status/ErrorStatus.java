@@ -21,7 +21,9 @@ public enum ErrorStatus implements BaseErrorCode {
 	_UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
 	_FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
 	NOTICE_NOT_FOUND(HttpStatus.BAD_REQUEST, "NOTICE400","공지사항을 찾을 수 없습니다."),
-	VOUCHER_NOT_FOUND(HttpStatus.BAD_REQUEST, "VOUCHER400","해당 바우처를 찾을 수 없습니다.");
+	VOUCHER_NOT_FOUND(HttpStatus.BAD_REQUEST, "VOUCHER400","해당 바우처를 찾을 수 없습니다."),
+	INVALID_CATEGORY(HttpStatus.BAD_REQUEST, "VOUCHER4001", "잘못된 카테고리 값입니다.");
+
 
 
 	private final HttpStatus httpStatus;
