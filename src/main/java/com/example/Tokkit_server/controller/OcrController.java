@@ -4,6 +4,8 @@ import com.example.Tokkit_server.apiPayload.ApiResponse;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.service.OcrService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
@@ -14,11 +16,13 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users/ocr")
+@Tag(name = "OCR", description = "OCR 관련 API입니다.")
 public class OcrController {
 
 	private final OcrService ocrService;
 
 	@PostMapping(value = "/verify-identity", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+	@Operation(summary = "OCR 인식 요청", description = "요청으로 들어온 값과 이미지에서 OCR로 추출한 값을 비교합니다.")
 	public ApiResponse<?> verifyIdentity(
 			@RequestParam("name") String name,
 			@RequestParam("rrnPrefix") String rrnPrefix,

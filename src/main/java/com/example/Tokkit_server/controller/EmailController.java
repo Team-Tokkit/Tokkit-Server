@@ -4,6 +4,7 @@ import com.example.Tokkit_server.apiPayload.ApiResponse;
 import com.example.Tokkit_server.apiPayload.code.status.SuccessStatus;
 import com.example.Tokkit_server.dto.request.EmailVerificationDto;
 import com.example.Tokkit_server.service.EmailService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -13,13 +14,13 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
-@Tag(name = "이메일 인증 API", description = "이메일 인증 API입니다.")
+@Tag(name = "Email", description = "이메일 인증 API입니다.")
 public class EmailController {
 
 	private final EmailService emailService;
 
-	// 이메일 인증 요청
 	@PostMapping("/emailCheck")
+	@Operation(summary = "이메일 인증 요청", description = "이메일 인증 코드 요청을 보내는 API입니다.")
 	public ApiResponse<?> requestEmailValidation(@RequestParam String email) {
 		try {
 			emailService.sendMessage(email);
@@ -32,6 +33,7 @@ public class EmailController {
 
 	// 인증번호 검증
 	@PostMapping("/verification")
+	@Operation(summary = "인증번호 검증", description = "이메일 인증 코드를 검증하는 API입니다.")
 	public ApiResponse<?> checkEmailValidation(@RequestBody EmailVerificationDto verificationDto) {
 		try {
 			boolean isValid = emailService.ValidationCheck(

@@ -15,6 +15,8 @@ import com.example.Tokkit_server.dto.request.UserInfoUpdateRequest;
 import com.example.Tokkit_server.dto.response.UserResponse;
 import com.example.Tokkit_server.service.EmailService;
 import com.example.Tokkit_server.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -26,26 +28,27 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/users")
+@Tag(name = "User", description = "User 관련 API입니다.")
 public class UserController {
 
 	private final UserService userService;
 	private final EmailService emailService;
 
-	// 회원가입
 	@PostMapping("/register")
+	@Operation(summary = "회원가입 요청", description = "회원가입 요청을 처리합니다.")
 	public ApiResponse<UserResponse> createUser(@RequestBody CreateUserRequestDto requestDto) {
 		UserResponse response = userService.createUser(requestDto);
 		return ApiResponse.onSuccess(response);
 	}
 
-	// 내정보 조회
 	@GetMapping("/info")
+	@Operation(summary = "내 정보 조회", description = "유저의 이름, 이메일, 전화번호를 조회합니다.")
 	public ApiResponse<UserResponse> getUser(@AuthenticationPrincipal UserDetails userDetails) {
 		return ApiResponse.onSuccess(userService.getUser(userDetails.getUsername()));
 	}
 
-	// 비밀번호 변경
 	@PutMapping("/password-update")
+	@Operation(summary = "비밀번호 변경", description = "유저의 비밀번호를 변경합니다.")
 	public ApiResponse<?> updateUser(@AuthenticationPrincipal UserDetails userDetails,
 		@RequestBody UpdateUserRequestDto requestDto) {
 		try {
@@ -56,8 +59,8 @@ public class UserController {
 		}
 	}
 
-	// 비밀번호 찾기
 	@PostMapping("/findPw")
+	@Operation(summary = "비밀번호 찾기(재설성)", description = "유저의 비밀번호를 랜덤한 값으로 설정한 후 이메일로 전송합니다.")
 	public ApiResponse<?> passWordReissuance(@RequestParam("email") String email) {
 		try {
 			emailService.sendMessageForPassword(email);
@@ -68,8 +71,8 @@ public class UserController {
 		}
 	}
 
-	// 간편 비밀번호 재설정 시 이메일 전송
 	@PostMapping("/simple-password/send-verification")
+	@Operation(summary = "간편 비밀번호 재설정 시 이메일 전송", description = "유저가 간편 비밀번호를 재설정 하기 전에 이메일 인증을 하기 위해 인증 코드를 이메일로 전송합니다.")
 	public ApiResponse<?> sendSimplePasswordVerification(@AuthenticationPrincipal CustomUserDetails userDetails) {
 		try {
 			emailService.sendSimplePasswordVerification(userDetails.getUsername());
@@ -80,6 +83,7 @@ public class UserController {
 	}
 
 	@PostMapping("/simple-password/verify")
+	@Operation(summary = "간편 비밀번호 재설정 시 이메일 인증", description = "유저가 간편 비밀번호를 재설정 하기 전에 이메일 인증 코드를 확인합니다.")
 	public ApiResponse<?> verifySimplePasswordCode(
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody SimplePasswordVerificationRequest request) {
@@ -89,6 +93,7 @@ public class UserController {
 	}
 
 	@PutMapping("/simple-password/update")
+	@Operation(summary = "간편 비밀번호 재설정", description = "유저의 간편 비밀번호를 수정합니다.")
 	public ApiResponse<?> updateSimplePassword(
 		@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody SimplePasswordResetRequest request) {
@@ -97,9 +102,8 @@ public class UserController {
 		return ApiResponse.onSuccess(SuccessStatus._OK);
 	}
 
-
-	// 내 정보 수정 (이름, 전화번호)
 	@PutMapping("/info-update")
+	@Operation(summary = "내 정보 수정", description = "유저의 이름, 전화번호를 수정합니다.")
 	public ApiResponse<?> updateUserInfo(@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody UserInfoUpdateRequest requestDto) {
 		userService.updateUserInfo(userDetails.getId(), requestDto);
@@ -108,20 +112,21 @@ public class UserController {
 
 	// 이메일 변경
 	@PutMapping("/email-update")
+	@Operation(summary = "이메일 변경", description = "유저의 이메일을 수정합니다.(이 과정 이전에 바꾸고자 하는 이메일에 대해 이메일 인증이 필요합니다)")
 	public ApiResponse<?> updateEmail(@AuthenticationPrincipal CustomUserDetails userDetails,
 		@RequestBody EmailChangeRequest requestDto) {
 		userService.updateEmail(userDetails.getId(), requestDto);
 		return ApiResponse.onSuccess(SuccessStatus._OK);
 	}
 
-	// 로그인 - 사용 x, swagger용 api
 	@PostMapping("/login")
+	@Operation(summary = "로그인", description = "로그인을 진행합니다. 실제 사용은 되지 않으며 swagger용 api입니다.")
 	public ApiResponse<?> login(@RequestBody LoginRequest loginRequest) {
 		return ApiResponse.onSuccess(null);
 	}
 
-	// 로그아웃
 	@PostMapping("/logout")
+	@Operation(summary = "로그아웃", description = "로그아웃을 진행합니다. 실제 사용은 되지 않으며 swagger용 api입니다.")
 	public ApiResponse<?> logout(@AuthenticationPrincipal UserDetails userDetails) {
 		// 실제 로그아웃 로직 추가 필요
 		return ApiResponse.onSuccess(null);
