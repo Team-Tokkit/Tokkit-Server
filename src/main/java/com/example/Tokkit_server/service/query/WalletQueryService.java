@@ -27,7 +27,7 @@ public class WalletQueryService {
 
     @Transactional
     public void convertDepositToToken(DepositToTokenRequest request) {
-        Wallet wallet = walletRepository.findByUserId(request.getUserId())
+        Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
 
         if (wallet.getDepositBalance() < request.getAmount()) {
@@ -50,7 +50,7 @@ public class WalletQueryService {
 
     @Transactional
     public void convertTokenToDeposit(TokenToDepositRequest request) {
-        Wallet wallet = walletRepository.findByUserId(request.getUserId())
+        Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
 
         if (wallet.getTokenBalance() < request.getAmount()) {
@@ -72,9 +72,18 @@ public class WalletQueryService {
     }
 
     public List<TransactionHistoryResponse> getRecentTransactions(Long userId) {
-        List<Transaction> transactions = transactionRepository.findTop10ByWalletUserIdOrderByCreatedAtDesc(userId);
+        Wallet wallet = walletRepository.findByUser_Id(userId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
+
+        List<Transaction> transactions = transactionRepository
+            .findTop10ByWalletIdOrderByCreatedAtDesc(wallet.getId());
+
         return transactions.stream()
-            .map(t -> new TransactionHistoryResponse(t.getType(), t.getAmount(), t.getDescription(), t.getCreatedAt()))
+            .map(t -> new TransactionHistoryResponse(
+                t.getType(),
+                t.getAmount(),
+                t.getDescription(),
+                t.getCreatedAt()))
             .toList();
     }
 
