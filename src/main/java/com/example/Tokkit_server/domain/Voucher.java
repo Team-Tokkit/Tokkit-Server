@@ -66,7 +66,10 @@ public class Voucher extends BaseTimeEntity {
     @JoinColumn(name = "merchant_id", nullable = false)
     private Merchant merchant;
 
-    @OneToMany(mappedBy = "voucher")
-    private List<VoucherOwnership> ownerships;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "voucher_store_id", nullable = false)
+    private VoucherStore voucherStore;
+
 
 }

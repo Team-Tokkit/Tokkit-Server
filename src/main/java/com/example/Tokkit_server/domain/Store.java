@@ -1,6 +1,5 @@
 package com.example.Tokkit_server.domain;
 
-import com.example.Tokkit_server.Enum.StoreCategory;
 import com.example.Tokkit_server.domain.common.BaseTimeEntity;
 
 import jakarta.persistence.*;
@@ -9,6 +8,9 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.locationtech.jts.geom.Point;
+
+import java.awt.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,32 +21,35 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Table(name = "store")
 public class Store extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	@Column(nullable = false)
-	private String name; // 매장이름i
+    private String storeName;
 
-	@Enumerated(EnumType.STRING)
-	@Column(nullable = false)
-	private StoreCategory storeCategory;
+    private String roadAddress;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "merchant_id", unique = true)
-	private Merchant merchant;
+    private String newZipcode;
 
-	@Column(nullable = false)
-	private String address;
+    private Double longitude;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-			name = "voucher_store",
-			joinColumns = @JoinColumn(name = "store_id"),
-			inverseJoinColumns = @JoinColumn(name = "voucher_id")
-	)
-	private List<Voucher> vouchers = new ArrayList<>();
+    private Double latitude;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "store_category_id")
+    private StoreCategory storeCategory;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "merchant_id")
+    private Merchant merchant;
+
+    @Column(columnDefinition = "POINT")
+    private Point location;
 }
