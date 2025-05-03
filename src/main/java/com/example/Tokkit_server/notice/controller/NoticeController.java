@@ -1,10 +1,10 @@
-package com.example.Tokkit_server.controller;
+package com.example.Tokkit_server.notice.controller;
 
-import com.example.Tokkit_server.apiPayload.ApiResponse;
-import com.example.Tokkit_server.dto.request.NoticeRequestDto;
-import com.example.Tokkit_server.dto.response.NoticeResponseDto;
-import com.example.Tokkit_server.service.command.NoticeCommandService;
-import com.example.Tokkit_server.service.query.NoticeQueryService;
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
+import com.example.Tokkit_server.notice.dto.request.NoticeRequestDto;
+import com.example.Tokkit_server.notice.dto.response.NoticeResponseDto;
+import com.example.Tokkit_server.notice.service.command.NoticeCommandService;
+import com.example.Tokkit_server.notice.service.query.NoticeQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

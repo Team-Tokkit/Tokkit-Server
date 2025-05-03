@@ -1,10 +1,10 @@
-package com.example.Tokkit_server.service.command;
+package com.example.Tokkit_server.notice.service.command;
 
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.Notice;
-import com.example.Tokkit_server.dto.request.NoticeRequestDto;
-import com.example.Tokkit_server.repository.NoticeRepository;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.notice.entity.Notice;
+import com.example.Tokkit_server.notice.dto.request.NoticeRequestDto;
+import com.example.Tokkit_server.notice.repository.NoticeRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

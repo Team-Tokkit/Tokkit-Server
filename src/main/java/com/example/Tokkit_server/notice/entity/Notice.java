@@ -1,6 +1,6 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.notice.entity;
 
-import com.example.Tokkit_server.domain.common.BaseTimeEntity;
+import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -16,13 +16,11 @@ public class Notice extends BaseTimeEntity {
     private Long id;
 
     private String title;
+
     private String content;
 
     private boolean isDeleted;
 
-
-
-    // Notice 수정용 메서드
     public void update(String title, String content) {
         this.title = title;
         this.content = content;

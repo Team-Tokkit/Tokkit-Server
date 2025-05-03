@@ -1,6 +1,6 @@
-package com.example.Tokkit_server.dto.request;
+package com.example.Tokkit_server.notice.dto.request;
 
-import com.example.Tokkit_server.domain.Notice;
+import com.example.Tokkit_server.notice.entity.Notice;
 import lombok.Getter;
 import lombok.Setter;
 
