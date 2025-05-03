@@ -1,9 +1,9 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.transaction.entity;
 
 
-
-import com.example.Tokkit_server.Enum.TransactionType;
-import com.example.Tokkit_server.domain.common.BaseTimeEntity;
+import com.example.Tokkit_server.transaction.enums.TransactionType;
+import com.example.Tokkit_server.wallet.entity.Wallet;
+import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -31,17 +31,16 @@ public class Transaction extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    private Long amount;
+
+    private String txHash;
+
+    private String description;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id")
     private Wallet wallet;
 
     @Enumerated(EnumType.STRING)
-    private TransactionType type; // DEPOSIT, WITHDRAW, CONVERT, PURCHASE, REFUND 등
-
-    private Long amount;
-
-    private String txHash; // 토큰 트랜잭션 해시 (옵션)
-
-    private String description; // 설명 ("바우처 A 구매", "예금 → 토큰 전환")
-
+    private TransactionType type;
 }
