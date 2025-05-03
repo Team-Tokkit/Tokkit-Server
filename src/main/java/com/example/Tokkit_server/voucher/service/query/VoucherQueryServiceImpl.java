@@ -1,14 +1,14 @@
-package com.example.Tokkit_server.service.query;
+package com.example.Tokkit_server.voucher.service.query;
 
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.Voucher;
-import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
-import com.example.Tokkit_server.dto.response.StoreResponse;
-import com.example.Tokkit_server.dto.response.VoucherDetailResponse;
-import com.example.Tokkit_server.dto.response.VoucherResponse;
-import com.example.Tokkit_server.repository.StoreRepository;
-import com.example.Tokkit_server.repository.VoucherRepository;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.voucher.entity.Voucher;
+import com.example.Tokkit_server.voucher.dto.request.VoucherSearchRequest;
+import com.example.Tokkit_server.store.dto.response.StoreResponse;
+import com.example.Tokkit_server.voucher.dto.response.VoucherDetailResponse;
+import com.example.Tokkit_server.voucher.dto.response.VoucherResponse;
+import com.example.Tokkit_server.store.repository.StoreRepository;
+import com.example.Tokkit_server.voucher.repository.VoucherJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class VoucherQueryServiceImpl implements VoucherQueryService {
 
-    private final VoucherRepository voucherRepository;
+    private final VoucherJpaRepository voucherRepository;
     private final StoreRepository storeRepository;
 
     // 전체 바우처 조회하기

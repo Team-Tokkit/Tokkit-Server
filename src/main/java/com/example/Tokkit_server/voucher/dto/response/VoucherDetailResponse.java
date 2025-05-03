@@ -1,6 +1,7 @@
-package com.example.Tokkit_server.dto.response;
+package com.example.Tokkit_server.voucher.dto.response;
 
-import com.example.Tokkit_server.domain.Voucher;
+import com.example.Tokkit_server.store.dto.response.StoreResponse;
+import com.example.Tokkit_server.voucher.entity.Voucher;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;

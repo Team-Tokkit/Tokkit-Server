@@ -1,11 +1,11 @@
-package com.example.Tokkit_server.controller;
+package com.example.Tokkit_server.voucher.controller;
 
-import com.example.Tokkit_server.apiPayload.ApiResponse;
-import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
-import com.example.Tokkit_server.dto.response.StoreResponse;
-import com.example.Tokkit_server.dto.response.VoucherDetailResponse;
-import com.example.Tokkit_server.dto.response.VoucherResponse;
-import com.example.Tokkit_server.service.query.VoucherQueryService;
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
+import com.example.Tokkit_server.voucher.dto.request.VoucherSearchRequest;
+import com.example.Tokkit_server.store.dto.response.StoreResponse;
+import com.example.Tokkit_server.voucher.dto.response.VoucherDetailResponse;
+import com.example.Tokkit_server.voucher.dto.response.VoucherResponse;
+import com.example.Tokkit_server.voucher.service.query.VoucherQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

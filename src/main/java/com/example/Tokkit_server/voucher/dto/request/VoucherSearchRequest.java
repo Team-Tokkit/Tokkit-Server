@@ -1,6 +1,5 @@
-package com.example.Tokkit_server.dto.request;
+package com.example.Tokkit_server.voucher.dto.request;
 
-import com.example.Tokkit_server.Enum.StoreCategory;
 import lombok.Getter;
 import lombok.Setter;
 

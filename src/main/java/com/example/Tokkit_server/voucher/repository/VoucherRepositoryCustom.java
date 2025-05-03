@@ -1,34 +1,31 @@
-package com.example.Tokkit_server.repository;
+package com.example.Tokkit_server.voucher.repository;
 
 import com.example.Tokkit_server.Enum.StoreCategory;
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.QVoucher;
-import com.example.Tokkit_server.domain.Voucher;
-import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
+import com.example.Tokkit_server.voucher.entity.Voucher;
+import com.example.Tokkit_server.voucher.dto.request.VoucherSearchRequest;
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.Expression;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import org.aspectj.weaver.GeneratedReferenceTypeDelegate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDateTime;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class VoucherRepositoryCustomImpl implements VoucherRepositoryCustom {
+public class VoucherRepositoryCustom implements VoucherRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public VoucherRepositoryCustomImpl(JPAQueryFactory queryFactory) {
+    public VoucherRepositoryCustom(JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
 

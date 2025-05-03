@@ -1,9 +1,9 @@
-package com.example.Tokkit_server.service.query;
+package com.example.Tokkit_server.voucher.service.query;
 
-import com.example.Tokkit_server.dto.request.VoucherSearchRequest;
-import com.example.Tokkit_server.dto.response.StoreResponse;
-import com.example.Tokkit_server.dto.response.VoucherDetailResponse;
-import com.example.Tokkit_server.dto.response.VoucherResponse;
+import com.example.Tokkit_server.voucher.dto.request.VoucherSearchRequest;
+import com.example.Tokkit_server.store.dto.response.StoreResponse;
+import com.example.Tokkit_server.voucher.dto.response.VoucherDetailResponse;
+import com.example.Tokkit_server.voucher.dto.response.VoucherResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.service.command;
+package com.example.Tokkit_server.voucher.service.command;
 
 public interface VoucherCommandService {
 
