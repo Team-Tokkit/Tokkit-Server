@@ -1,10 +1,10 @@
-package com.example.Tokkit_server.service;
+package com.example.Tokkit_server.user.service;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
-import com.example.Tokkit_server.domain.User;
-import com.example.Tokkit_server.repository.UserRepository;
+import com.example.Tokkit_server.user.entity.User;
+import com.example.Tokkit_server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 
 @Service

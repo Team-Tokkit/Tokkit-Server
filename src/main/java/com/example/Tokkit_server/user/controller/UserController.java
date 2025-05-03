@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.controller;
+package com.example.Tokkit_server.user.controller;
 
 import java.util.List;
 
@@ -8,9 +8,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.Tokkit_server.apiPayload.ApiResponse;
-import com.example.Tokkit_server.domain.User;
-import com.example.Tokkit_server.service.UserService;
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
+import com.example.Tokkit_server.user.entity.User;
+import com.example.Tokkit_server.user.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.RequiredArgsConstructor;

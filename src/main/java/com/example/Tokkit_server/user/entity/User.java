@@ -1,6 +1,7 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.user.entity;
 
-import com.example.Tokkit_server.domain.common.BaseTimeEntity;
+import com.example.Tokkit_server.wallet.entity.Wallet;
+import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -39,7 +40,9 @@ public class User extends BaseTimeEntity {
     @Column(nullable = false)
     private String simplePassword;
 
-    private Boolean isDormant; // 휴면 계정 여부
+    private Boolean isDormant;
+
+    private String roles;
 
     @OneToOne(mappedBy = "user", fetch = FetchType.LAZY)
     private Wallet wallet;
