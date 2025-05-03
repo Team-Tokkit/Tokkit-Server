@@ -1,5 +1,5 @@
 // PasswordVerifyRequest.java
-package com.example.Tokkit_server.dto.request;
+package com.example.Tokkit_server.wallet.dto.request;
 
 import lombok.Getter;
 

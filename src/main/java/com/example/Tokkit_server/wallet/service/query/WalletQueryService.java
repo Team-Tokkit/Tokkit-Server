@@ -1,21 +1,21 @@
-package com.example.Tokkit_server.service.query;
+package com.example.Tokkit_server.wallet.service.query;
 
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.example.Tokkit_server.Enum.TransactionType;
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.Transaction;
-import com.example.Tokkit_server.domain.Wallet;
-import com.example.Tokkit_server.dto.request.DepositToTokenRequest;
-import com.example.Tokkit_server.dto.request.TokenToDepositRequest;
-import com.example.Tokkit_server.dto.response.TransactionDetailResponse;
-import com.example.Tokkit_server.dto.response.TransactionHistoryResponse;
-import com.example.Tokkit_server.repository.TransactionRepository;
-import com.example.Tokkit_server.repository.WalletRepository;
+import com.example.Tokkit_server.transaction.enums.TransactionType;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.transaction.entity.Transaction;
+import com.example.Tokkit_server.wallet.entity.Wallet;
+import com.example.Tokkit_server.wallet.dto.request.DepositToTokenRequest;
+import com.example.Tokkit_server.wallet.dto.request.TokenToDepositRequest;
+import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
+import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
+import com.example.Tokkit_server.transaction.repository.TransactionRepository;
+import com.example.Tokkit_server.wallet.repository.WalletRepository;
 
 import lombok.RequiredArgsConstructor;
 

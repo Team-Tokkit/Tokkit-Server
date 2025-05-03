@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.controller;
+package com.example.Tokkit_server.wallet.controller;
 
 import java.util.List;
 
@@ -10,23 +10,23 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.Tokkit_server.apiPayload.ApiResponse;
-import com.example.Tokkit_server.dto.request.DepositToTokenRequest;
-import com.example.Tokkit_server.dto.request.DirectPaymentRequest;
-import com.example.Tokkit_server.dto.request.PasswordVerifyRequest;
-import com.example.Tokkit_server.dto.request.TokenToDepositRequest;
-import com.example.Tokkit_server.dto.request.VoucherPaymentRequest;
-import com.example.Tokkit_server.dto.request.VoucherPurchaseRequest;
-import com.example.Tokkit_server.dto.response.DirectPaymentResponse;
-import com.example.Tokkit_server.dto.response.PasswordVerifyResponse;
-import com.example.Tokkit_server.dto.response.TransactionDetailResponse;
-import com.example.Tokkit_server.dto.response.TransactionHistoryResponse;
-import com.example.Tokkit_server.dto.response.VoucherPaymentResponse;
-import com.example.Tokkit_server.dto.response.VoucherPurchaseResponse;
-import com.example.Tokkit_server.dto.response.WalletBalanceResponse;
-import com.example.Tokkit_server.service.WalletAuthService;
-import com.example.Tokkit_server.service.command.WalletCommandService;
-import com.example.Tokkit_server.service.query.WalletQueryService;
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
+import com.example.Tokkit_server.wallet.dto.request.DepositToTokenRequest;
+import com.example.Tokkit_server.wallet.dto.request.DirectPaymentRequest;
+import com.example.Tokkit_server.wallet.dto.request.PasswordVerifyRequest;
+import com.example.Tokkit_server.wallet.dto.request.TokenToDepositRequest;
+import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentRequest;
+import com.example.Tokkit_server.wallet.dto.request.VoucherPurchaseRequest;
+import com.example.Tokkit_server.wallet.dto.response.DirectPaymentResponse;
+import com.example.Tokkit_server.wallet.dto.response.PasswordVerifyResponse;
+import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
+import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
+import com.example.Tokkit_server.wallet.dto.response.VoucherPaymentResponse;
+import com.example.Tokkit_server.wallet.dto.response.VoucherPurchaseResponse;
+import com.example.Tokkit_server.wallet.dto.response.WalletBalanceResponse;
+import com.example.Tokkit_server.wallet.service.WalletAuthService;
+import com.example.Tokkit_server.wallet.service.command.WalletCommandService;
+import com.example.Tokkit_server.wallet.service.query.WalletQueryService;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

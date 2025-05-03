@@ -1,12 +1,12 @@
 // WalletAuthService.java
-package com.example.Tokkit_server.service;
+package com.example.Tokkit_server.wallet.service;
 
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.User;
-import com.example.Tokkit_server.dto.request.PasswordVerifyRequest;
-import com.example.Tokkit_server.dto.response.PasswordVerifyResponse;
-import com.example.Tokkit_server.repository.UserRepository;
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.user.entity.User;
+import com.example.Tokkit_server.wallet.dto.request.PasswordVerifyRequest;
+import com.example.Tokkit_server.wallet.dto.response.PasswordVerifyResponse;
+import com.example.Tokkit_server.user.repository.UserRepository;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

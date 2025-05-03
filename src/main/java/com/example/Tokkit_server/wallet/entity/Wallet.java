@@ -1,5 +1,7 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.wallet.entity;
 
+import com.example.Tokkit_server.merchant.entity.Merchant;
+import com.example.Tokkit_server.user.entity.User;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -33,9 +35,9 @@ public class Wallet {
 	private Merchant merchant;
 
 	@Column(nullable = false)
-	private Long depositBalance; // 예금 잔액
+	private Long depositBalance;
 
-	private Long tokenBalance; // 토큰 잔액
+	private Long tokenBalance;
 
 	public void updateBalance(Long deposit, Long token) {
 		this.depositBalance = deposit;

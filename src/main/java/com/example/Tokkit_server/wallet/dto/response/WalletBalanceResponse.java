@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.dto.response;
+package com.example.Tokkit_server.wallet.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
