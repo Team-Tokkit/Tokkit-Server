@@ -1,6 +1,6 @@
-package com.example.Tokkit_server.repository;
+package com.example.Tokkit_server.store.repository;
 
-import com.example.Tokkit_server.domain.Store;
+import com.example.Tokkit_server.store.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

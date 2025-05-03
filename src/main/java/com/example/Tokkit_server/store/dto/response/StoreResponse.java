@@ -1,6 +1,6 @@
-package com.example.Tokkit_server.dto.response;
+package com.example.Tokkit_server.store.dto.response;
 
-import com.example.Tokkit_server.domain.Store;
+import com.example.Tokkit_server.store.entity.Store;
 import lombok.Builder;
 import lombok.Getter;
 
