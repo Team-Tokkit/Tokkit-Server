@@ -1,8 +1,10 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.voucher_ownership.entity;
 
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.common.BaseTimeEntity;
+import com.example.Tokkit_server.wallet.entity.Wallet;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.global.entity.BaseTimeEntity;
+import com.example.Tokkit_server.voucher.entity.Voucher;
 import jakarta.persistence.*;
 import lombok.*;
 

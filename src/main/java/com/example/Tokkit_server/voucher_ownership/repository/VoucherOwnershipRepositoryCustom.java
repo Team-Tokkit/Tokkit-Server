@@ -1,13 +1,13 @@
-package com.example.Tokkit_server.repository;
+package com.example.Tokkit_server.voucher_ownership.repository;
 
 import com.example.Tokkit_server.Enum.StoreCategory;
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.QVoucher;
 import com.example.Tokkit_server.domain.QVoucherOwnership;
-import com.example.Tokkit_server.domain.Voucher;
-import com.example.Tokkit_server.domain.VoucherOwnership;
-import com.example.Tokkit_server.dto.request.VoucherOwnershipSearchRequest;
+import com.example.Tokkit_server.voucher.entity.Voucher;
+import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
+import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherOwnershipSearchRequest;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-public class VoucherOwnershipRepositoryCustomImpl implements VoucherOwnershipRepositoryCustom {
+public class VoucherOwnershipRepositoryCustom implements VoucherOwnershipRepository {
 
     private final JPAQueryFactory queryFactory;
 
-    public VoucherOwnershipRepositoryCustomImpl(JPAQueryFactory queryFactory) {
+    public VoucherOwnershipRepositoryCustom(JPAQueryFactory queryFactory) {
         this.queryFactory = queryFactory;
     }
 

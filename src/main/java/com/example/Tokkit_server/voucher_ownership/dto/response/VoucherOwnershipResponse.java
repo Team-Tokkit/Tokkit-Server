@@ -1,6 +1,6 @@
-package com.example.Tokkit_server.dto.response;
+package com.example.Tokkit_server.voucher_ownership.dto.response;
 
-import com.example.Tokkit_server.domain.VoucherOwnership;
+import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
 import lombok.Builder;
 import lombok.Getter;
 

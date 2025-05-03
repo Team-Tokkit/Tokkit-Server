@@ -1,14 +1,14 @@
-package com.example.Tokkit_server.service.query;
+package com.example.Tokkit_server.voucher_ownership.service.query;
 
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.VoucherOwnership;
-import com.example.Tokkit_server.dto.request.VoucherOwnershipSearchRequest;
-import com.example.Tokkit_server.dto.response.StoreResponse;
-import com.example.Tokkit_server.dto.response.VoucherOwnershipDetailResponse;
-import com.example.Tokkit_server.dto.response.VoucherOwnershipResponse;
-import com.example.Tokkit_server.repository.StoreRepository;
-import com.example.Tokkit_server.repository.VoucherOwnershipRepository;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
+import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherOwnershipSearchRequest;
+import com.example.Tokkit_server.store.dto.response.StoreResponse;
+import com.example.Tokkit_server.voucher_ownership.dto.response.VoucherOwnershipDetailResponse;
+import com.example.Tokkit_server.voucher_ownership.dto.response.VoucherOwnershipResponse;
+import com.example.Tokkit_server.store.repository.StoreRepository;
+import com.example.Tokkit_server.voucher_ownership.repository.VoucherOwnershipJpaRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,7 +18,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class VoucherOwnershipQueryServiceImpl implements VoucherOwnershipQueryService {
 
-    private final VoucherOwnershipRepository voucherOwnershipRepository;
+    private final VoucherOwnershipJpaRepository voucherOwnershipRepository;
     private final StoreRepository storeRepository;
 
     // 내 바우처 조회하기

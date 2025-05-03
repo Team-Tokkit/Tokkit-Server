@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.dto.request;
+package com.example.Tokkit_server.voucher_ownership.dto.request;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
