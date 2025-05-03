@@ -1,9 +1,9 @@
-package com.example.Tokkit_server.apiPayload.code.status;
+package com.example.Tokkit_server.global.apiPayload.code.status;
 
 import org.springframework.http.HttpStatus;
 
-import com.example.Tokkit_server.apiPayload.code.BaseErrorCode;
-import com.example.Tokkit_server.apiPayload.code.ErrorReasonDTO;
+import com.example.Tokkit_server.global.apiPayload.code.BaseErrorCode;
+import com.example.Tokkit_server.global.apiPayload.code.ErrorReasonDTO;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

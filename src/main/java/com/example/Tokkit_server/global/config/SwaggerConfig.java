@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.config;
+package com.example.Tokkit_server.global.config;
 
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;

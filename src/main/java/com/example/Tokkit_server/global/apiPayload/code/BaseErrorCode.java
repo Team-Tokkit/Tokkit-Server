@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.apiPayload.code;
+package com.example.Tokkit_server.global.apiPayload.code;
 
 public interface BaseErrorCode {
 	ErrorReasonDTO getReason();

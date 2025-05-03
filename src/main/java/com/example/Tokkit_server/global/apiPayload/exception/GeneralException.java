@@ -1,8 +1,8 @@
-package com.example.Tokkit_server.apiPayload.exception;
+package com.example.Tokkit_server.global.apiPayload.exception;
 
 
-import com.example.Tokkit_server.apiPayload.code.ErrorReasonDTO;
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.code.ErrorReasonDTO;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

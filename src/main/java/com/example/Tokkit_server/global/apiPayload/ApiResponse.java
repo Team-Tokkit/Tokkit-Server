@@ -1,6 +1,6 @@
-package com.example.Tokkit_server.apiPayload;
+package com.example.Tokkit_server.global.apiPayload;
 
-import com.example.Tokkit_server.apiPayload.code.status.SuccessStatus;
+import com.example.Tokkit_server.global.apiPayload.code.status.SuccessStatus;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;

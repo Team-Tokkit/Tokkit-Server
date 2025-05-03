@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.apiPayload.exception;
+package com.example.Tokkit_server.global.apiPayload.exception;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -16,9 +16,9 @@ import org.springframework.web.context.request.ServletWebRequest;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.example.Tokkit_server.apiPayload.ApiResponse;
-import com.example.Tokkit_server.apiPayload.code.ErrorReasonDTO;
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
+import com.example.Tokkit_server.global.apiPayload.code.ErrorReasonDTO;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.extern.slf4j.Slf4j;

@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.domain.common;
+package com.example.Tokkit_server.global.entity;
 
 import java.time.LocalDateTime;
 
