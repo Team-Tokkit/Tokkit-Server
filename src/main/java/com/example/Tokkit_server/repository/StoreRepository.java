@@ -32,4 +32,4 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
     );
 }
 
-}
+
