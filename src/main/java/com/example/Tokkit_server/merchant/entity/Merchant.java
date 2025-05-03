@@ -1,6 +1,8 @@
-package com.example.Tokkit_server.domain;
+package com.example.Tokkit_server.merchant.entity;
 
-import com.example.Tokkit_server.domain.common.BaseTimeEntity;
+import com.example.Tokkit_server.store.entity.Store;
+import com.example.Tokkit_server.wallet.entity.Wallet;
+import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -21,15 +23,13 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class Merchant extends BaseTimeEntity {
-    // 가맹점주 ID
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 대표자명
     private String name;
 
-    // 전화번호
     private String phoneNumber;
 
     @Column(nullable = false)
@@ -44,9 +44,9 @@ public class Merchant extends BaseTimeEntity {
     @Column(nullable = false)
     private String businessNumber;
 
-    // 휴면 상태
     private Boolean isDormant;
 
+    private String roles;
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "merchant")
     private Wallet wallet;
 
