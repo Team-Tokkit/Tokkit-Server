@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.store_category.entity;
+package com.example.Tokkit_server.global.entity;
 
 import jakarta.persistence.*;
 import lombok.Getter;

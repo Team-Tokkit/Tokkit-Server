@@ -28,10 +28,10 @@ public class Notification extends BaseTimeEntity {
 
     private String content;
 
-    private boolean deleted = false;
+    private boolean deleted;
 
     @Column(nullable = false)
-    private boolean sent = false;
+    private boolean sent;
 
     // soft delete 용 메서드
     public void softDelete() {
