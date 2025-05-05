@@ -8,14 +8,14 @@ import lombok.Getter;
 @Builder
 public class StoreResponse {
     private Long id;
-    private String name;
-    private String address;
+    private String storeName;
+    private String roadAddress;
 
     public static StoreResponse from(Store store) {
         return StoreResponse.builder()
                 .id(store.getId())
-                .name(store.getName())
-                .address(store.getAddress())
+                .storeName(store.getStoreName())
+                .roadAddress(store.getRoadAddress())
                 .build();
     }
 }
