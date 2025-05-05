@@ -1,6 +1,5 @@
-package com.example.Tokkit_server.voucher_stroe.entity;
+package com.example.Tokkit_server.global.entity;
 
-import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 import com.example.Tokkit_server.store.entity.Store;
 import com.example.Tokkit_server.voucher.entity.Voucher;
 import jakarta.persistence.*;
@@ -9,8 +8,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -31,4 +28,6 @@ public class VoucherStore extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "store_id", nullable = false)
     private Store store;
+
+
 }

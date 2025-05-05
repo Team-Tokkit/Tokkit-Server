@@ -17,7 +17,7 @@ import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
 import com.example.Tokkit_server.wallet.dto.request.DirectPaymentRequest;
 import com.example.Tokkit_server.wallet.dto.response.DirectPaymentResponse;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
-import com.example.Tokkit_server.voucher.repository.VoucherJpaRepository;
+import com.example.Tokkit_server.voucher.repository.VoucherRepository;
 import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentRequest;
 import com.example.Tokkit_server.wallet.dto.request.VoucherPurchaseRequest;
@@ -27,7 +27,7 @@ import com.example.Tokkit_server.wallet.dto.response.VoucherPurchaseResponse;
 import com.example.Tokkit_server.wallet.dto.response.WalletBalanceResponse;
 import com.example.Tokkit_server.transaction.repository.TransactionRepository;
 import com.example.Tokkit_server.user.repository.UserRepository;
-import com.example.Tokkit_server.voucher_ownership.repository.VoucherOwnershipJpaRepository;
+import com.example.Tokkit_server.voucher_ownership.repository.VoucherOwnershipRepository;
 import com.example.Tokkit_server.wallet.repository.WalletRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -38,9 +38,9 @@ public class WalletCommandService {
 
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
-    private final VoucherOwnershipJpaRepository voucherOwnershipRepository;
+    private final VoucherOwnershipRepository voucherOwnershipRepository;
     private final UserRepository userRepository;
-    private final VoucherJpaRepository voucherRepository;
+    private final VoucherRepository voucherRepository;
     private final MerchantRepository merchantRepository;
 
     /**

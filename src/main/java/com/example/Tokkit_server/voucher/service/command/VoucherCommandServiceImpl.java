@@ -1,8 +1,9 @@
+/*
 package com.example.Tokkit_server.voucher.service.command;
 
 import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.voucher_ownership.repository.VoucherOwnershipJpaRepository;
-import com.example.Tokkit_server.voucher.repository.VoucherJpaRepository;
+import com.example.Tokkit_server.voucher.repository.VoucherRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -13,7 +14,7 @@ public class VoucherCommandServiceImpl implements VoucherCommandService {
 
     private final VoucherOwnershipJpaRepository voucherOwnershipRepository;
     private final UserRepository userRepository;
-    private final VoucherJpaRepository voucherRepository;
+    private final VoucherRepository voucherRepository;
 
     @Transactional
     @Override
@@ -28,3 +29,4 @@ public class VoucherCommandServiceImpl implements VoucherCommandService {
     }
 
 }
+*/

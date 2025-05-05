@@ -1,6 +1,5 @@
-package com.example.Tokkit_server.voucher_image.entity;
+package com.example.Tokkit_server.global.entity;
 
-import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

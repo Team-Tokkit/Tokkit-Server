@@ -1,3 +1,4 @@
+/*
 package com.example.Tokkit_server.voucher.service.command;
 
 public interface VoucherCommandService {
@@ -8,3 +9,4 @@ public interface VoucherCommandService {
     // 바우처 환불하기
     void refundVoucher(Long voucherId, Long userId);
 }
+*/
