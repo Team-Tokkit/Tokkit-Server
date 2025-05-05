@@ -2,15 +2,17 @@ package com.example.Tokkit_server.voucher.entity;
 
 import java.time.LocalDateTime;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
-import com.example.Tokkit_server.store_category.entity.StoreCategory;
+import com.example.Tokkit_server.store.entity.Store;
+import com.example.Tokkit_server.global.entity.StoreCategory;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
 import com.example.Tokkit_server.merchant.entity.Merchant;
-import com.example.Tokkit_server.voucher_stroe.entity.VoucherStore;
+import com.example.Tokkit_server.global.entity.VoucherStore;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -55,11 +57,20 @@ public class Voucher extends BaseTimeEntity {
     @OneToMany(mappedBy = "voucher")
     private List<VoucherOwnership> ownerships;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "voucher_store_id", nullable = false)
-    private VoucherStore voucherStore;
+    @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL)
+    private List<VoucherStore> voucherStores;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
     private StoreCategory category;
+
+    public void addVoucherStore(Store store) {
+        VoucherStore vs = VoucherStore.builder()
+                .voucher(this)
+                .store(store)
+                .build();
+        this.voucherStores.add(vs);
+    }
+
+
 }
