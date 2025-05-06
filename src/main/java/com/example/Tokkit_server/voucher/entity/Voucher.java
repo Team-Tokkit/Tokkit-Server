@@ -54,11 +54,13 @@ public class Voucher extends BaseTimeEntity {
     @JoinColumn(name = "merchant_id", nullable = false)
     private Merchant merchant;
 
+    @Builder.Default
     @OneToMany(mappedBy = "voucher")
-    private List<VoucherOwnership> ownerships;
+    private List<VoucherOwnership> ownerships = new ArrayList<>();
 
+    @Builder.Default
     @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL)
-    private List<VoucherStore> voucherStores;
+    private List<VoucherStore> voucherStores = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id", nullable = false)
