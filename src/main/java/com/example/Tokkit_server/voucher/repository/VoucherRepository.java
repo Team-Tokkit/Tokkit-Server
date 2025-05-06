@@ -10,10 +10,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VoucherRepository extends JpaRepository<Voucher, Long>, VoucherRepositoryCustom {
-
-    @Query("SELECT new com.example.Tokkit_server.store.dto.response.StoreResponse(s) " +
-            "FROM VoucherStore vs JOIN vs.store s " +
-            "WHERE vs.voucher.id = :voucherId")
-    Page<StoreResponse> findStoresByVoucherId(@Param("voucherId") Long voucherId, Pageable pageable);
+public interface VoucherRepository extends JpaRepository<Voucher, Long>, VoucherCustomRepository {
+     // 기본 CRUD + 사용자 정의 쿼리용 확장 인터페이스
 }
