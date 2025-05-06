@@ -14,6 +14,7 @@ import com.example.Tokkit_server.transaction.entity.Transaction;
 import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.voucher.entity.Voucher;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
+import com.example.Tokkit_server.voucher_ownership.enums.VoucherOwnershipStatus;
 import com.example.Tokkit_server.wallet.dto.request.DirectPaymentRequest;
 import com.example.Tokkit_server.wallet.dto.response.DirectPaymentResponse;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
@@ -78,7 +79,7 @@ public class WalletCommandService {
 
         //2. 토큰 잔액확인
         if(wallet.getTokenBalance() < request.getAmount()) {
-            throw new GeneralException(ErrorStatus._BAD_REQUEST); // 토큰 부족
+            throw new GeneralException(ErrorStatus.INSUFFICIENT_BALANCE); // 토큰 부족
         }
 
         // 3. 토큰 차감
@@ -92,7 +93,7 @@ public class WalletCommandService {
             .voucher(voucher)
             .remainingAmount(request.getAmount()) // 처음에는 구매 금액 전체가 남음
             .wallet(wallet)
-            .isUsed(false)
+            .status(VoucherOwnershipStatus.AVAILABLE)
             .build();
 
         VoucherOwnership savedOwnership = voucherOwnershipRepository.save(ownership);
