@@ -1,12 +1,14 @@
 package com.example.Tokkit_server.voucher_ownership.dto.response;
 
-import com.example.Tokkit_server.store.dto.response.StoreResponse;
-import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
-import lombok.Builder;
-import lombok.Getter;
+import java.time.LocalDateTime;
+
 import org.springframework.data.domain.Page;
 
-import java.time.LocalDateTime;
+import com.example.Tokkit_server.store.dto.response.StoreResponse;
+import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
+
+import lombok.Builder;
+import lombok.Getter;
 
 @Getter
 @Builder
@@ -21,15 +23,15 @@ public class VoucherOwnershipDetailResponse {
 
     private Page<StoreResponse> stores;
 
-    public static VoucherOwnershipDetailResponse from (VoucherOwnership voucherOwnership, Page<StoreResponse> stores) {
+    public static VoucherOwnershipDetailResponse from(VoucherOwnership ownership, Page<StoreResponse> stores) {
         return VoucherOwnershipDetailResponse.builder()
-                .id(voucherOwnership.getId())
-                .voucherName(voucherOwnership.getVoucher().getName())
-                .voucherContact(voucherOwnership.getVoucher().getContact())
-                .voucherValidDate(voucherOwnership.getVoucher().getValidDate())
-                .voucherDetailDescription(voucherOwnership.getVoucher().getDetailDescription())
-                .voucherRefundPolicy(voucherOwnership.getVoucher().getRefundPolicy())
-                .remainingAmount(voucherOwnership.getRemainingAmount())
+                .id(ownership.getId())
+                .voucherName(ownership.getVoucher().getName())
+                .voucherContact(ownership.getVoucher().getContact())
+                .voucherValidDate(ownership.getVoucher().getValidDate())
+                .voucherDetailDescription(ownership.getVoucher().getDetailDescription())
+                .voucherRefundPolicy(ownership.getVoucher().getRefundPolicy())
+                .remainingAmount(ownership.getRemainingAmount())
                 .stores(stores)
                 .build();
     }
