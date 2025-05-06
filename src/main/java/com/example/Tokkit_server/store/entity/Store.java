@@ -11,8 +11,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.awt.*;
+import org.locationtech.jts.geom.Point;
 
 
 @Entity
@@ -48,6 +47,6 @@ public class Store extends BaseTimeEntity {
 	@JoinColumn(name = "merchant_id", unique = true)
 	private Merchant merchant;
 
-	@Column(columnDefinition = "POINT")
-	private Point location;
+	@Column(columnDefinition = "POINT", nullable = false)
+	private Point location; // JTS Point로 수정함
 }
