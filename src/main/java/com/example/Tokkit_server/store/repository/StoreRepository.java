@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.store.repository;
 
+import com.example.Tokkit_server.store.dto.response.StoreResponse;
 import com.example.Tokkit_server.store.entity.Store;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,4 +12,8 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface StoreRepository extends JpaRepository<Store, Long> {
 
+    @Query("SELECT new com.example.Tokkit_server.store.dto.response.StoreResponse(s) " +
+           "FROM VoucherStore vs JOIN vs.store s " +
+           "WHERE vs.voucher.id = :voucherId")
+    Page<StoreResponse> findByVoucherId(@Param("voucherId") Long voucherId, Pageable pageable);
 }
