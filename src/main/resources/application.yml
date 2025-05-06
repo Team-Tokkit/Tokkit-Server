@@ -19,7 +19,5 @@ spring:
         default_batch_fetch_size: 1000
 
 springdoc:
-  api-docs:
-    path: /api/v3/api-docs
   swagger-ui:
-    path: /api/swagger-ui.html
+    path: /
