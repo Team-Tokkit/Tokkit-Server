@@ -2,7 +2,7 @@ package com.example.Tokkit_server;
 import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.domain.Store;
-import com.example.Tokkit_server.service.command.StoreCommandService;
+import com.example.Tokkit_server.store.service.command.StoreCommandService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
