@@ -34,6 +34,8 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
             jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");
         }
 
+
+
         String sort = Optional.ofNullable(request.getSort()).orElse("createdAt");
         String dir = Optional.ofNullable(request.getDirection()).orElse("desc");
         jpql.append(" ORDER BY v.").append(sort).append(" ").append(dir);
