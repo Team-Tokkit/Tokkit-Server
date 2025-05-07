@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.hibernate:hibernate-core:6.2.12.Final'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
@@ -32,33 +34,15 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-
-	// Swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-
-	// QueryDSL
-	implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'
-	annotationProcessor 'com.querydsl:querydsl-apt:5.0.0:jakarta'
-	annotationProcessor 'jakarta.annotation:jakarta.annotation-api'
-	annotationProcessor 'jakarta.persistence:jakarta.persistence-api'
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
 
+	// JTS Point (공간 타입)을 JPA에서 인식하게 끔
+	implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
+	implementation 'org.locationtech.jts:jts-core:1.19.0' // JTS geometry
 }
 
 tasks.named('test') {
 	useJUnitPlatform()
-}
-
-def querydslDir = "$buildDir/generated/querydsl"
-
-sourceSets {
-	main.java.srcDirs += querydslDir
-}
-
-tasks.withType(JavaCompile).configureEach {
-	options.annotationProcessorGeneratedSourcesDirectory = file(querydslDir)
-}
-
-clean.doLast {
-	delete file(querydslDir)
 }
