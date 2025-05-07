@@ -39,7 +39,17 @@ public enum ErrorStatus implements BaseErrorCode {
 	VOUCHER_OWNERSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "VOUCHER_004", "해당 사용자의 바우처 소유 정보가 없습니다."),
 
 	// User 관련
-	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "존재하지 않는 사용자입니다.");
+	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "존재하지 않는 사용자입니다."),
+	USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER4091", "이미 존재하는 유저입니다."),
+
+	// Notification 관련
+	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404", "해당 알림을 찾을 수 없습니다."),
+	NOTIFICATION_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATIONSETTING404", "알림 설정 정보가 존재하지 않습니다."),
+
+	// Email 관련
+	EMAIL_NOT_SEND(HttpStatus.INTERNAL_SERVER_ERROR, "EMAILSEND500", "이메일 전송 실패, 관리자에게 문의 바랍니다."),
+	VERIFY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "VERIFY500", "이메일 인증 실패, 재시도 바랍니다."),
+	EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAILVERIFY400", "이메일 인증이 완료되지 않았습니다.");
 
 
 	private final HttpStatus httpStatus;

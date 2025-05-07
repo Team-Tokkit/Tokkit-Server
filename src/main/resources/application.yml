@@ -15,11 +15,56 @@ spring:
         format_sql: true
         use_sql_comments: true
         hbm2ddl:
-          auto: none
+          auto: update
         default_batch_fetch_size: 1000
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: teamtokkit@gmail.com
+    password: ${EMAIL_KEY}
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connectiontimeout: 5000
+          timeout: 5000
+          writetimeout: 5000
+
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+      enabled: true
+  jwt:
+    secret: ${JWT_SECRET}
+    token:
+      access-expiration-time: 1800000 # 30분
+      refresh-expiration-time: 1209600000 # 14일
+
+server:
+  servlet:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 springdoc:
   api-docs:
     path: /api/v3/api-docs
   swagger-ui:
     path: /api/swagger-ui.html
+
+## OCR API 설정
+naver:
+  ocr:
+    idcard:
+      secret-key: QWNqbmtJbmxRVndoQ3ljUEFpeVp5UnJmSlVMZ3NCc1E=
+      invoke-url: https://k9u3pyte9g.apigw.ntruss.com/custom/v1/41621/59bc81da5db993acb6c0bf60023dde4506d86af651654dc586f5f4b04a86fad0/document/id-card
+    business:
+      secret-key: d1pWcW54Y1FoWHhaa3hXaklIWkpXdmpldW56QW9tT24=
+      invoke-url: https://k9u3pyte9g.apigw.ntruss.com/custom/v1/41620/33646f10ecfd772acfd015b95b4be8e83c7ffcd95c19ad076e9e91c26bb4587e/document/biz-license
+
+

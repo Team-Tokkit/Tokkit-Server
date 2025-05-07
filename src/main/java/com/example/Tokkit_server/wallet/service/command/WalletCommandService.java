@@ -3,6 +3,7 @@ package com.example.Tokkit_server.wallet.service.command;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.example.Tokkit_server.wallet.enums.WalletType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -43,6 +44,27 @@ public class WalletCommandService {
     private final UserRepository userRepository;
     private final VoucherRepository voucherRepository;
     private final MerchantRepository merchantRepository;
+
+    // 전자 지갑 생성
+    @Transactional
+    public void createInitialWallet(Long userId) {
+        // 이미 전자지갑이 있는지 확인
+        if (walletRepository.existsByUserId(userId)) {
+            return;
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        Wallet wallet = Wallet.builder()
+                .user(user)
+                .depositBalance(0L)
+                .tokenBalance(0L)
+                .walletType(WalletType.USER)
+                .build();
+
+        walletRepository.save(wallet);
+    }
 
     /**
      * 지갑 잔액 조회

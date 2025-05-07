@@ -29,9 +29,9 @@ public class CorsConfig {
 		config.addAllowedHeader("*");
 		config.addAllowedMethod("*");
 		config.setExposedHeaders(List.of(
-			"accessToken",
-			"Authorization",
-			"Authorization-refresh"
+				"accessToken",
+				"Authorization",
+				"Authorization-refresh"
 		));
 		config.addExposedHeader("Set-Cookie");
 
@@ -40,4 +40,3 @@ public class CorsConfig {
 		return new CorsFilter(source);
 	}
 }
-
