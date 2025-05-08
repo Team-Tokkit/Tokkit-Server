@@ -74,16 +74,6 @@ public class UserService {
         return UserResponseDto.from(user);
     }
 
-    public Long findUserIdByEmail(String email) {
-        // 이메일로 사용자 정보를 조회
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-
-        // 사용자 ID 반환
-        return user.getId();
-    }
-
-
     @Transactional
     public UserResponseDto updateUserPassword(String email, UpdateUserPasswordRequestDto userRequestDto) {
         User user = userRepository.findByEmail(email)

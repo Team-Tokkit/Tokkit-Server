@@ -41,18 +41,6 @@ public class UserController {
         return ApiResponse.onSuccess(userService.getUser(userDetails.getUsername()));
     }
 
-    @PutMapping("/password-update")
-    @Operation(summary = "비밀번호 변경", description = "유저의 비밀번호를 변경합니다.")
-    public ApiResponse<?> updateUser(@AuthenticationPrincipal UserDetails userDetails,
-                                     @RequestBody UpdateUserPasswordRequestDto requestDto) {
-        try {
-            UserResponseDto response = userService.updateUserPassword(userDetails.getUsername(), requestDto);
-            return ApiResponse.onSuccess(response);
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.onFailure("400", e.getMessage(), null);
-        }
-    }
-
     @PostMapping("/findPw")
     @Operation(summary = "비밀번호 찾기(재설성)", description = "유저의 비밀번호를 랜덤한 값으로 설정한 후 이메일로 전송합니다.")
     public ApiResponse<?> passWordReissuance(@RequestParam("email") String email) {
@@ -65,6 +53,18 @@ public class UserController {
         }
     }
 
+    @PutMapping("/password-update")
+    @Operation(summary = "비밀번호 변경", description = "유저의 비밀번호를 변경합니다.")
+    public ApiResponse<?> updateUser(@AuthenticationPrincipal UserDetails userDetails,
+                                     @RequestBody UpdateUserPasswordRequestDto requestDto) {
+        try {
+            UserResponseDto response = userService.updateUserPassword(userDetails.getUsername(), requestDto);
+            return ApiResponse.onSuccess(response);
+        } catch (IllegalArgumentException e) {
+            return ApiResponse.onFailure("400", e.getMessage(), null);
+        }
+    }
+
     @PostMapping("/simple-password/send-verification")
     @Operation(summary = "간편 비밀번호 재설정 시 이메일 전송", description = "유저가 간편 비밀번호를 재설정 하기 전에 이메일 인증을 하기 위해 인증 코드를 이메일로 전송합니다.")
     public ApiResponse<?> sendSimplePasswordVerification(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -72,7 +72,7 @@ public class UserController {
             emailService.sendSimplePasswordVerification(userDetails.getUsername());
             return ApiResponse.onSuccess(SuccessStatus._OK);
         } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.EMAIL_NOT_SEND);
+            return ApiResponse.onFailure("500", e.getMessage(), null);
         }
     }
 

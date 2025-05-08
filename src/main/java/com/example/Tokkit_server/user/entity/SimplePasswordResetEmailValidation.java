@@ -16,9 +16,6 @@ import java.util.Date;
 @AllArgsConstructor
 public class SimplePasswordResetEmailValidation extends BaseTimeEntity {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
     private String email;
 
     private String code;
