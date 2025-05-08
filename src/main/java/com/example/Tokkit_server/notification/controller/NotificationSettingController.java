@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.example.Tokkit_server.global.apiPayload.ApiResponse;
 import com.example.Tokkit_server.global.apiPayload.code.status.SuccessStatus;
-import com.example.Tokkit_server.notification.dto.NotificationCategoryUpdateRequestDto;
+import com.example.Tokkit_server.notification.dto.request.NotificationCategoryUpdateRequestDto;
 import com.example.Tokkit_server.notification.service.NotificationSettingService;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.response.NotificationCategorySettingResponseDto;

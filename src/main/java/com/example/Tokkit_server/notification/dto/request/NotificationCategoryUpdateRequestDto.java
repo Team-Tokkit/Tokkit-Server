@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.notification.dto;
+package com.example.Tokkit_server.notification.dto.request;
 
 
 import com.example.Tokkit_server.notification.entity.NotificationCategorySetting;

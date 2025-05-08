@@ -2,7 +2,7 @@ package com.example.Tokkit_server.notification.service;
 
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.notification.dto.NotificationCategoryUpdateRequestDto;
+import com.example.Tokkit_server.notification.dto.request.NotificationCategoryUpdateRequestDto;
 import com.example.Tokkit_server.notification.entity.NotificationCategorySetting;
 import com.example.Tokkit_server.notification.enums.NotificationCategory;
 import com.example.Tokkit_server.notification.repository.NotificationSettingRepository;
