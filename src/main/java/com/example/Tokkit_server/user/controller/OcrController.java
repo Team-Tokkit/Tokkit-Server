@@ -31,16 +31,32 @@ public class OcrController {
     ) {
         try {
             Map<String, String> ocr = ocrService.extractInfo(image);
+            System.out.println("OCR 추출 결과: " + ocr);
 
-            if (ocr.get("name") == null || ocr.get("rrn") == null || ocr.get("issuedDate") == null)
-                throw new GeneralException(ErrorStatus._BAD_REQUEST);
+            String extractedName = ocr.get("name");
+            String extractedRrn = ocr.get("rrn");
+            String extractedIssuedDate = ocr.get("issuedDate");
 
-            boolean match = ocr.get("name").equals(name) &&
-                    ocr.get("rrn").startsWith(rrnPrefix) &&
-                    ocr.get("issuedDate").equals(issuedDate);
+            // 어떤 값이 null인지 명시적으로 확인
+            if (extractedName == null || extractedRrn == null || extractedIssuedDate == null) {
+                return ApiResponse.onFailure(
+                        ErrorStatus._BAD_REQUEST.getCode(),
+                        "OCR로부터 필요한 정보를 모두 추출하지 못했습니다.",
+                        ocr  // 👉 추출된 값 그대로 반환
+                );
+            }
+
+            // 값 비교
+            boolean match = extractedName.equals(name)
+                    && extractedRrn.startsWith(rrnPrefix)
+                    && extractedIssuedDate.equals(issuedDate);
 
             if (!match) {
-                return ApiResponse.onFailure(ErrorStatus._BAD_REQUEST.getCode(), "입력값과 신분증 정보가 일치하지 않습니다.", null);
+                return ApiResponse.onFailure(
+                        ErrorStatus._BAD_REQUEST.getCode(),
+                        "입력값과 신분증 정보가 일치하지 않습니다.",
+                        ocr
+                );
             }
 
             return ApiResponse.onSuccess("본인 확인 완료");
@@ -52,4 +68,5 @@ public class OcrController {
             throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
         }
     }
+
 }

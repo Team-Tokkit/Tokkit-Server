@@ -6,16 +6,23 @@ import org.springframework.context.annotation.Configuration;
 
 @Getter
 @Configuration
-@ConfigurationProperties(prefix = "ocr")
+@ConfigurationProperties(prefix = "naver.ocr")
 public class OcrProperties {
-    private String secretKey;
-    private String invokeUrl;
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
-    }
+    private final OcrEndpoint idcard = new OcrEndpoint();
+    private final OcrEndpoint business = new OcrEndpoint();
 
-    public void setInvokeUrl(String invokeUrl) {
-        this.invokeUrl = invokeUrl;
+    @Getter
+    public static class OcrEndpoint {
+        private String secretKey;
+        private String invokeUrl;
+
+        public void setSecretKey(String secretKey) {
+            this.secretKey = secretKey;
+        }
+
+        public void setInvokeUrl(String invokeUrl) {
+            this.invokeUrl = invokeUrl;
+        }
     }
 }
