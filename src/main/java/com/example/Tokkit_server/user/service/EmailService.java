@@ -141,7 +141,7 @@ public class EmailService {
         StringBuffer key = new StringBuffer();
         Random rnd = new Random();
 
-        for (int i = 0; i < 4; i++) { // 비밀번호 4자리
+        for (int i = 0; i < 6; i++) { // 비밀번호 6자리
             int index = rnd.nextInt(3); // 0~2 까지 랜덤
 
             switch (index) {

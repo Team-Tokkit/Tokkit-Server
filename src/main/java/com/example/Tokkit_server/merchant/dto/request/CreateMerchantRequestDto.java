@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.merchant.dto;
+package com.example.Tokkit_server.merchant.dto.request;
 
 import com.example.Tokkit_server.global.entity.StoreCategory;
 import com.example.Tokkit_server.merchant.entity.Merchant;

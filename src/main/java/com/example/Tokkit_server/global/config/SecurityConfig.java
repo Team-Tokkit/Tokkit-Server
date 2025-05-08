@@ -42,6 +42,8 @@ public class SecurityConfig {
             "/api/users/findPw",
             "/api/auth/reissue",
             "/api/auth/**",
+            "/api/merchants/emailCheck",
+            "/api/merchants/verification",
             "/swagger-ui/**",
             "/v3/api-docs/**",
     };

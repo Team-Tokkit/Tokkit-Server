@@ -10,7 +10,5 @@ import java.util.Optional;
 
 @Repository
 public interface EmailValidationRepository extends JpaRepository<EmailValidation, String> {
-    Optional<EmailValidation> findByEmail(String email);
-
     List<EmailValidation> findAllByEmail(String email);
 }

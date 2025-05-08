@@ -52,4 +52,6 @@ public class Merchant extends BaseTimeEntity {
 
     @OneToOne(mappedBy = "merchant")
     private Store store;
+
+
 }
