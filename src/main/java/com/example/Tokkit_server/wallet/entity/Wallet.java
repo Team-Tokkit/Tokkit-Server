@@ -42,6 +42,9 @@ public class Wallet extends BaseTimeEntity {
 	private Merchant merchant;
 
 	@Column(nullable = false)
+	private String accountNumber;
+
+	@Column(nullable = false)
 	private Long depositBalance;
 
 	private Long tokenBalance;
@@ -49,6 +52,7 @@ public class Wallet extends BaseTimeEntity {
 	@Enumerated(EnumType.STRING)
 	@Column(nullable = false)
 	private WalletType walletType;
+
 
 	public void updateBalance(Long deposit, Long token) {
 		this.depositBalance = deposit;

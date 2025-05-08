@@ -18,6 +18,7 @@ import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.user.repository.EmailValidationRepository;
 import com.example.Tokkit_server.user.repository.PasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.user.repository.UserRepository;
+import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.service.command.WalletCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -41,7 +42,6 @@ public class UserService {
             throw new GeneralException(ErrorStatus.USER_ALREADY_EXISTS);
         }
 
-        // 이메일 인증 여부 확인
         EmailValidation emailValidation = emailValidationRepository.findById(createUserRequestDto.getEmail())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
 
@@ -49,9 +49,12 @@ public class UserService {
             throw new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED);
         }
 
-        // 유저 생성
         User user = createUserRequestDto.toEntity(passwordEncoder);
         userRepository.save(user);
+
+        // 지갑 생성 후, 직접 set
+        Wallet wallet = walletCommandService.createInitialWalletForUser(user.getId());
+        user.setWallet(wallet);
 
         // 알림 설정
         for (NotificationCategory category : NotificationCategory.values()) {
@@ -63,12 +66,8 @@ public class UserService {
             notificationSettingRepository.save(setting);
         }
 
-        walletCommandService.createInitialWallet(user.getId());
-
         return UserResponseDto.from(user);
     }
-
-
 
     public UserResponseDto getUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("사용자가 존재히지 않습니다."));

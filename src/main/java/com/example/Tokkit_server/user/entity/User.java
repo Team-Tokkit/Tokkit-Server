@@ -83,4 +83,8 @@ public class User extends BaseTimeEntity {
     public void updateEmail(String newEmail) {
         this.email = newEmail;
     }
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
 }

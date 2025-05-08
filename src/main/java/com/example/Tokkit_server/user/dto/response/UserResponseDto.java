@@ -21,12 +21,15 @@ public class UserResponseDto {
 
     public String phoneNumber;
 
+    public String accountNumber;
+
     public static UserResponseDto from(User user) {
         return UserResponseDto.builder()
                 .id(user.getId())
                 .name(user.getName())
                 .email(user.getEmail())
                 .phoneNumber(user.getPhoneNumber())
+                .accountNumber(user.getWallet().getAccountNumber())
                 .build();
     }
 }

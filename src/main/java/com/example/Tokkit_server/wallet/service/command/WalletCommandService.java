@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.example.Tokkit_server.wallet.enums.WalletType;
+import com.example.Tokkit_server.wallet.utils.AccountGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -47,10 +48,10 @@ public class WalletCommandService {
 
     // 전자 지갑 생성
     @Transactional
-    public void createInitialWallet(Long userId) {
-        // 이미 전자지갑이 있는지 확인
+    public Wallet createInitialWalletForUser(Long userId) {
         if (walletRepository.existsByUserId(userId)) {
-            return;
+            return walletRepository.findByUserId(userId)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
         }
 
         User user = userRepository.findById(userId)
@@ -61,9 +62,10 @@ public class WalletCommandService {
                 .depositBalance(0L)
                 .tokenBalance(0L)
                 .walletType(WalletType.USER)
+                .accountNumber(AccountGenerator.generateAccountNumber())
                 .build();
 
-        walletRepository.save(wallet);
+        return walletRepository.save(wallet);
     }
 
     /**
