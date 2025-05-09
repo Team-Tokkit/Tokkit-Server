@@ -25,8 +25,14 @@ public class VoucherService {
      * [1] 바우처 목록 조회 - 검색 + 필터 + 정렬 포함
      */
     public Page<VoucherResponse> searchVouchers(VoucherSearchRequest request, Pageable pageable) {
-        return voucherRepository.searchVouchers(request, pageable)
-            .map(VoucherResponse::from);
+        Page<VoucherResponse> result = voucherRepository.searchVouchers(request, pageable)
+                .map(VoucherResponse::from);
+
+        if (result.isEmpty()) {
+            throw new GeneralException(ErrorStatus.VOUCHER_NOT_FOUND);
+        }
+
+        return result;
     }
 
     /**

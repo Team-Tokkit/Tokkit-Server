@@ -7,7 +7,7 @@ import java.util.List;
 
 
 import com.example.Tokkit_server.store.entity.Store;
-import com.example.Tokkit_server.global.entity.StoreCategory;
+import com.example.Tokkit_server.store.enums.StoreCategory;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
@@ -39,8 +39,21 @@ public class Voucher extends BaseTimeEntity {
     @Column(nullable = false)
     private String detailDescription;
 
+    // 할인금액
     @Column(nullable = false)
     private Integer price;
+
+    // 정가
+    @Column(nullable = false)
+    private Integer originalPrice;
+
+    // 총 바우처 발행 개수
+    @Column(nullable = false)
+    private Integer totalCount;
+
+    // 남은 개수
+    @Column(nullable = false)
+    private Integer remainingCount;
 
     @Column(nullable = false)
     private LocalDateTime validDate;
@@ -62,9 +75,8 @@ public class Voucher extends BaseTimeEntity {
     @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL)
     private List<VoucherStore> voucherStores = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
-    private StoreCategory category;
+    @Enumerated(EnumType.STRING)
+    private StoreCategory storeCategory;
 
     public void addVoucherStore(Store store) {
         VoucherStore vs = VoucherStore.builder()
@@ -74,5 +86,11 @@ public class Voucher extends BaseTimeEntity {
         this.voucherStores.add(vs);
     }
 
+    public void decreaseRemainingCount() {
+        if (this.remainingCount <= 0) {
+            throw new IllegalStateException("잔여 수량이 부족합니다.");
+        }
+        this.remainingCount -= 1;
+    }
 
 }
