@@ -33,7 +33,7 @@ public class StoreService {
 			.newZipcode(dto.getNewZipcode())
 			.longitude(dto.getLongitude())
 			.latitude(dto.getLatitude())
-			.storeCategory(dto.getStringCategory())
+			.storeCategory(dto.getStoreCategory())
 			.region(
 				regionRepository.findById(dto.getRegionId())
 					.orElseThrow(() -> new GeneralException(ErrorStatus.REGION_NOT_FOUND))

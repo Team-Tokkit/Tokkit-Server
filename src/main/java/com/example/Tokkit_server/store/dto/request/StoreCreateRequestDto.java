@@ -12,7 +12,7 @@ public class StoreCreateRequestDto {
     private Double latitude;
     private Double longitude;
 
-    private StoreCategory stringCategory;
+    private StoreCategory storeCategory;
     private Long regionId;
     private Long merchantId;
 }

@@ -63,7 +63,7 @@ public class Voucher extends BaseTimeEntity {
     private List<VoucherStore> voucherStores = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
-    private StoreCategory category;
+    private StoreCategory storeCategory;
 
     public void addVoucherStore(Store store) {
         VoucherStore vs = VoucherStore.builder()
