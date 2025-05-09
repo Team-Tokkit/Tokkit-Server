@@ -1,5 +1,7 @@
 package com.example.Tokkit_server.store.repository;
 
+import java.util.Optional;
+
 import com.example.Tokkit_server.store.dto.response.StoreResponse;
 import com.example.Tokkit_server.store.entity.Store;
 import org.springframework.data.domain.Page;
@@ -16,4 +18,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
            "FROM VoucherStore vs JOIN vs.store s " +
            "WHERE vs.voucher.id = :voucherId")
     Page<StoreResponse> findByVoucherId(@Param("voucherId") Long voucherId, Pageable pageable);
+
+    Optional<Store> findByIdAndMerchantId(Long storeId, Long merchantId);
 }
