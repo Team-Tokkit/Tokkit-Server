@@ -20,6 +20,7 @@ public class VoucherOwnershipDetailResponse {
     private String voucherDetailDescription;
     private String voucherRefundPolicy;
     private Long remainingAmount;
+    private String status;
 
     private Page<StoreResponse> stores;
 
@@ -32,6 +33,7 @@ public class VoucherOwnershipDetailResponse {
                 .voucherDetailDescription(ownership.getVoucher().getDetailDescription())
                 .voucherRefundPolicy(ownership.getVoucher().getRefundPolicy())
                 .remainingAmount(ownership.getRemainingAmount())
+                .status(ownership.getStatus().name())
                 .stores(stores)
                 .build();
     }
