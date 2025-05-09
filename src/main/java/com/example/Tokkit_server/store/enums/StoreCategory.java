@@ -7,4 +7,8 @@ public enum StoreCategory {
     TOURISM,
     LODGING,
     EDUCATION
+<<<<<<< HEAD
 }
+=======
+} 
+>>>>>>> develop

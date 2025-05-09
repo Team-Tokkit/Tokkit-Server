@@ -39,8 +39,23 @@ public class Voucher extends BaseTimeEntity {
     @Column(nullable = false)
     private String detailDescription;
 
+    // 할인금액
     @Column(nullable = false)
     private Integer price;
+
+    // 정가
+    @Column(nullable = false)
+    private Integer originalPrice;
+
+
+    // 총 바우처 발행 개수
+    @Column(nullable = false)
+    private Integer totalCount;
+
+    // 남은 개수
+    @Column(nullable = false)
+    private Integer remainingCount;
+
 
     @Column(nullable = false)
     private LocalDateTime validDate;
@@ -73,5 +88,11 @@ public class Voucher extends BaseTimeEntity {
         this.voucherStores.add(vs);
     }
 
+    public void decreaseRemainingCount() {
+        if (this.remainingCount <= 0) {
+            throw new IllegalStateException("잔여 수량이 부족합니다.");
+        }
+        this.remainingCount -= 1;
+    }
 
 }

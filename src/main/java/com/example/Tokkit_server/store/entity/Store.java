@@ -5,6 +5,10 @@ import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.store.enums.StoreCategory;
+<<<<<<< HEAD
+=======
+
+>>>>>>> develop
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -35,12 +39,22 @@ public class Store extends BaseTimeEntity {
 
     private Double latitude;
 
+<<<<<<< HEAD
     @Enumerated(EnumType.STRING)
     private StoreCategory storeCategory;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "region_id")
     private Region region;
+=======
+	@Enumerated(EnumType.STRING)
+	private StoreCategory storeCategory;
+
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "region_id")
+	private Region region;
+>>>>>>> develop
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "merchant_id", unique = true)

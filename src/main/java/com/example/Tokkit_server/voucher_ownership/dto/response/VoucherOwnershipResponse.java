@@ -14,6 +14,7 @@ public class VoucherOwnershipResponse {
     private String voucherContact;
     private Long remainingAmount;
     private Boolean isVoucher;
+    private VoucherOwnershipStatus status;
 
     public static VoucherOwnershipResponse from(VoucherOwnership voucherOwnership) {
         return VoucherOwnershipResponse.builder()
@@ -22,6 +23,7 @@ public class VoucherOwnershipResponse {
                 .voucherContact(voucherOwnership.getVoucher().getContact())
                 .remainingAmount(voucherOwnership.getRemainingAmount())
                 .isVoucher(voucherOwnership.getStatus() == VoucherOwnershipStatus.AVAILABLE)
+                .status(VoucherOwnershipStatus.AVAILABLE)
                 .build();
     }
 }

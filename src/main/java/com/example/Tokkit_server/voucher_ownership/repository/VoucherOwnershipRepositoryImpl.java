@@ -25,6 +25,7 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
         StringBuilder jpql = new StringBuilder("SELECT vo FROM VoucherOwnership vo JOIN FETCH vo.voucher v WHERE vo.wallet.user.id = :userId");
 
         if (request.getStoreCategory() != null) {
+
             jpql.append(" AND v.category = :category");
         }
 
