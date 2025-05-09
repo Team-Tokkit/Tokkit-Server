@@ -47,11 +47,14 @@ public class Merchant extends BaseTimeEntity {
     private Boolean isDormant;
 
     private String roles;
+
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "merchant")
     private Wallet wallet;
 
     @OneToOne(mappedBy = "merchant")
     private Store store;
 
-
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
 }

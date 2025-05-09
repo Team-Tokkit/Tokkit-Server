@@ -44,6 +44,7 @@ public class SecurityConfig {
             "/api/auth/**",
             "/api/merchants/emailCheck",
             "/api/merchants/verification",
+            "/api/merchants/register",
             "/swagger-ui/**",
             "/v3/api-docs/**",
     };

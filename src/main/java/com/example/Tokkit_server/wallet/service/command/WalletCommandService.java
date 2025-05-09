@@ -46,7 +46,7 @@ public class WalletCommandService {
     private final VoucherRepository voucherRepository;
     private final MerchantRepository merchantRepository;
 
-    // 전자 지갑 생성
+    // 유저 - 전자 지갑 생성
     @Transactional
     public Wallet createInitialWalletForUser(Long userId) {
         if (walletRepository.existsByUserId(userId)) {
@@ -62,6 +62,28 @@ public class WalletCommandService {
                 .depositBalance(0L)
                 .tokenBalance(0L)
                 .walletType(WalletType.USER)
+                .accountNumber(AccountGenerator.generateAccountNumber())
+                .build();
+
+        return walletRepository.save(wallet);
+    }
+
+    // 가맹점주 - 전자 지갑 생성
+    @Transactional
+    public Wallet createInitialWalletForMerchant(Long merchantId) {
+        if (walletRepository.existsByMerchantId(merchantId)) {
+            return walletRepository.findByMerchantId(merchantId)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
+        }
+
+        Merchant merchant = merchantRepository.findById(merchantId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+
+        Wallet wallet = Wallet.builder()
+                .merchant(merchant)
+                .depositBalance(0L)
+                .tokenBalance(0L)
+                .walletType(WalletType.MERCHANT)
                 .accountNumber(AccountGenerator.generateAccountNumber())
                 .build();
 

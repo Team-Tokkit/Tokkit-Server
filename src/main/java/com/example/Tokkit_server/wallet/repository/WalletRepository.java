@@ -13,7 +13,11 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
 
     Optional<Wallet> findByUser_Id(Long userId);
 
+    Optional<Wallet> findByMerchantId(Long merchantId);
+
     Optional<Wallet> findByMerchant_Id(Long merchantId);
 
     boolean existsByUserId(Long userId);
+
+    boolean existsByMerchantId(Long merchantId);
 }

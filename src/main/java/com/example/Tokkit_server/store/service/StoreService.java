@@ -8,7 +8,6 @@ import org.springframework.stereotype.Service;
 
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.global.repository.StoreCategoryRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.region.repository.RegionRepository;
 import com.example.Tokkit_server.store.dto.request.StoreCreateRequestDto;
@@ -23,7 +22,6 @@ public class StoreService {
 	private final MerchantRepository merchantRepository;
 	private final RegionRepository regionRepository;
 	private final StoreRepository storeRepository;
-	private final StoreCategoryRepository storeCategoryRepository;
 
 	public void createStore(StoreCreateRequestDto dto) {
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
@@ -35,10 +33,7 @@ public class StoreService {
 			.newZipcode(dto.getNewZipcode())
 			.longitude(dto.getLongitude())
 			.latitude(dto.getLatitude())
-			.storeCategory(
-				storeCategoryRepository.findById(dto.getCategoryId())
-					.orElseThrow(() -> new GeneralException(ErrorStatus.STORE_CATEGORY_NOT_FOUND))
-			)
+			.storeCategory(dto.getStoreCategory())
 			.region(
 				regionRepository.findById(dto.getRegionId())
 					.orElseThrow(() -> new GeneralException(ErrorStatus.REGION_NOT_FOUND))

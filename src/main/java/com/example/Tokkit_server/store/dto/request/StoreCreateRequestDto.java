@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.store.dto.request;
 
+import com.example.Tokkit_server.store.enums.StoreCategory;
 import lombok.Getter;
 
 @Getter
@@ -11,7 +12,7 @@ public class StoreCreateRequestDto {
     private Double latitude;
     private Double longitude;
 
-    private Long categoryId;
+    private StoreCategory storeCategory;
     private Long regionId;
     private Long merchantId;
 }

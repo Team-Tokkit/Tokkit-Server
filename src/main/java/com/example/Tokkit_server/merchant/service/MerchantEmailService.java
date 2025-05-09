@@ -1,12 +1,8 @@
 package com.example.Tokkit_server.merchant.service;
 
-import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.entity.MerchantEmailValidation;
 import com.example.Tokkit_server.merchant.repository.MerchantEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
-import com.example.Tokkit_server.user.entity.EmailValidation;
-import com.example.Tokkit_server.user.entity.SimplePasswordResetEmailValidation;
-import com.example.Tokkit_server.user.entity.User;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -138,7 +134,6 @@ public class MerchantEmailService {
     }
 
 //    public void sendMessageForPassword(String to)throws Exception {
-//        // TODO Auto-generated method stub
 //        MimeMessage message = createPasswordMessage(to);
 //        try{//예외처리
 //            emailSender.send(message);
