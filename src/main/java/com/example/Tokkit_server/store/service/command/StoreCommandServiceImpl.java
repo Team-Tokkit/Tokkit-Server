@@ -1,8 +1,10 @@
 package com.example.Tokkit_server.store.service.command;
 
-import com.example.Tokkit_server.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.domain.Store;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.store.dto.response.KakaoMapStoreResponse;
+import com.example.Tokkit_server.store.enums.StoreCategory;
+import com.example.Tokkit_server.store.repository.StoreRepository;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -14,12 +16,20 @@ import java.util.stream.Collectors;
 public class StoreCommandServiceImpl implements StoreCommandService {
     private final StoreRepository storeRepository;
 
-    public List<StoreResponse> getStoresByRadius(double lat, double lng, double radius) {
+    @Override
+    public List<KakaoMapStoreResponse> findNearbyStores(double lat, double lng, double radius, StoreCategory category, String keyword) {
         if (radius <= 0) {
             throw new GeneralException(ErrorStatus.INVALID_RADIUS);
         }
 
-        List<Store> stores = storeRepository.findNearbyStoresByUserVoucher(1l,lat, lng, radius);
-        return stores.stream().map(StoreResponse::from).collect(Collectors.toList());
+        // 이미 KakaoMapStoreResponse를 반환하므로 추가 변환 불필요
+        return storeRepository.findNearbyStores(
+                1L, // userId는 필요 시 동적으로 변경
+                lat,
+                lng,
+                radius,
+                category != null ? category.name() : null,
+                keyword
+        );
     }
 }

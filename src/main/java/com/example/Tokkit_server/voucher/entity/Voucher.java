@@ -7,7 +7,7 @@ import java.util.List;
 
 
 import com.example.Tokkit_server.store.entity.Store;
-import com.example.Tokkit_server.global.entity.StoreCategory;
+import com.example.Tokkit_server.store.enums.StoreCategory;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
@@ -54,12 +54,6 @@ public class Voucher extends BaseTimeEntity {
     @JoinColumn(name = "merchant_id", nullable = false)
     private Merchant merchant;
 
-<<<<<<< HEAD:src/main/java/com/example/Tokkit_server/domain/Voucher.java
-
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "voucher_store_id", nullable = false)
-    private VoucherStore voucherStore;
-=======
     @Builder.Default
     @OneToMany(mappedBy = "voucher")
     private List<VoucherOwnership> ownerships = new ArrayList<>();
@@ -68,8 +62,7 @@ public class Voucher extends BaseTimeEntity {
     @OneToMany(mappedBy = "voucher", cascade = CascadeType.ALL)
     private List<VoucherStore> voucherStores = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_id", nullable = false)
+    @Enumerated(EnumType.STRING)
     private StoreCategory category;
 
     public void addVoucherStore(Store store) {
@@ -79,7 +72,6 @@ public class Voucher extends BaseTimeEntity {
                 .build();
         this.voucherStores.add(vs);
     }
->>>>>>> develop:src/main/java/com/example/Tokkit_server/voucher/entity/Voucher.java
 
 
 }

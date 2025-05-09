@@ -17,10 +17,10 @@ public enum ErrorStatus implements BaseErrorCode {
 
 	// 가장 일반적인 응답
 	_INTERNAL_SERVER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "COMMON500", "서버 에러, 관리자에게 문의 바랍니다."),
-	_BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400","잘못된 요청입니다."),
-	_UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
+	_BAD_REQUEST(HttpStatus.BAD_REQUEST, "COMMON400", "잘못된 요청입니다."),
+	_UNAUTHORIZED(HttpStatus.UNAUTHORIZED, "COMMON401", "인증이 필요합니다."),
 	_FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
-	NOTICE_NOT_FOUND(HttpStatus.BAD_REQUEST, "NOTICE400","공지사항을 찾을 수 없습니다."),
+	NOTICE_NOT_FOUND(HttpStatus.BAD_REQUEST, "NOTICE400", "공지사항을 찾을 수 없습니다."),
 
 	// Store 관련
 	STORE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_001", "존재하지 않는 매장 카테고리입니다."),
@@ -39,7 +39,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	VOUCHER_OWNERSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "VOUCHER_004", "해당 사용자의 바우처 소유 정보가 없습니다."),
 
 	// User 관련
-	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "존재하지 않는 사용자입니다.");
+	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "존재하지 않는 사용자입니다."),
+
+	// Kakao Map 관련
+	INVALID_RADIUS(HttpStatus.BAD_REQUEST, "KAKAO_001", "유효하지 않은 반경입니다.");
 
 
 	private final HttpStatus httpStatus;
@@ -49,20 +52,20 @@ public enum ErrorStatus implements BaseErrorCode {
 	@Override
 	public ErrorReasonDTO getReason() {
 		return ErrorReasonDTO.builder()
-			.message(message)
-			.code(code)
-			.isSuccess(false)
-			.build();
+				.message(message)
+				.code(code)
+				.isSuccess(false)
+				.build();
 	}
 
 
 	@Override
 	public ErrorReasonDTO getReasonHttpStatus() {
 		return ErrorReasonDTO.builder()
-			.message(message)
-			.code(code)
-			.isSuccess(false)
-			.httpStatus(httpStatus)
-			.build();
+				.message(message)
+				.code(code)
+				.isSuccess(false)
+				.httpStatus(httpStatus)
+				.build();
 	}
-}
+	}

@@ -1,6 +1,8 @@
 package com.example.Tokkit_server.store.controller;
 
-import com.example.Tokkit_server.apiPayload.ApiResponse;
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
+import com.example.Tokkit_server.store.dto.response.KakaoMapStoreResponse;
+import com.example.Tokkit_server.store.enums.StoreCategory;
 import com.example.Tokkit_server.store.service.command.StoreCommandService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,12 +20,15 @@ public class StoreController {
     private final StoreCommandService storeCommandService;
 
     @GetMapping("/nearby")
-    public ApiResponse<List<StoreResponse>> getNearbyStores(
+    public ApiResponse<List<KakaoMapStoreResponse>> findNearbyStores(
             @RequestParam double lat,
             @RequestParam double lng,
-            @RequestParam(defaultValue = "1000") double radius) {
+            @RequestParam int radius,
+            @RequestParam(required = false) StoreCategory
+                    category,
+            @RequestParam(required = false) String keyword) {
 
-        List<StoreResponse> response = storeCommandService.getStoresByRadius(lat, lng, radius);
-        return (ApiResponse.onSuccess(response));
+        List<KakaoMapStoreResponse> stores = storeCommandService.findNearbyStores(lat, lng, radius, category, keyword);
+        return ApiResponse.onSuccess(stores);
     }
 }

@@ -1,10 +1,10 @@
 package com.example.Tokkit_server.store.entity;
 
 import com.example.Tokkit_server.region.entity.Region;
-import com.example.Tokkit_server.global.entity.StoreCategory;
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
 import com.example.Tokkit_server.merchant.entity.Merchant;
+import com.example.Tokkit_server.store.enums.StoreCategory;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -21,32 +21,31 @@ import org.locationtech.jts.geom.Point;
 @Builder
 public class Store extends BaseTimeEntity {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String storeName;
+    private String storeName;
 
-	private String roadAddress;
+    private String roadAddress;
 
-	private String newZipcode;
+    private String newZipcode;
 
-	private Double longitude;
+    private Double longitude;
 
-	private Double latitude;
+    private Double latitude;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "store_category_id")
-	private StoreCategory storeCategory;
+    @Enumerated(EnumType.STRING)
+    private StoreCategory storeCategory;
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "region_id")
-	private Region region;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "region_id")
+    private Region region;
 
-	@OneToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "merchant_id", unique = true)
-	private Merchant merchant;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "merchant_id", unique = true)
+    private Merchant merchant;
 
-	@Column(columnDefinition = "POINT", nullable = false)
-	private Point location; // JTS Point로 수정함
+    @Column(columnDefinition = "POINT", nullable = false)
+    private Point location; // JTS Point로 수정함
 }

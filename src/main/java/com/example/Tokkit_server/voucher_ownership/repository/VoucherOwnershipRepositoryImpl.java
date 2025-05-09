@@ -24,8 +24,8 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
     public Page<VoucherOwnership> searchMyVoucher(VoucherOwnershipSearchRequest request, Pageable pageable) {
         StringBuilder jpql = new StringBuilder("SELECT vo FROM VoucherOwnership vo JOIN FETCH vo.voucher v WHERE vo.wallet.user.id = :userId");
 
-        if (StringUtils.hasText(request.getCategory()) && !"ALL".equalsIgnoreCase(request.getCategory())) {
-            jpql.append(" AND v.category.name = :category");
+        if (request.getCategory() != null) {
+            jpql.append(" AND v.category = :category");
         }
 
         if (StringUtils.hasText(request.getSearchKeyword()) && !"ALL".equalsIgnoreCase(request.getSearchKeyword())) {
@@ -39,7 +39,7 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
         TypedQuery<VoucherOwnership> query = em.createQuery(jpql.toString(), VoucherOwnership.class);
         query.setParameter("userId", request.getUserId());
 
-        if (StringUtils.hasText(request.getCategory()) && !"ALL".equalsIgnoreCase(request.getCategory())) {
+        if (request.getCategory() != null) {
             query.setParameter("category", request.getCategory());
         }
 
