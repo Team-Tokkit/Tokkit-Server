@@ -14,11 +14,12 @@ public class VoucherDetailResponse {
     private Long id;
     private String name;
     private Integer price;
+    private Integer originalPrice;
+    private Integer remainingCount;
     private LocalDateTime validDate;
     private String detailDescription;
     private String refundPolicy;
     private String contact;
-
     private Page<StoreResponse> stores;
 
     public static VoucherDetailResponse from (Voucher voucher, Page<StoreResponse> stores) {
@@ -26,6 +27,8 @@ public class VoucherDetailResponse {
                 .id(voucher.getId())
                 .name(voucher.getName())
                 .price(voucher.getPrice())
+                .originalPrice(voucher.getOriginalPrice())
+                .remainingCount(voucher.getRemainingCount())
                 .validDate(voucher.getValidDate())
                 .detailDescription(voucher.getDetailDescription())
                 .refundPolicy(voucher.getRefundPolicy())
