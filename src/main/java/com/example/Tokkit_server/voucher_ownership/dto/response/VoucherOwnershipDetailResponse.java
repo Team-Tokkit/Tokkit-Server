@@ -2,6 +2,7 @@ package com.example.Tokkit_server.voucher_ownership.dto.response;
 
 import java.time.LocalDateTime;
 
+import com.example.Tokkit_server.voucher_ownership.enums.VoucherOwnershipStatus;
 import org.springframework.data.domain.Page;
 
 import com.example.Tokkit_server.store.dto.response.StoreResponse;
@@ -20,7 +21,7 @@ public class VoucherOwnershipDetailResponse {
     private String voucherDetailDescription;
     private String voucherRefundPolicy;
     private Long remainingAmount;
-    private String status;
+    private VoucherOwnershipStatus status;
 
     private Page<StoreResponse> stores;
 
@@ -33,7 +34,7 @@ public class VoucherOwnershipDetailResponse {
                 .voucherDetailDescription(ownership.getVoucher().getDetailDescription())
                 .voucherRefundPolicy(ownership.getVoucher().getRefundPolicy())
                 .remainingAmount(ownership.getRemainingAmount())
-                .status(ownership.getStatus().name())
+                .status(VoucherOwnershipStatus.AVAILABLE)
                 .stores(stores)
                 .build();
     }
