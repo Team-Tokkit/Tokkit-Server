@@ -42,6 +42,9 @@ public class Wallet extends BaseTimeEntity {
 	private Merchant merchant;
 
 	@Column(nullable = false)
+	private String accountNumber;
+
+	@Column(nullable = false)
 	private Long depositBalance;
 
 	private Long tokenBalance;
