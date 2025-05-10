@@ -47,7 +47,6 @@ public class Voucher extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer originalPrice;
 
-
     // 총 바우처 발행 개수
     @Column(nullable = false)
     private Integer totalCount;
@@ -78,7 +77,11 @@ public class Voucher extends BaseTimeEntity {
     private List<VoucherStore> voucherStores = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
+<<<<<<< Updated upstream
     private StoreCategory storeCategory;
+=======
+    private StoreCategory category;
+>>>>>>> Stashed changes
 
     public void addVoucherStore(Store store) {
         VoucherStore vs = VoucherStore.builder()
@@ -94,5 +97,10 @@ public class Voucher extends BaseTimeEntity {
         }
         this.remainingCount -= 1;
     }
+<<<<<<< Updated upstream
+=======
+
+
+>>>>>>> Stashed changes
 
 }

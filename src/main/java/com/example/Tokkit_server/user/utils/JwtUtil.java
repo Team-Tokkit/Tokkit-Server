@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.user.utils;
 
 
+import com.example.Tokkit_server.merchant.auth.CustomMerchantDetails;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.JwtDto;
 import com.example.Tokkit_server.user.entity.Token;
@@ -94,6 +95,22 @@ public class JwtUtil {
                 .compact(); //합치기
     }
 
+    public String tokenProvider(CustomMerchantDetails merchantDetails, Instant expiration) {
+        String authorities = merchantDetails.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .collect(Collectors.joining(","));
+
+        return Jwts.builder()
+                .header().add("typ", "JWT").and()
+                .subject(merchantDetails.getBusinessNumber()) // 사업자번호를 subject로!
+                .claim("role", authorities)
+                .issuedAt(Date.from(Instant.now()))
+                .expiration(Date.from(expiration))
+                .signWith(secretKey)
+                .compact();
+    }
+
+
     // principalDetails 객체에 대해 새로운 JWT 액세스 토큰을 생성
     public String createJwtAccessToken(CustomUserDetails customUserDetails) {
         Instant expiration = Instant.now().plusMillis(accessExpMs);
@@ -115,6 +132,20 @@ public class JwtUtil {
 
         return refreshToken;
     }
+
+    public String createJwtAccessToken(CustomMerchantDetails merchantDetails) {
+        return tokenProvider(merchantDetails, Instant.now().plusMillis(accessExpMs));
+    }
+
+    public String createJwtRefreshToken(CustomMerchantDetails merchantDetails) {
+        String refresh = tokenProvider(merchantDetails, Instant.now().plusMillis(refreshExpMs));
+        tokenRepository.save(Token.builder()
+                .email(merchantDetails.getBusinessNumber())  // subject 기준
+                .token(refresh)
+                .build());
+        return refresh;
+    }
+
 
     public Claims parseToken(String token) {
         try {

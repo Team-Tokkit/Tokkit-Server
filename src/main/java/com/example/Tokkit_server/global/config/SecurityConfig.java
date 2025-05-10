@@ -1,5 +1,10 @@
 package com.example.Tokkit_server.global.config;
 
+import com.example.Tokkit_server.merchant.auth.CustomMerchantDetailsService;
+import com.example.Tokkit_server.merchant.filter.CustomMerchantLoginFilter;
+import com.example.Tokkit_server.merchant.filter.MerchantJwtAuthenticationFilter;
+import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.user.auth.CustomUserDetailsService;
 import com.example.Tokkit_server.user.filter.CustomLoginFilter;
 import com.example.Tokkit_server.user.filter.JwtAuthenticationFilter;
 import com.example.Tokkit_server.user.repository.UserRepository;
@@ -9,107 +14,77 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
-import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.web.cors.CorsConfiguration;
-import org.springframework.web.cors.CorsConfigurationSource;
-import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
-
-import java.util.List;
 
 @Configuration
-@EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final AuthenticationConfiguration authenticationConfiguration;
+    private final CustomUserDetailsService userDetailsService;
+    private final CustomMerchantDetailsService merchantDetailsService;
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
-
-    private final String[] allowedUrls = {
-            "/api/users/ocr/verify-identity",
-            "/api/users/login",
-            "/api/users/register",
-            "/api/users/emailCheck",
-            "/api/users/verification",
-            "/api/users/findPw",
-            "/api/auth/reissue",
-            "/api/auth/**",
-            "/api/merchants/emailCheck",
-            "/api/merchants/verification",
-            "/api/merchants/register",
-            "/swagger-ui/**",
-            "/v3/api-docs/**",
-    };
-
-    private static final String SERVER_URL = "https://xxxxx";
-    private static final String FRONT_URL = "https://xxxxx";
-    private static final String FRONT_LOCALHOST_URL = "http://localhost:3000";
-    private static final String SERVER_LOCALHOST_URL = "http://localhost:8080";
+    private final MerchantRepository merchantRepository;
 
     @Bean
-    public CorsConfigurationSource apiConfigurationSource() {
-        CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowCredentials(true);
-        configuration.addAllowedOrigin(SERVER_URL);
-        configuration.addAllowedOrigin(FRONT_URL);
-        configuration.addAllowedOrigin(FRONT_LOCALHOST_URL);
-        configuration.addAllowedOrigin(SERVER_LOCALHOST_URL);
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        AuthenticationManager authManager = authenticationManager(http);
 
-        configuration.addAllowedHeader("*");
-        configuration.addAllowedMethod("*");
+        // 사용자 로그인 필터
+        CustomLoginFilter userLoginFilter = new CustomLoginFilter(authManager, jwtUtil);
+        userLoginFilter.setFilterProcessesUrl("/api/users/login");
 
-        configuration.setExposedHeaders(List.of(
-                "Authorization",
-                "accessToken",
-                "Authorization-refresh",
-                "Set-Cookie"
-        ));
+        // 가맹점주 로그인 필터
+        CustomMerchantLoginFilter merchantLoginFilter = new CustomMerchantLoginFilter(authManager, jwtUtil);
+        merchantLoginFilter.setFilterProcessesUrl("/api/merchants/login");
 
-        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);
-        return source;
+        return http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(
+                                "/api/users/ocr/verify-identity",
+                                "/api/users/login",
+                                "/api/users/register",
+                                "/api/users/emailCheck",
+                                "/api/users/verification",
+                                "/api/users/findPw",
+                                "/api/auth/reissue",
+                                "/api/auth/**",
+                                "/api/merchants/emailCheck",
+                                "/api/merchants/verification",
+                                "/api/merchants/register",
+                                "/swagger-ui/**",
+                                "/v3/api-docs/**"
+                        ).permitAll()
+                        .anyRequest().authenticated()
+                )
+                .exceptionHandling(configurer ->
+                        configurer.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
+                .addFilterBefore(userLoginFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(merchantLoginFilter, UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository), CustomLoginFilter.class)
+                .addFilterBefore(new MerchantJwtAuthenticationFilter(jwtUtil, merchantRepository), CustomLoginFilter.class)
+                .authenticationManager(authManager)
+                .build();
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
+    public AuthenticationManager authenticationManager(HttpSecurity http) throws Exception {
+        AuthenticationManagerBuilder builder = http.getSharedObject(AuthenticationManagerBuilder.class);
+        builder.userDetailsService(userDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+        builder.userDetailsService(merchantDetailsService).passwordEncoder(new BCryptPasswordEncoder());
+        return builder.build();
     }
 
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
-    }
-
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .cors(cors -> cors.configurationSource(apiConfigurationSource()))
-                .csrf(AbstractHttpConfigurer::disable)
-                .formLogin(AbstractHttpConfigurer::disable)
-                .logout(AbstractHttpConfigurer::disable)
-                .exceptionHandling(configurer -> configurer
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
-                .httpBasic(AbstractHttpConfigurer::disable)
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(allowedUrls).permitAll()
-                        .anyRequest().authenticated());
-
-        CustomLoginFilter loginFilter = new CustomLoginFilter(
-                authenticationManager(authenticationConfiguration), jwtUtil);
-        loginFilter.setFilterProcessesUrl("/api/users/login");
-
-        http.addFilterAt(loginFilter, UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(new JwtAuthenticationFilter(jwtUtil, userRepository), CustomLoginFilter.class);
-
-        return http.build();
     }
 }

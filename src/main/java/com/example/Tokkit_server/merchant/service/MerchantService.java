@@ -33,7 +33,7 @@ public class MerchantService {
     private final StoreRepository storeRepository;
     private final WalletCommandService walletCommandService;
     private final PasswordEncoder passwordEncoder;
-    private final GeometryFactory geometryFactory;
+    private final GeometryFactory geometryFactory = new GeometryFactory();
 
     public MerchantResponseDto createMerchant(CreateMerchantRequestDto request) {
         // 1. 이메일 인증 여부 확인
