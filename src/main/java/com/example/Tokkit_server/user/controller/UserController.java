@@ -43,7 +43,7 @@ public class UserController {
 
     @PostMapping("/findPw")
     @Operation(summary = "비밀번호 찾기(재설성)", description = "유저의 비밀번호를 랜덤한 값으로 설정한 후 이메일로 전송합니다.")
-    public ApiResponse<?> passWordReissuance(@RequestParam("email") String email) {
+    public ApiResponse<?> passwordReIssuance(@RequestParam("email") String email) {
         try {
             emailService.sendMessageForPassword(email);
             return ApiResponse.onSuccess(null);
@@ -55,7 +55,7 @@ public class UserController {
 
     @PutMapping("/password-update")
     @Operation(summary = "비밀번호 변경", description = "유저의 비밀번호를 변경합니다.")
-    public ApiResponse<?> updateUser(@AuthenticationPrincipal UserDetails userDetails,
+    public ApiResponse<?> updateUserPassword(@AuthenticationPrincipal UserDetails userDetails,
                                      @RequestBody UpdateUserPasswordRequestDto requestDto) {
         try {
             UserResponseDto response = userService.updateUserPassword(userDetails.getUsername(), requestDto);

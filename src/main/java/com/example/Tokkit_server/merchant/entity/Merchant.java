@@ -41,7 +41,7 @@ public class Merchant extends BaseTimeEntity {
     @Column(nullable = false)
     private String simplePassword;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String businessNumber;
 
     private Boolean isDormant;
@@ -56,5 +56,17 @@ public class Merchant extends BaseTimeEntity {
 
     public void setWallet(Wallet wallet) {
         this.wallet = wallet;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
+
+    public void updatePassword(String password) { this.password = password; }
+
+    public void updateSimplePasword(String newSimplePassword) { this.simplePassword = newSimplePassword; }
+
+    public void updateEmail(String newEmail) {
+        this.email = newEmail;
     }
 }

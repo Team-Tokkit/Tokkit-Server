@@ -1,8 +1,13 @@
 package com.example.Tokkit_server.merchant.service;
 
+import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.entity.MerchantEmailValidation;
+import com.example.Tokkit_server.merchant.entity.MerchantSimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.merchant.repository.MerchantEmailValidationRepository;
+import com.example.Tokkit_server.merchant.repository.MerchantPasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.user.entity.SimplePasswordResetEmailValidation;
+import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
 import lombok.extern.slf4j.Slf4j;
@@ -32,6 +37,9 @@ public class MerchantEmailService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    @Autowired
+    private MerchantPasswordResetEmailValidationRepository merchantPasswordResetEmailValidationRepository;
+
     // 인증번호 발송
     private MimeMessage createMessage(String to) throws Exception {
         String ePw = createKey();
@@ -60,16 +68,72 @@ public class MerchantEmailService {
         return message;
     }
 
-//    private void saveVerificationCode(String email, String code) {
-//        passwordResetEmailValidationRepository.deleteById(email); // 기존 삭제
-//        SimplePasswordResetEmailValidation validation = SimplePasswordResetEmailValidation.builder()
-//                .email(email)
-//                .code(code)
-//                .exp(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
-//                .isVerified(false)
-//                .build();
-//        passwordResetEmailValidationRepository.save(validation);
-//    }
+    // 임시 비밀번호 발급
+    private MimeMessage createPasswordMessage(String to) throws Exception {
+        String newPw = createPassword();
+        MimeMessage message = emailSender.createMimeMessage();
+
+        insertPw(to, newPw);
+        message.addRecipients(MimeMessage.RecipientType.TO, to);//보내는 대상
+        message.setSubject("토킷(Tokkit) 임시 비밀번호입니다.");//제목
+
+        String msgg = "";
+        msgg += "<div style='margin:20px; font-family:sans-serif;'>";
+        msgg += "  <div style='padding:30px; border-radius:12px; background-color:#eaf8ff; border:1px solid #b3e0ff;'>";
+        msgg += "    <h2 style='color:#3399ff;'>Tokkit 임시 비밀번호 안내</h2>";
+        msgg += "    <p style='margin-top:10px; font-size:15px;'>아래 임시 비밀번호로 로그인한 뒤 반드시 변경해주세요.</p>";
+        msgg += "    <div style='margin-top:20px; text-align:center;'>";
+        msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #80cfff; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
+        msgg +=        newPw + "</span>";
+        msgg += "    </div>";
+        msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>Tokkit 보안을 위해 꼭 비밀번호를 변경해 주세요.</p>";
+        msgg += "  </div>";
+        msgg += "</div>";
+        message.setText(msgg, "utf-8", "html");//내용
+        message.setFrom(new InternetAddress("Tokkit","토킷")); //보내는 사람
+
+        return message;
+    }
+
+    // 간편 비밀번호 변경
+    public void sendSimplePasswordVerification(String email) throws Exception {
+        String code = createKey();
+        saveVerificationCode(email, code);
+
+        MimeMessage message = emailSender.createMimeMessage();
+        message.addRecipients(Message.RecipientType.TO, email);
+        message.setSubject("토킷(Tokkit) 간편 비밀번호 변경 인증번호입니다.");
+
+        String msgg = "";
+        msgg += "<div style='margin:20px; font-family:sans-serif;'>";
+        msgg += "  <div style='padding:30px; border-radius:12px; background-color:#f2f7ff; border:1px solid #a0c4ff;'>";
+        msgg += "    <h2 style='color:#3f87ff;'>Tokkit 간편 비밀번호 변경 인증</h2>";
+        msgg += "    <p style='margin-top:10px; font-size:15px;'>앱에 아래 인증번호를 입력하여 변경을 완료해 주세요.</p>";
+        msgg += "    <div style='margin-top:20px; text-align:center;'>";
+        msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #8ecaff; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
+        msgg +=        code + "</span>";
+        msgg += "    </div>";
+        msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>토킷 서비스의 보안을 위해 발송된 인증 코드입니다.</p>";
+        msgg += "  </div>";
+        msgg += "</div>";
+
+
+        message.setText(msgg, "utf-8", "html");
+        message.setFrom(new InternetAddress("Tokkit", "토킷"));
+
+        emailSender.send(message);
+    }
+
+    private void saveVerificationCode(String email, String code) {
+        merchantPasswordResetEmailValidationRepository.deleteById(email); // 기존 삭제
+        MerchantSimplePasswordResetEmailValidation validation = MerchantSimplePasswordResetEmailValidation.builder()
+                .email(email)
+                .code(code)
+                .exp(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
+                .isVerified(false)
+                .build();
+        merchantPasswordResetEmailValidationRepository.save(validation);
+    }
 
 
     public static String createKey() {
@@ -133,15 +197,15 @@ public class MerchantEmailService {
         }
     }
 
-//    public void sendMessageForPassword(String to)throws Exception {
-//        MimeMessage message = createPasswordMessage(to);
-//        try{//예외처리
-//            emailSender.send(message);
-//        }catch(MailException es){
-//            es.printStackTrace();
-//            throw new IllegalArgumentException();
-//        }
-//    }
+    public void sendMessageForPassword(String to)throws Exception {
+        MimeMessage message = createPasswordMessage(to);
+        try{//예외처리
+            emailSender.send(message);
+        }catch(MailException es){
+            es.printStackTrace();
+            throw new IllegalArgumentException();
+        }
+    }
 
     private void isnertDB(String email, String ePw){
         List<MerchantEmailValidation> emailValidationList = merchantEmailRepository.findAllByEmail(email);
@@ -187,10 +251,9 @@ public class MerchantEmailService {
         }
     }
 
-
-//    private void insertPw(String email, String pw) {
-//        Merchant merchant = merchantRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Merchant not found"));
-//        merchant.updatePassword(passwordEncoder.encode(pw));
-//        merchantRepository.save(merchant);
-//    }
+    private void insertPw(String email, String pw) {
+        Merchant merchant = merchantRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Merchant not found"));
+        merchant.updatePassword(passwordEncoder.encode(pw));
+        merchantRepository.save(merchant);
+    }
 }

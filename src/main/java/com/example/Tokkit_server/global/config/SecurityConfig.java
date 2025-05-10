@@ -60,6 +60,8 @@ public class SecurityConfig {
                                 "/api/merchants/emailCheck",
                                 "/api/merchants/verification",
                                 "/api/merchants/register",
+                                "/api/merchants/login",
+                                "/api/merchants/findPw",
                                 "/swagger-ui/**",
                                 "/v3/api-docs/**"
                         ).permitAll()

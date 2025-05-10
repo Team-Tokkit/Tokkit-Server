@@ -50,6 +50,8 @@ public enum ErrorStatus implements BaseErrorCode {
 
 	// Merchant 관련
 	MERCHANT_ALREADY_EXISTS(HttpStatus.CONFLICT, "MERCHANT_001", "이미 존재하는 가맹점주입니다."),
+	MERCHANT_PASSWORD_UPDATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "MERCHANT_002", "현재 비밀번호와 새 비밀번호를 모두 입력해야 합니다."),
+	MERCHANT_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "MERCHANT_003", "현재 비밀번호가 일치하지 않습니다."),
 
 	// Notification 관련
 	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404", "해당 알림을 찾을 수 없습니다."),

@@ -3,10 +3,15 @@ package com.example.Tokkit_server.merchant.service;
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.merchant.dto.request.CreateMerchantRequestDto;
+import com.example.Tokkit_server.merchant.dto.request.MerchantEmailChangeRequestDto;
+import com.example.Tokkit_server.merchant.dto.request.UpdateMerchantPasswordRequestDto;
+import com.example.Tokkit_server.merchant.dto.response.MerchantRegisterResponseDto;
 import com.example.Tokkit_server.merchant.dto.response.MerchantResponseDto;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.entity.MerchantEmailValidation;
+import com.example.Tokkit_server.merchant.entity.MerchantSimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.merchant.repository.MerchantEmailValidationRepository;
+import com.example.Tokkit_server.merchant.repository.MerchantPasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.region.entity.Region;
 import com.example.Tokkit_server.region.repository.RegionRepository;
@@ -22,6 +27,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -33,9 +40,11 @@ public class MerchantService {
     private final StoreRepository storeRepository;
     private final WalletCommandService walletCommandService;
     private final PasswordEncoder passwordEncoder;
+    private final MerchantPasswordResetEmailValidationRepository merchantPasswordResetEmailValidationRepository;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
-    public MerchantResponseDto createMerchant(CreateMerchantRequestDto request) {
+    // 회원가입
+    public MerchantRegisterResponseDto createMerchant(CreateMerchantRequestDto request) {
         // 1. 이메일 인증 여부 확인
         MerchantEmailValidation emailValidation = emailValidationRepository
                 .findTopByEmailOrderByExpDesc(request.getEmail())
@@ -47,6 +56,11 @@ public class MerchantService {
 
         // 2. 이메일 중복 체크
         if (merchantRepository.existsByEmail(request.getEmail())) {
+            throw new GeneralException(ErrorStatus.MERCHANT_ALREADY_EXISTS);
+        }
+
+        // 3. 사업자 등록 번호 중복 체크
+        if (merchantRepository.existsByBusinessNumber(request.getBusinessNumber())) {
             throw new GeneralException(ErrorStatus.MERCHANT_ALREADY_EXISTS);
         }
 
@@ -71,11 +85,91 @@ public class MerchantService {
                 point
         );
         storeRepository.save(store);
+        merchant.setStore(store);
 
         // 7. Wallet 생성
         Wallet wallet = walletCommandService.createInitialWalletForMerchant(merchant.getId());
         merchant.setWallet(wallet);
 
+        return MerchantRegisterResponseDto.from(merchant);
+    }
+
+    // 내 정보 조회
+    public MerchantResponseDto getInfo(Long merchantId) {
+        Merchant merchant = merchantRepository.findById(merchantId).orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
         return MerchantResponseDto.from(merchant);
+    }
+
+    // 비밀번호 변경
+    @Transactional
+    public MerchantResponseDto updateMerchantPassword(String email, UpdateMerchantPasswordRequestDto requestDto) {
+        Merchant merchant = merchantRepository.findByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+
+        if (requestDto.getPassword() == null || requestDto.getNewPassword() == null) {
+            throw new GeneralException(ErrorStatus.MERCHANT_PASSWORD_UPDATE_BAD_REQUEST);
+        }
+
+        // 현재 비밀번호 확인
+        if (!passwordEncoder.matches(requestDto.getPassword(), merchant.getPassword())) {
+            throw new GeneralException(ErrorStatus.MERCHANT_PASSWORD_NOT_MATCH);
+        }
+
+        // 새로운 비밀번호 인코딩 및 업데이트
+        String encodedNewPassword = passwordEncoder.encode(requestDto.getNewPassword());
+        merchant.updatePassword(encodedNewPassword);
+
+        merchantRepository.save(merchant);
+        return MerchantResponseDto.from(merchant);
+    }
+
+    // 간편 비밀번호 변경 시 이메일 인증
+    @Transactional
+    public void verifySimplePasswordCode(String email, String code) {
+        MerchantSimplePasswordResetEmailValidation validation = merchantPasswordResetEmailValidationRepository.findById(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+
+        if (new Date().after(validation.getExp())) {
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
+        }
+
+        if (!validation.getCode().equals(code)) {
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
+        }
+
+        validation.setVerified(true);
+        merchantPasswordResetEmailValidationRepository.save(validation);
+    }
+
+    // 간편 비밀번호 변경
+    @Transactional
+    public void updateSimplePassword(String email, String newSimplePassword) {
+        MerchantSimplePasswordResetEmailValidation validation = merchantPasswordResetEmailValidationRepository.findById(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+
+        if (!validation.getIsVerified()) {
+            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
+        }
+
+        Merchant merchant = merchantRepository.findByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+
+        merchant.updateSimplePasword(passwordEncoder.encode(newSimplePassword));
+    }
+
+    // 이메일 변경
+    @Transactional
+    public void updateEmail(Long merchantId, MerchantEmailChangeRequestDto requestDto) {
+        MerchantEmailValidation validation = emailValidationRepository.findById(requestDto.getNewEmail())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+
+        if (!validation.getIsVerified()) {
+            throw new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED);
+        }
+
+        Merchant merchant = merchantRepository.findById(merchantId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+
+        merchant.updateEmail(requestDto.getNewEmail());
     }
 }
