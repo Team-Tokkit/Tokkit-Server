@@ -20,6 +20,9 @@ public enum ErrorStatus implements BaseErrorCode {
 	_BAD_REQUEST(HttpStatus.BAD_REQUEST,"COMMON400","잘못된 요청입니다."),
 	_UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
 	_FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
+
+
+	// Notice 관련
 	NOTICE_NOT_FOUND(HttpStatus.BAD_REQUEST, "NOTICE400","공지사항을 찾을 수 없습니다."),
 
 	// Store 관련
@@ -27,6 +30,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_002", "존재하지 않는 지역입니다."),
 	MERCHANT_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_003", "존재하지 않는 가맹점입니다."),
 	INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A001", "유효하지 않은 주소입니다. 카카오 주소 검색 실패."),
+	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_004", "해당 가맹점을 찾을 수 없습니다."),
 
 	// Wallet 관련
 	USER_WALLET_NOT_FOUND(HttpStatus.NOT_FOUND, "WALLET_001", "사용자 지갑이 존재하지 않습니다."),
@@ -38,6 +42,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	VOUCHER_ALREADY_USED(HttpStatus.BAD_REQUEST, "VOUCHER_002", "이미 사용된 바우처입니다."),
 	VOUCHER_EXPIRED(HttpStatus.BAD_REQUEST, "VOUCHER_003", "만료된 바우처입니다."),
 	VOUCHER_OWNERSHIP_NOT_FOUND(HttpStatus.NOT_FOUND, "VOUCHER_004", "해당 사용자의 바우처 소유 정보가 없습니다."),
+	VOUCHER_SOLD_OUT(HttpStatus.BAD_REQUEST, "VOUCHER_005", "해당 바우처는 모두 소진되었습니다."),
 
 	// User 관련
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "존재하지 않는 사용자입니다."),

@@ -134,6 +134,14 @@ public class WalletCommandService {
         //  4. 바우처 엔티티 조회
         Voucher voucher = voucherRepository.findById(request.getVoucherId()).orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
 
+        // 구매 가능 수량 확인
+        if (voucher.getRemainingCount() <= 0) {
+            throw new GeneralException(ErrorStatus.VOUCHER_SOLD_OUT);
+        }
+
+        // 수량 차감
+        voucher.decreaseRemainingCount();
+
         // 4. VoucherOwnership 생성
         VoucherOwnership ownership = VoucherOwnership.builder()
             .voucher(voucher)

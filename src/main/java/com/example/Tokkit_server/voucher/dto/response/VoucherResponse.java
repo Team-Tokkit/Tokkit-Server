@@ -13,8 +13,11 @@ public class VoucherResponse {
     private String name;
     private String description;
     private Integer price;
+    private Integer originalPrice;
     private LocalDateTime validDate;
     private String contact;
+    private Integer remainingCount;
+
 
     public static VoucherResponse from (Voucher voucher) {
         return VoucherResponse.builder()
@@ -22,8 +25,10 @@ public class VoucherResponse {
                 .name(voucher.getName())
                 .description(voucher.getDescription())
                 .price(voucher.getPrice())
+                .originalPrice(voucher.getOriginalPrice())
                 .validDate(voucher.getValidDate())
                 .contact(voucher.getContact())
+                .remainingCount(voucher.getRemainingCount())
                 .build();
     }
 }

@@ -5,6 +5,7 @@ import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.store.enums.StoreCategory;
+
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -37,6 +38,7 @@ public class Store extends BaseTimeEntity {
 
 	@Enumerated(EnumType.STRING)
 	private StoreCategory storeCategory;
+
 
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "region_id")

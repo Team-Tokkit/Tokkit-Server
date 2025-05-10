@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.store.dto.request;
 
 import com.example.Tokkit_server.store.enums.StoreCategory;
+
 import lombok.Getter;
 
 @Getter
