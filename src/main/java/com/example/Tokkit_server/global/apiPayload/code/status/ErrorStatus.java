@@ -29,7 +29,6 @@ public enum ErrorStatus implements BaseErrorCode {
 	STORE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_001", "존재하지 않는 매장 카테고리입니다."),
 	REGION_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_002", "존재하지 않는 지역입니다."),
 	MERCHANT_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_003", "존재하지 않는 가맹점입니다."),
-	INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "A001", "유효하지 않은 주소입니다. 카카오 주소 검색 실패."),
 	STORE_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_004", "해당 가맹점을 찾을 수 없습니다."),
 
 	// Wallet 관련
@@ -63,7 +62,11 @@ public enum ErrorStatus implements BaseErrorCode {
 	EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAILVERIFY400", "이메일 인증이 완료되지 않았습니다."),
 
 	// ocr 관련
-	OCR_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"OCR_001", "OCR 처리에 실패했습니다.");
+	OCR_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"OCR_001", "OCR 처리에 실패했습니다."),
+
+	// kakao api 관련
+	ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "KAKAO_001", "존재하지 않는 주소입니다."),
+	INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "KAKAO_002", "유효하지 않은 주소입니다. 카카오 주소 검색 실패.");
 
 
 	private final HttpStatus httpStatus;

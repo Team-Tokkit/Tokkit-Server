@@ -1,9 +1,10 @@
-package com.example.Tokkit_server.merchant.service;
+package com.example.Tokkit_server.ocr.service;
 
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.global.utils.MultipartInputStreamFileResource;
-import com.example.Tokkit_server.merchant.dto.response.BusinessOcrResponseDto;
+import com.example.Tokkit_server.ocr.utils.MultipartInputStreamFileResource;
+import com.example.Tokkit_server.ocr.dto.BusinessOcrResponseDto;
+import com.example.Tokkit_server.ocr.utils.KakaoGeoResult;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @Service
@@ -31,6 +33,7 @@ public class BusinessOcrService {
     private String invokeUrl;
 
     private final ObjectMapper objectMapper;
+    private final KakaoAddressSearchService kakaoAddressSearchService;
     private final RestTemplate restTemplate = new RestTemplate();
 
     public BusinessOcrResponseDto extractBusinessInfo(MultipartFile image) {
@@ -64,31 +67,32 @@ public class BusinessOcrService {
                 throw new GeneralException(ErrorStatus.OCR_PROCESSING_FAILED);
             }
 
-            JsonNode bizResult = result.get("images").get(0)
-                    .path("bizLicense")
-                    .path("result");
+            JsonNode bizResult = result.get("images").get(0).get("bizLicense").get("result");
+            if (bizResult == null) {
+                throw new GeneralException(ErrorStatus.OCR_PROCESSING_FAILED);
+            }
 
-            String registerNumber = getTextOrNull(bizResult, "registerNumber");
-            String companyName = getTextOrNull(bizResult, "companyName");
-            String repName = getTextOrNull(bizResult, "repName");
-            String address = getTextOrNull(bizResult, "bisAddress");
+            String number = getTextOrNull(bizResult.get("registerNumber"));
+            String storeName = getTextOrNull(bizResult.get("companyName"));
+            String ceoName = getTextOrNull(bizResult.get("repName"));
+            String address = getTextOrNull(bizResult.get("bisAddress"));
 
-            return BusinessOcrResponseDto.of(registerNumber, companyName, repName, address);
+            log.info("[OCR] 추출 결과: number={}, storeName={}, ceoName={}, address={}", number, storeName, ceoName, address);
+
+            // 주소 -> 위도, 경도, 우편번호 변환
+            Optional<KakaoGeoResult> geoResultOpt = kakaoAddressSearchService.search(address);
+
+            return BusinessOcrResponseDto.of(
+                    number,
+                    storeName,
+                    ceoName,
+                    address
+            );
 
         } catch (Exception e) {
             log.error("[OCR] OCR 처리 중 예외 발생", e);
             throw new GeneralException(ErrorStatus.OCR_PROCESSING_FAILED);
         }
-    }
-
-    private String getTextOrNull(JsonNode parent, String field) {
-        if (parent != null && parent.has(field)) {
-            JsonNode array = parent.get(field);
-            if (array.isArray() && array.size() > 0 && array.get(0).has("text")) {
-                return array.get(0).get("text").asText();
-            }
-        }
-        return null;
     }
 
     private Map<String, Object> defaultRequestBody() {
@@ -103,5 +107,12 @@ public class BusinessOcrService {
         request.put("timestamp", System.currentTimeMillis());
 
         return request;
+    }
+
+    private String getTextOrNull(JsonNode arrayNode) {
+        if (arrayNode != null && arrayNode.isArray() && arrayNode.size() > 0) {
+            return arrayNode.get(0).get("text").asText();
+        }
+        return null;
     }
 }

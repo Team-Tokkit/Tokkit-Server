@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.global.utils;
+package com.example.Tokkit_server.ocr.utils;
 
 import org.springframework.core.io.InputStreamResource;
 
