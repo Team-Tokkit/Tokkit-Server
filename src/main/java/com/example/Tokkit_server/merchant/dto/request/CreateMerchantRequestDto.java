@@ -26,9 +26,6 @@ public class CreateMerchantRequestDto {
     // 가맹점 정보
     private String storeName;            // 상호명 (OCR)
     private String roadAddress;          // 도로명주소 (카카오 API 결과)
-    private String newZipcode;           // 우편번호 (카카오 API 결과)
-    private double latitude;             // 위도 (카카오 API 결과)
-    private double longitude;            // 경도 (카카오 API 결과)
 
     private String sidoName;             // 시/도 (사용자 선택)
     private String sigunguName;          // 시/군/구 (사용자 선택)
@@ -53,9 +50,6 @@ public class CreateMerchantRequestDto {
         return Store.builder()
                 .storeName(storeName)
                 .roadAddress(roadAddress)
-                .newZipcode(newZipcode)
-                .latitude(latitude)
-                .longitude(longitude)
                 .location(point)
                 .merchant(merchant)
                 .region(region)

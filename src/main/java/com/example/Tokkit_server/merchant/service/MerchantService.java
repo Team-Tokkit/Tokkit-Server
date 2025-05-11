@@ -13,6 +13,9 @@ import com.example.Tokkit_server.merchant.entity.MerchantSimplePasswordResetEmai
 import com.example.Tokkit_server.merchant.repository.MerchantEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantPasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.ocr.service.KakaoAddressSearchService;
+import com.example.Tokkit_server.ocr.utils.KakaoGeoClient;
+import com.example.Tokkit_server.ocr.utils.KakaoGeoResult;
 import com.example.Tokkit_server.region.entity.Region;
 import com.example.Tokkit_server.region.repository.RegionRepository;
 import com.example.Tokkit_server.store.entity.Store;
@@ -28,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +45,11 @@ public class MerchantService {
     private final WalletCommandService walletCommandService;
     private final PasswordEncoder passwordEncoder;
     private final MerchantPasswordResetEmailValidationRepository merchantPasswordResetEmailValidationRepository;
+    private final KakaoAddressSearchService kakaoAddressSearchService;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
     // 회원가입
+    @Transactional
     public MerchantRegisterResponseDto createMerchant(CreateMerchantRequestDto request) {
         // 1. 이메일 인증 여부 확인
         MerchantEmailValidation emailValidation = emailValidationRepository
@@ -64,35 +70,47 @@ public class MerchantService {
             throw new GeneralException(ErrorStatus.MERCHANT_ALREADY_EXISTS);
         }
 
-        // 3. Region, StoreCategory 조회
+        // 4. Region 조회
         Region region = regionRepository.findBySidoNameAndSigunguName(
                         request.getSidoName(), request.getSigunguName())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.REGION_NOT_FOUND));
 
-        // 4. Merchant 저장
+        // 5. Merchant 저장
         Merchant merchant = request.toMerchantEntity(passwordEncoder);
         merchantRepository.save(merchant);
 
-        // 5. 좌표로 Point 생성
-        Coordinate coord = new Coordinate(request.getLongitude(), request.getLatitude());
+        // 6. 도로명 주소로 Kakao 주소 API 호출 (위도, 경도, 우편번호 조회)
+        Optional<KakaoGeoResult> geoResultOpt = kakaoAddressSearchService.search(request.getRoadAddress());
+
+        KakaoGeoResult kakaoGeoResult = geoResultOpt
+                .orElseThrow(() -> new GeneralException(ErrorStatus.ADDRESS_NOT_FOUND));
+
+        Coordinate coord = new Coordinate(kakaoGeoResult.getLongitude(), kakaoGeoResult.getLatitude());
         Point point = geometryFactory.createPoint(coord);
 
-        // 6. Store 저장
-        Store store = request.toStoreEntity(
-                merchant,
-                region,
-                request.getStoreCategory(),
-                point
-        );
+
+        // 7. Store 저장 - Kakao 응답 정보로 채움
+        Store store = Store.builder()
+                .storeName(request.getStoreName())
+                .roadAddress(request.getRoadAddress())
+                .newZipcode(kakaoGeoResult.getZipCode())
+                .latitude(kakaoGeoResult.getLatitude())
+                .longitude(kakaoGeoResult.getLongitude())
+                .location(point)
+                .merchant(merchant)
+                .region(region)
+                .storeCategory(request.getStoreCategory())
+                .build();
         storeRepository.save(store);
         merchant.setStore(store);
 
-        // 7. Wallet 생성
+        // 8. Wallet 생성
         Wallet wallet = walletCommandService.createInitialWalletForMerchant(merchant.getId());
         merchant.setWallet(wallet);
 
         return MerchantRegisterResponseDto.from(merchant);
     }
+
 
     // 내 정보 조회
     public MerchantResponseDto getInfo(Long merchantId) {

@@ -6,7 +6,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class KakaoGeoResult {
-    private String longitude;
-    private String latitude;
-    private String zonecode;
+    private Double longitude;
+    private Double latitude;
+    private String zipCode;
 }

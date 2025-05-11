@@ -79,9 +79,6 @@ public class BusinessOcrService {
 
             log.info("[OCR] 추출 결과: number={}, storeName={}, ceoName={}, address={}", number, storeName, ceoName, address);
 
-            // 주소 -> 위도, 경도, 우편번호 변환
-            Optional<KakaoGeoResult> geoResultOpt = kakaoAddressSearchService.search(address);
-
             return BusinessOcrResponseDto.of(
                     number,
                     storeName,

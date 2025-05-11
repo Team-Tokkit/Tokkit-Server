@@ -60,11 +60,14 @@ public class KakaoAddressSearchService {
                 JsonNode first = documents.get(0);
                 String x = first.path("x").asText();
                 String y = first.path("y").asText();
-                String zonecode = first.path("road_address").path("zone_no").asText();
+                String zipCode = first.path("road_address").path("zone_no").asText();
 
-                log.info("[Kakao API] 위도: {}, 경도: {}, 우편번호: {}", y, x, zonecode);
+                double longitude = Double.parseDouble(x);
+                double latitude = Double.parseDouble(y);
 
-                return Optional.of(new KakaoGeoResult(x, y, zonecode));
+                log.info("[Kakao API] 위도: {}, 경도: {}, 우편번호: {}", latitude, longitude, zipCode);
+
+                return Optional.of(new KakaoGeoResult(longitude, latitude, zipCode));
             } else {
                 log.warn("[Kakao API] 결과 없음: 응답에 documents 항목이 비어 있음");
             }

@@ -42,10 +42,10 @@ public class KakaoGeoClient {
         }
 
         JsonNode doc = response.getBody().path("documents").get(0);
-        String latitude = doc.path("y").asText();
-        String longitude = doc.path("x").asText();
-        String zonecode = doc.path("road_address").path("zone_no").asText();
+        Double latitude = Double.valueOf(doc.path("y").asText());
+        Double longitude = Double.valueOf(doc.path("x").asText());
+        String zipCode = doc.path("road_address").path("zone_no").asText();
 
-        return new KakaoGeoResult(longitude, latitude, zonecode);
+        return new KakaoGeoResult(longitude, latitude, zipCode);
     }
 }
