@@ -60,7 +60,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	// Email 관련
 	EMAIL_NOT_SEND(HttpStatus.INTERNAL_SERVER_ERROR, "EMAILSEND500", "이메일 전송 실패, 관리자에게 문의 바랍니다."),
 	VERIFY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "VERIFY500", "이메일 인증 실패, 재시도 바랍니다."),
-	EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAILVERIFY400", "이메일 인증이 완료되지 않았습니다.");
+	EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAILVERIFY400", "이메일 인증이 완료되지 않았습니다."),
+
+	// ocr 관련
+	OCR_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"OCR_001", "OCR 처리에 실패했습니다.");
 
 
 	private final HttpStatus httpStatus;

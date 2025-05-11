@@ -49,7 +49,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
-                                "/api/users/ocr/verify-identity",
+                                "/api/ocr/**",
                                 "/api/users/login",
                                 "/api/users/register",
                                 "/api/users/emailCheck",
