@@ -27,8 +27,8 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
     public Page<Voucher> searchVouchers(VoucherSearchRequest request, Pageable pageable) {
         StringBuilder jpql = new StringBuilder("SELECT v FROM Voucher v WHERE 1=1");
 
-        if (StringUtils.hasText(request.getCategory())) {
-            jpql.append(" AND v.category.name = :category");
+        if (request.getStoreCategory() != null) {
+            jpql.append(" AND v.storeCategory = :category");
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
             jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");
@@ -42,8 +42,8 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
 
         TypedQuery<Voucher> query = em.createQuery(jpql.toString(), Voucher.class);
 
-        if (StringUtils.hasText(request.getCategory())) {
-            query.setParameter("category", request.getCategory());
+        if ((request.getStoreCategory() != null)) {
+            query.setParameter("category", request.getStoreCategory());
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
             query.setParameter("keyword", request.getSearchKeyword());
