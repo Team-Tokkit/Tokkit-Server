@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
+import com.example.Tokkit_server.global.entity.VoucherImage;
 import com.example.Tokkit_server.store.entity.Store;
 import com.example.Tokkit_server.store.enums.StoreCategory;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
@@ -77,6 +78,9 @@ public class Voucher extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private StoreCategory storeCategory;
+
+    @OneToOne(mappedBy = "voucher", cascade = CascadeType.ALL)
+    private VoucherImage image;
 
     public void addVoucherStore(Store store) {
         VoucherStore vs = VoucherStore.builder()
