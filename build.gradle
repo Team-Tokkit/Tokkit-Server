@@ -41,6 +41,10 @@ dependencies {
 	// JTS Point (공간 타입)을 JPA에서 인식하게 끔
 	implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
 	implementation 'org.locationtech.jts:jts-core:1.19.0' // JTS geometry
+
+	// AWS S3
+	implementation "software.amazon.awssdk:s3:2.13.0"
+
 }
 
 tasks.named('test') {
