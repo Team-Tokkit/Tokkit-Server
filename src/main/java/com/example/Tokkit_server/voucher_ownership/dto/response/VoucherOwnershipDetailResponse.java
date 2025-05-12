@@ -22,6 +22,7 @@ public class VoucherOwnershipDetailResponse {
     private String voucherRefundPolicy;
     private Long remainingAmount;
     private VoucherOwnershipStatus status;
+    private String imageUrl;
 
     private Page<StoreResponse> stores;
 
@@ -36,6 +37,11 @@ public class VoucherOwnershipDetailResponse {
                 .remainingAmount(ownership.getRemainingAmount())
                 .status(VoucherOwnershipStatus.AVAILABLE)
                 .stores(stores)
+                .imageUrl(
+                        ownership.getVoucher().getImage() != null ?
+                                "http://localhost:8080/api/s3/" + ownership.getVoucher().getImage().getImageUrl()
+                                : null
+                )
                 .build();
     }
 }

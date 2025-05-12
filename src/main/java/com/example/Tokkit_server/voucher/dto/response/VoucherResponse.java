@@ -19,7 +19,7 @@ public class VoucherResponse {
     private LocalDateTime validDate;
     private String contact;
     private Integer remainingCount;
-
+    private String imageUrl;
 
 
     public static VoucherResponse from (Voucher voucher) {
@@ -32,6 +32,11 @@ public class VoucherResponse {
                 .validDate(voucher.getValidDate())
                 .contact(voucher.getContact())
                 .remainingCount(voucher.getRemainingCount())
+                .imageUrl(
+                        voucher.getImage() != null ?
+                                "http://localhost:8080/api/s3/" + voucher.getImage().getImageUrl()
+                                : null
+                )
                 .build();
     }
 }

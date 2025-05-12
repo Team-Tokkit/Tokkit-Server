@@ -15,6 +15,7 @@ public class VoucherOwnershipResponse {
     private Long remainingAmount;
     private Boolean isVoucher;
     private VoucherOwnershipStatus status;
+    private String imageUrl;
 
     public static VoucherOwnershipResponse from(VoucherOwnership voucherOwnership) {
         return VoucherOwnershipResponse.builder()
@@ -24,6 +25,11 @@ public class VoucherOwnershipResponse {
                 .remainingAmount(voucherOwnership.getRemainingAmount())
                 .isVoucher(voucherOwnership.getStatus() == VoucherOwnershipStatus.AVAILABLE)
                 .status(VoucherOwnershipStatus.AVAILABLE)
+                .imageUrl(
+                        voucherOwnership.getVoucher().getImage() != null ?
+                                "http://localhost:8080/api/s3/" + voucherOwnership.getVoucher().getImage().getImageUrl()
+                                : null
+                )
                 .build();
     }
 }

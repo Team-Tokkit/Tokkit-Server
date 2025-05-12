@@ -22,6 +22,8 @@ public class VoucherDetailResponse {
     private String detailDescription;
     private String refundPolicy;
     private String contact;
+    private String imageUrl;
+
 
     private Page<StoreResponse> stores;
 
@@ -37,6 +39,11 @@ public class VoucherDetailResponse {
                 .refundPolicy(voucher.getRefundPolicy())
                 .contact(voucher.getContact())
                 .stores(stores)
+                .imageUrl(
+                        voucher.getImage() != null ?
+                                "http://localhost:8080/api/s3/" + voucher.getImage().getImageUrl()
+                                : null
+                )
                 .build();
     }
 }
