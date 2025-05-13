@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.merchant.filter;
 
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
 import com.example.Tokkit_server.merchant.auth.CustomMerchantDetails;
 import com.example.Tokkit_server.merchant.dto.request.MerchantLoginRequestDto;
 import com.example.Tokkit_server.user.dto.request.JwtDto;
@@ -61,10 +62,11 @@ public class CustomMerchantLoginFilter extends UsernamePasswordAuthenticationFil
         String refreshToken = jwtUtil.createJwtRefreshToken(merchantDetails);
 
         JwtDto jwtDto = new JwtDto(accessToken, refreshToken);
+        ApiResponse<JwtDto> apiResponse = ApiResponse.onSuccess(jwtDto);
 
         response.setContentType("application/json;charset=UTF-8");
         response.setStatus(HttpServletResponse.SC_OK);
-        new ObjectMapper().writeValue(response.getWriter(), jwtDto);
+        new ObjectMapper().writeValue(response.getWriter(), apiResponse);
 
         log.info("[MerchantLoginFilter] 로그인 성공 - JWT 발급 완료");
     }

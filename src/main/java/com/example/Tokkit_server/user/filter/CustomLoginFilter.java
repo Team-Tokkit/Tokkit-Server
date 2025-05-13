@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.user.filter;
 
+import com.example.Tokkit_server.global.apiPayload.ApiResponse;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.JwtDto;
 import com.example.Tokkit_server.user.dto.request.LoginRequestDto;
@@ -79,6 +80,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
                 .accessToken(jwtUtil.createJwtAccessToken(customUserDetails)) //access token 생성
                 .refreshToken(jwtUtil.createJwtRefreshToken(customUserDetails)) //refresh token 생성
                 .build();
+        ApiResponse<JwtDto> apiResponse = ApiResponse.onSuccess(jwtDto);
 
         ObjectMapper objectMapper = new ObjectMapper();
         response.setStatus(HttpStatus.OK.value()); //Response 의 Status 를 200으로 설정
@@ -86,7 +88,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         response.setCharacterEncoding("UTF-8");
 
         //Body 에 토큰이 담긴 Response 쓰기
-        response.getWriter().write(objectMapper.writeValueAsString(jwtDto));
+        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
     }
 
     //로그인 실패시
