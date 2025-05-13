@@ -17,6 +17,11 @@ jobs:
 
       - name: Checkout Repository
         uses: actions/checkout@v3
+        
+      - name: application.yml
+        run: |
+          mkdir -p /home/tokkit/Tokkit-Server/src/main/resources
+          echo "${{ secrets.APPLICATION_DEV_YML }}" > /home/tokkit/Tokkit-Server/src/main/resources/application.yml
 
       - name: Docker Compose Down
         run: |
