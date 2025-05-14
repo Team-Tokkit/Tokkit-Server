@@ -10,6 +10,7 @@ import com.example.Tokkit_server.user.filter.JwtAuthenticationFilter;
 import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.user.utils.JwtUtil;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -30,7 +31,6 @@ import java.util.List;
 
 @Configuration
 @EnableWebSecurity
-@RequiredArgsConstructor
 public class SecurityConfig {
 
     private final CustomUserDetailsService customUserDetailsService;
@@ -38,10 +38,28 @@ public class SecurityConfig {
     private final JwtUtil jwtUtil;
     private final UserRepository userRepository;
     private final MerchantRepository merchantRepository;
+
     private final CorsConfigurationSource corsConfigurationSource;
 
+    public SecurityConfig(
+            CustomUserDetailsService customUserDetailsService,
+            CustomMerchantDetailsService customMerchantDetailsService,
+            JwtUtil jwtUtil,
+            UserRepository userRepository,
+            MerchantRepository merchantRepository,
+            @Qualifier("apiConfigurationSource") CorsConfigurationSource corsConfigurationSource
+    ) {
+        this.customUserDetailsService = customUserDetailsService;
+        this.customMerchantDetailsService = customMerchantDetailsService;
+        this.jwtUtil = jwtUtil;
+        this.userRepository = userRepository;
+        this.merchantRepository = merchantRepository;
+        this.corsConfigurationSource = corsConfigurationSource;
+    }
+
     private final String[] allowedUrls = {
-            "/api/ocr/**",
+            "/api/ocr/idCard",
+            "/api/ocr/business",
             "/api/users/login",
             "/api/auth/reissue",
             "/api/auth/**",
@@ -68,14 +86,19 @@ public class SecurityConfig {
 
         return http
                 .securityMatcher("/api/users/**")
-                .cors(cors -> cors.configurationSource(CorsConfig.apiConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(config -> config.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/users/register", "/api/users/emailCheck", "/api/users/verification", "/api/users/findPw").permitAll()
+                        .requestMatchers(
+                                "/api/ocr/idCard",
+                                "/api/users/register",
+                                "/api/users/emailCheck",
+                                "/api/users/verification",
+                                "/api/users/findPw").permitAll()
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated())
                 .addFilterAt(userLoginFilter, UsernamePasswordAuthenticationFilter.class)
@@ -96,7 +119,7 @@ public class SecurityConfig {
 
         return http
                 .securityMatcher("/api/merchants/**")
-                .cors(cors -> cors.configurationSource(CorsConfig.apiConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
                 .httpBasic(httpBasic -> httpBasic.disable())
