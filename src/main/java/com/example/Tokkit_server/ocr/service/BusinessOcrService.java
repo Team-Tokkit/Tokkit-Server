@@ -61,7 +61,6 @@ public class BusinessOcrService {
             );
 
             JsonNode result = response.getBody();
-            log.info("[OCR] 응답 수신 완료: {}", result);
 
             if (result == null || !result.has("images")) {
                 throw new GeneralException(ErrorStatus.OCR_PROCESSING_FAILED);
