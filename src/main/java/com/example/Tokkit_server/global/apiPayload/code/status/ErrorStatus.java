@@ -46,6 +46,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	// User 관련
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "존재하지 않는 사용자입니다."),
 	USER_ALREADY_EXISTS(HttpStatus.CONFLICT, "USER_002", "이미 존재하는 유저입니다."),
+	USER_PASSWORD_NOT_MATCH(HttpStatus.INTERNAL_SERVER_ERROR, "USER_003", "현재 비밀번호와 새 비밀번호를 모두 입력해야 합니다."),
+	USER_PASSWORD_UPDATE_BAD_REQUEST(HttpStatus.BAD_REQUEST, "USER_004", "현재 비밀번호가 일치하지 않습니다."),
 
 	// Merchant 관련
 	MERCHANT_ALREADY_EXISTS(HttpStatus.CONFLICT, "MERCHANT_001", "이미 존재하는 가맹점주입니다."),
@@ -53,13 +55,15 @@ public enum ErrorStatus implements BaseErrorCode {
 	MERCHANT_PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST, "MERCHANT_003", "현재 비밀번호가 일치하지 않습니다."),
 
 	// Notification 관련
-	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION404", "해당 알림을 찾을 수 없습니다."),
-	NOTIFICATION_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATIONSETTING404", "알림 설정 정보가 존재하지 않습니다."),
+	NOTIFICATION_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_001", "해당 알림을 찾을 수 없습니다."),
+	NOTIFICATION_SETTING_NOT_FOUND(HttpStatus.NOT_FOUND, "NOTIFICATION_SETTING_001", "알림 설정 정보가 존재하지 않습니다."),
 
 	// Email 관련
-	EMAIL_NOT_SEND(HttpStatus.INTERNAL_SERVER_ERROR, "EMAILSEND500", "이메일 전송 실패, 관리자에게 문의 바랍니다."),
-	VERIFY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "VERIFY500", "이메일 인증 실패, 재시도 바랍니다."),
-	EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAILVERIFY400", "이메일 인증이 완료되지 않았습니다."),
+	EMAIL_NOT_SEND(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_SEND_001", "이메일 전송 실패, 관리자에게 문의 바랍니다."),
+	EMAIL_NOT_FOUND(HttpStatus.NOT_FOUND, "EMAIL_SEND_002", "이메일 전송 실패, 가입되지 않은 이메일입니다."),
+	VERIFY_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_VERIFY_001", "이메일 인증 실패, 재시도 바랍니다."),
+	EMAIL_NOT_VERIFIED(HttpStatus.BAD_REQUEST, "EMAIL_VERIFY_002", "이메일 인증이 완료되지 않았습니다."),
+	EMAIL_CREATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "EMAIL_CREATE_001", "이메일 생성에 실패했습니다."),
 
 	// ocr 관련
 	OCR_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"OCR_001", "OCR 처리에 실패했습니다."),

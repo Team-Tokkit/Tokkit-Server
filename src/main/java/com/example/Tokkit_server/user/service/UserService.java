@@ -70,22 +70,22 @@ public class UserService {
     }
 
     public UserResponseDto getUser(String email) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new IllegalArgumentException("사용자가 존재히지 않습니다."));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         return UserResponseDto.from(user);
     }
 
     @Transactional
     public UserResponseDto updateUserPassword(String email, UpdateUserPasswordRequestDto userRequestDto) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         if (userRequestDto.getPassword() == null || userRequestDto.getNewPassword() == null) {
-            throw new IllegalArgumentException("현재 비밀번호와 새 비밀번호를 모두 입력해야 합니다.");
+            throw new GeneralException(ErrorStatus.USER_PASSWORD_UPDATE_BAD_REQUEST);
         }
 
         // 현재 비밀번호 확인
         if (!passwordEncoder.matches(userRequestDto.getPassword(), user.getPassword())) {
-            throw new IllegalArgumentException("현재 비밀번호가 일치하지 않습니다.");
+            throw new GeneralException(ErrorStatus.USER_PASSWORD_NOT_MATCH);
         }
 
         // 새로운 비밀번호 인코딩 및 업데이트

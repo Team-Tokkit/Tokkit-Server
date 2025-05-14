@@ -1,5 +1,7 @@
 package com.example.Tokkit_server.user.service;
 
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.user.entity.EmailValidation;
 import com.example.Tokkit_server.user.entity.SimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.user.entity.User;
@@ -41,88 +43,101 @@ public class EmailService {
     private PasswordEncoder passwordEncoder;
 
     // 인증 번호 전송
-    private MimeMessage createMessage(String to)throws Exception{
-        String ePw = createKey();
+    private MimeMessage createMessage(String to) {
+        try {
+            String ePw = createKey();
 
-        isnertDB(to, ePw);
-        MimeMessage  message = emailSender.createMimeMessage();
+            isnertDB(to, ePw);
+            MimeMessage  message = emailSender.createMimeMessage();
 
-        message.addRecipients(MimeMessage.RecipientType.TO, to);//보내는 대상
-        message.setSubject("토킷(Tokkit) 이메일 인증입니다.");//제목
+            message.addRecipients(MimeMessage.RecipientType.TO, to);//보내는 대상
+            message.setSubject("토킷(Tokkit) 이메일 인증입니다.");//제목
 
-        String msgg = "";
-        msgg += "<div style='margin:20px; font-family:sans-serif;'>";
-        msgg += "  <div style='padding:30px; border-radius:12px; background-color:#fff5e0; border:1px solid #ffc66c;'>";
-        msgg += "    <h2 style='color:#ff9900;'>Tokkit 이메일 인증</h2>";
-        msgg += "    <p style='margin-top:10px; font-size:15px;'>아래 인증번호를 사이트에 입력해 주세요.</p>";
-        msgg += "    <div style='margin-top:20px; text-align:center;'>";
-        msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #ffcc80; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
-        msgg +=        ePw + "</span>";
-        msgg += "    </div>";
-        msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>본 메일은 Tokkit 서비스의 이메일 인증을 위해 발송되었습니다.</p>";
-        msgg += "  </div>";
-        msgg += "</div>";
-        message.setText(msgg, "utf-8", "html");//내용
-        message.setFrom(new InternetAddress("Tokkit","토킷"));//보내는 사람
+            String msgg = "";
+            msgg += "<div style='margin:20px; font-family:sans-serif;'>";
+            msgg += "  <div style='padding:30px; border-radius:12px; background-color:#fff5e0; border:1px solid #ffc66c;'>";
+            msgg += "    <h2 style='color:#ff9900;'>Tokkit 이메일 인증</h2>";
+            msgg += "    <p style='margin-top:10px; font-size:15px;'>아래 인증번호를 사이트에 입력해 주세요.</p>";
+            msgg += "    <div style='margin-top:20px; text-align:center;'>";
+            msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #ffcc80; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
+            msgg +=        ePw + "</span>";
+            msgg += "    </div>";
+            msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>본 메일은 Tokkit 서비스의 이메일 인증을 위해 발송되었습니다.</p>";
+            msgg += "  </div>";
+            msgg += "</div>";
+            message.setText(msgg, "utf-8", "html");//내용
+            message.setFrom(new InternetAddress("Tokkit","토킷"));//보내는 사람
 
-        return message;
+            return message;
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.EMAIL_CREATE_FAIL);
+        }
+
     }
 
     // 임시 비밀번호 발급
-    private MimeMessage createPasswordMessage(String to)throws Exception{
-        String newPw = createPassword();
-        MimeMessage  message = emailSender.createMimeMessage();
+    private MimeMessage createPasswordMessage(String to) {
+        try {
+            String newPw = createPassword();
+            MimeMessage  message = emailSender.createMimeMessage();
 
 
-        insertPw(to, newPw);
-        message.addRecipients(MimeMessage.RecipientType.TO, to);//보내는 대상
-        message.setSubject("토킷(Tokkit) 임시 비밀번호입니다.");//제목
+            insertPw(to, newPw);
+            message.addRecipients(MimeMessage.RecipientType.TO, to);//보내는 대상
+            message.setSubject("토킷(Tokkit) 임시 비밀번호입니다.");//제목
 
-        String msgg = "";
-        msgg += "<div style='margin:20px; font-family:sans-serif;'>";
-        msgg += "  <div style='padding:30px; border-radius:12px; background-color:#eaf8ff; border:1px solid #b3e0ff;'>";
-        msgg += "    <h2 style='color:#3399ff;'>Tokkit 임시 비밀번호 안내</h2>";
-        msgg += "    <p style='margin-top:10px; font-size:15px;'>아래 임시 비밀번호로 로그인한 뒤 반드시 변경해주세요.</p>";
-        msgg += "    <div style='margin-top:20px; text-align:center;'>";
-        msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #80cfff; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
-        msgg +=        newPw + "</span>";
-        msgg += "    </div>";
-        msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>Tokkit 보안을 위해 꼭 비밀번호를 변경해 주세요.</p>";
-        msgg += "  </div>";
-        msgg += "</div>";
-        message.setText(msgg, "utf-8", "html");//내용
-        message.setFrom(new InternetAddress("Tokkit","토킷")); //보내는 사람
+            String msgg = "";
+            msgg += "<div style='margin:20px; font-family:sans-serif;'>";
+            msgg += "  <div style='padding:30px; border-radius:12px; background-color:#eaf8ff; border:1px solid #b3e0ff;'>";
+            msgg += "    <h2 style='color:#3399ff;'>Tokkit 임시 비밀번호 안내</h2>";
+            msgg += "    <p style='margin-top:10px; font-size:15px;'>아래 임시 비밀번호로 로그인한 뒤 반드시 변경해주세요.</p>";
+            msgg += "    <div style='margin-top:20px; text-align:center;'>";
+            msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #80cfff; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
+            msgg +=        newPw + "</span>";
+            msgg += "    </div>";
+            msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>Tokkit 보안을 위해 꼭 비밀번호를 변경해 주세요.</p>";
+            msgg += "  </div>";
+            msgg += "</div>";
+            message.setText(msgg, "utf-8", "html");//내용
+            message.setFrom(new InternetAddress("Tokkit","토킷")); //보내는 사람
 
-        return message;
+            return message;
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.EMAIL_NOT_FOUND);
+        }
     }
 
     // 간편 비밀번호 변경
-    public void sendSimplePasswordVerification(String email) throws Exception {
-        String code = createKey();
-        saveVerificationCode(email, code);
+    public void sendSimplePasswordVerification(String email) {
+        try {
+            String code = createKey();
+            saveVerificationCode(email, code);
 
-        MimeMessage message = emailSender.createMimeMessage();
-        message.addRecipients(Message.RecipientType.TO, email);
-        message.setSubject("토킷(Tokkit) 간편 비밀번호 변경 인증번호입니다.");
+            MimeMessage message = emailSender.createMimeMessage();
+            message.addRecipients(Message.RecipientType.TO, email);
+            message.setSubject("토킷(Tokkit) 간편 비밀번호 변경 인증번호입니다.");
 
-        String msgg = "";
-        msgg += "<div style='margin:20px; font-family:sans-serif;'>";
-        msgg += "  <div style='padding:30px; border-radius:12px; background-color:#f2f7ff; border:1px solid #a0c4ff;'>";
-        msgg += "    <h2 style='color:#3f87ff;'>Tokkit 간편 비밀번호 변경 인증</h2>";
-        msgg += "    <p style='margin-top:10px; font-size:15px;'>앱에 아래 인증번호를 입력하여 변경을 완료해 주세요.</p>";
-        msgg += "    <div style='margin-top:20px; text-align:center;'>";
-        msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #8ecaff; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
-        msgg +=        code + "</span>";
-        msgg += "    </div>";
-        msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>토킷 서비스의 보안을 위해 발송된 인증 코드입니다.</p>";
-        msgg += "  </div>";
-        msgg += "</div>";
+            String msgg = "";
+            msgg += "<div style='margin:20px; font-family:sans-serif;'>";
+            msgg += "  <div style='padding:30px; border-radius:12px; background-color:#f2f7ff; border:1px solid #a0c4ff;'>";
+            msgg += "    <h2 style='color:#3f87ff;'>Tokkit 간편 비밀번호 변경 인증</h2>";
+            msgg += "    <p style='margin-top:10px; font-size:15px;'>앱에 아래 인증번호를 입력하여 변경을 완료해 주세요.</p>";
+            msgg += "    <div style='margin-top:20px; text-align:center;'>";
+            msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #8ecaff; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
+            msgg +=        code + "</span>";
+            msgg += "    </div>";
+            msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>토킷 서비스의 보안을 위해 발송된 인증 코드입니다.</p>";
+            msgg += "  </div>";
+            msgg += "</div>";
 
 
-        message.setText(msgg, "utf-8", "html");
-        message.setFrom(new InternetAddress("Tokkit", "토킷"));
+            message.setText(msgg, "utf-8", "html");
+            message.setFrom(new InternetAddress("Tokkit", "토킷"));
 
-        emailSender.send(message);
+            emailSender.send(message);
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.EMAIL_NOT_SEND);
+        }
     }
 
     private void saveVerificationCode(String email, String code) {
@@ -198,15 +213,15 @@ public class EmailService {
         }
     }
 
-    public void sendMessageForPassword(String to)throws Exception {
-        MimeMessage message = createPasswordMessage(to);
-        try{//예외처리
+    public void sendMessageForPassword(String to) {
+        try {
+            MimeMessage message = createPasswordMessage(to);
             emailSender.send(message);
-        }catch(MailException es){
-            es.printStackTrace();
-            throw new IllegalArgumentException();
+        } catch (MailException e) {
+            throw new GeneralException(ErrorStatus.EMAIL_NOT_SEND);
         }
     }
+
     private void isnertDB(String email, String ePw){
         List<EmailValidation> emailValidationList = emailRepository.findAllByEmail(email);
         if (!emailValidationList.isEmpty()) {

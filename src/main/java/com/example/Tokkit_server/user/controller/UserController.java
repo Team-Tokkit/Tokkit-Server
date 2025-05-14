@@ -7,6 +7,7 @@ import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.*;
 import com.example.Tokkit_server.user.dto.response.UserResponseDto;
+import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.user.service.EmailService;
 import com.example.Tokkit_server.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,6 +28,7 @@ public class UserController {
 
     private final UserService userService;
     private final EmailService emailService;
+    private final UserRepository userRepository;
 
     @PostMapping("/register")
     @Operation(summary = "회원가입 요청", description = "회원가입 요청을 처리합니다.")
@@ -42,38 +44,25 @@ public class UserController {
     }
 
     @PostMapping("/findPw")
-    @Operation(summary = "비밀번호 찾기(재설성)", description = "유저의 비밀번호를 랜덤한 값으로 설정한 후 이메일로 전송합니다.")
+    @Operation(summary = "비밀번호 찾기(재설정)", description = "유저의 비밀번호를 랜덤한 값으로 설정한 후 이메일로 전송합니다.")
     public ApiResponse<?> passwordReIssuance(@RequestParam("email") String email) {
-        try {
-            emailService.sendMessageForPassword(email);
-            return ApiResponse.onSuccess(null);
-        } catch (Exception e) {
-            log.error("임시 비밀번호 발급 실패", e);
-            return ApiResponse.onFailure("500", "임시 비밀번호 발급에 실패했습니다.", null);
-        }
+        emailService.sendMessageForPassword(email);
+        return ApiResponse.onSuccess(null);
     }
 
     @PutMapping("/password-update")
     @Operation(summary = "비밀번호 변경", description = "유저의 비밀번호를 변경합니다.")
     public ApiResponse<?> updateUserPassword(@AuthenticationPrincipal UserDetails userDetails,
-                                     @RequestBody UpdateUserPasswordRequestDto requestDto) {
-        try {
-            UserResponseDto response = userService.updateUserPassword(userDetails.getUsername(), requestDto);
-            return ApiResponse.onSuccess(response);
-        } catch (IllegalArgumentException e) {
-            return ApiResponse.onFailure("400", e.getMessage(), null);
-        }
+                                             @RequestBody UpdateUserPasswordRequestDto requestDto) {
+        UserResponseDto response = userService.updateUserPassword(userDetails.getUsername(), requestDto);
+        return ApiResponse.onSuccess(response);
     }
 
     @PostMapping("/simple-password/send-verification")
     @Operation(summary = "간편 비밀번호 재설정 시 이메일 전송", description = "유저가 간편 비밀번호를 재설정 하기 전에 이메일 인증을 하기 위해 인증 코드를 이메일로 전송합니다.")
     public ApiResponse<?> sendSimplePasswordVerification(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        try {
-            emailService.sendSimplePasswordVerification(userDetails.getUsername());
-            return ApiResponse.onSuccess(SuccessStatus._OK);
-        } catch (Exception e) {
-            return ApiResponse.onFailure("500", e.getMessage(), null);
-        }
+        emailService.sendSimplePasswordVerification(userDetails.getUsername());
+        return ApiResponse.onSuccess(SuccessStatus._OK);
     }
 
     @PostMapping("/simple-password/verify")
