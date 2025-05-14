@@ -28,7 +28,7 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
         StringBuilder jpql = new StringBuilder("SELECT v FROM Voucher v WHERE 1=1");
 
         if (request.getStoreCategory() != null) {
-            jpql.append(" AND v.category.name = :category");
+            jpql.append(" AND v.category = :category");
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
             jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");

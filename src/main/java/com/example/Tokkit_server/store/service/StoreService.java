@@ -26,12 +26,12 @@ public class StoreService {
 	private final MerchantRepository merchantRepository;
 	private final RegionRepository regionRepository;
 	private final StoreRepository storeRepository;
+
 	private final WalletRepository walletRepository;
 
 	/**
 	 * 상점 생성 서비스 로직
 	 */
-
 	public void createStore(StoreCreateRequestDto dto) {
 		GeometryFactory geometryFactory = new GeometryFactory(new PrecisionModel(), 4326);
 		Point location = geometryFactory.createPoint(new Coordinate(dto.getLongitude(), dto.getLatitude()));

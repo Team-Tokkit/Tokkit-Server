@@ -1,7 +1,6 @@
 package com.example.Tokkit_server.store.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
-
 import lombok.Getter;
 
 @Getter
@@ -23,4 +22,6 @@ public enum StoreCategory {
     public String getKoreanName() {
         return koreanName;
     }
-} 
+  } 
+}
+
