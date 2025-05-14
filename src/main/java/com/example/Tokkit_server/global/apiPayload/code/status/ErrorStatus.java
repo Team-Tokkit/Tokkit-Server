@@ -21,10 +21,8 @@ public enum ErrorStatus implements BaseErrorCode {
 	_UNAUTHORIZED(HttpStatus.UNAUTHORIZED,"COMMON401","인증이 필요합니다."),
 	_FORBIDDEN(HttpStatus.FORBIDDEN, "COMMON403", "금지된 요청입니다."),
 
-
 	// Notice 관련
-	NOTICE_NOT_FOUND(HttpStatus.BAD_REQUEST, "NOTICE400","공지사항을 찾을 수 없습니다."),
-
+	NOTICE_NOT_FOUND(HttpStatus.BAD_REQUEST, "NOTICE400", "공지사항을 찾을 수 없습니다."),
 
 	// Store 관련
 	STORE_CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "STORE_001", "존재하지 않는 매장 카테고리입니다."),
@@ -59,7 +57,11 @@ public enum ErrorStatus implements BaseErrorCode {
 	TRANSACTION_NOT_FOUND(HttpStatus.NOT_FOUND,"TX_001","해당 거래 내역이 존재하지 않습니다."),
 
 	// 중복결제 관련
-	DUPLICATE_REQUEST(HttpStatus.CONFLICT,"DUPLICATED", "중복 요청입니다.");
+	DUPLICATE_REQUEST(HttpStatus.CONFLICT,"DUPLICATED", "중복 요청입니다."),
+
+	// Kakao Map 관련
+	INVALID_RADIUS(HttpStatus.BAD_REQUEST, "RADIUS_001", "유효하지 않은 반경입니다."),
+	INVALID_LATITUDE(HttpStatus.BAD_REQUEST, "KAKAO_MAP_001", "유효하지 않은 좌표입니다.");
 
 
 	private final HttpStatus httpStatus;
