@@ -23,8 +23,7 @@ public class VoucherDetailResponse {
     private String refundPolicy;
     private String contact;
     private String imageUrl;
-
-
+  
     private Page<StoreResponse> stores;
 
     public static VoucherDetailResponse from (Voucher voucher, Page<StoreResponse> stores) {

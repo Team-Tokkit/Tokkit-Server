@@ -7,6 +7,7 @@ import org.springframework.data.domain.Page;
 
 import com.example.Tokkit_server.store.dto.response.StoreResponse;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
+import com.example.Tokkit_server.voucher_ownership.enums.VoucherOwnershipStatus;
 
 import lombok.Builder;
 import lombok.Getter;
