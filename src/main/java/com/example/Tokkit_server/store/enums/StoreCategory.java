@@ -22,6 +22,5 @@ public enum StoreCategory {
     public String getKoreanName() {
         return koreanName;
     }
-  } 
-}
+  }
 
