@@ -8,5 +8,4 @@ import lombok.Getter;
 public class VoucherPurchaseRequest {
     private Long userId;
     private Long voucherId; // 구매하려는 바우처 ID
-    private Long amount; // 구매 금액
 }

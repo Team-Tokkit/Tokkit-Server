@@ -28,10 +28,10 @@ public class WalletQueryService {
     @Transactional
     public void convertDepositToToken(DepositToTokenRequest request) {
         Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
-                .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         if (wallet.getDepositBalance() < request.getAmount()) {
-            throw new GeneralException(ErrorStatus._BAD_REQUEST); // 잔액 부족 에러 처리
+            throw new GeneralException(ErrorStatus.INSUFFICIENT_BALANCE); // 잔액 부족 에러 처리
         }
 
         wallet.updateBalance(wallet.getDepositBalance() - request.getAmount(),
@@ -51,10 +51,10 @@ public class WalletQueryService {
     @Transactional
     public void convertTokenToDeposit(TokenToDepositRequest request) {
         Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
-                .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
 
         if (wallet.getTokenBalance() < request.getAmount()) {
-            throw new GeneralException(ErrorStatus._BAD_REQUEST);
+            throw new GeneralException(ErrorStatus.INSUFFICIENT_TOKEN_BALANCE); // 토큰 잔액 부족
         }
 
         wallet.updateBalance(wallet.getDepositBalance() + request.getAmount(),
@@ -73,7 +73,7 @@ public class WalletQueryService {
 
     public List<TransactionHistoryResponse> getRecentTransactions(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         List<Transaction> transactions = transactionRepository
             .findTop10ByWalletIdOrderByCreatedAtDesc(wallet.getId());
@@ -89,7 +89,7 @@ public class WalletQueryService {
 
     public TransactionDetailResponse getTransactionDetail(Long transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus._BAD_REQUEST));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.TRANSACTION_NOT_FOUND));
         return new TransactionDetailResponse(
             transaction.getId(),
             transaction.getType(),
