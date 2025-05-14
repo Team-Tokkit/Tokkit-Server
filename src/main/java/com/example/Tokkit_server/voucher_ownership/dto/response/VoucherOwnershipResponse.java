@@ -16,7 +16,7 @@ public class VoucherOwnershipResponse {
     private Boolean isVoucher;
     private VoucherOwnershipStatus status;
     private String imageUrl;
-
+  
     public static VoucherOwnershipResponse from(VoucherOwnership voucherOwnership) {
         return VoucherOwnershipResponse.builder()
                 .id(voucherOwnership.getId())

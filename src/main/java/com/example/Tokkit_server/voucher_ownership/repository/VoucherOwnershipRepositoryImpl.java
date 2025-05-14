@@ -47,7 +47,6 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
                 break;
         }
 
-
         TypedQuery<VoucherOwnership> query = em.createQuery(jpql.toString(), VoucherOwnership.class);
         query.setParameter("userId", request.getUserId());
 
