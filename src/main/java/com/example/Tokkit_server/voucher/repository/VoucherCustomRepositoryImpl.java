@@ -75,3 +75,4 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
         return new PageImpl<>(results, pageable, total);
     }
 }
+

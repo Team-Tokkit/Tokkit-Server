@@ -67,4 +67,20 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
         return new PageImpl<>(result, pageable, total);
     }
 
+    @Override
+    public List<VoucherOwnership> findAllWithVoucherAndStoresByUserId(Long userId) {
+        return em.createQuery("""
+            SELECT vo FROM VoucherOwnership vo
+            JOIN FETCH vo.voucher v
+            LEFT JOIN FETCH v.voucherStores vs
+            LEFT JOIN FETCH vs.store s
+            JOIN vo.wallet w
+            JOIN w.user u
+            WHERE u.id = :userId
+        """, VoucherOwnership.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
 }
+
+
