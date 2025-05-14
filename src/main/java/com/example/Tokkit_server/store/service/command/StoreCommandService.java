@@ -1,9 +1,14 @@
 package com.example.Tokkit_server.store.service.command;
 
-import com.example.Tokkit_server.store.dto.response.KakaoMapStoreResponse;
-import com.example.Tokkit_server.store.enums.StoreCategory;
+import com.example.Tokkit_server.store.dto.response.KakaoMapSearchResponse;
 
 import java.util.List;
 public interface StoreCommandService {
-    public List<KakaoMapStoreResponse> findNearbyStores(double lat, double lng, double radius, StoreCategory category, String keyword);
+    public List<KakaoMapSearchResponse> findNearbyStores(
+            Double lat,
+            Double lng,
+            Integer radius,
+            String storeCategory,
+            String keyword
+    );
 }
