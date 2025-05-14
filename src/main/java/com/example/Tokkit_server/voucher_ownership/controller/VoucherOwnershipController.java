@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.voucher_ownership.controller;
 
+import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -31,7 +32,7 @@ public class VoucherOwnershipController {
 
     // 내 바우처 전체 조회하기, 필터링 및 검색하기
     @GetMapping
-    @Operation(summary = "내 바우처 조회 및 필터링/검색하기", description = "내가 보유한 바우처 목록을 조회하고 필터링 및 검색할 수 API입니다.")
+    @Operation(summary = "내 바우처 조회 및 필터링/검색하기", description = "내가 보유한 바우처 목록을 조회하고 필터링 및 검색할 수 있는 API입니다.")
     public ApiResponse<Page<VoucherOwnershipResponse>> getMyVouchers(@ModelAttribute VoucherOwnershipSearchRequest request, Pageable pageable) {
         Page<VoucherOwnershipResponse> myVouchers = voucherOwnershipService.searchMyVouchers(request, pageable);
         return ApiResponse.onSuccess(myVouchers);
