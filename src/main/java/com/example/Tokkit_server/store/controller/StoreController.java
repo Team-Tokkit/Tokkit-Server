@@ -3,6 +3,7 @@ package com.example.Tokkit_server.store.controller;
 import com.example.Tokkit_server.global.apiPayload.ApiResponse;
 import com.example.Tokkit_server.store.dto.response.KakaoMapSearchResponse;
 import com.example.Tokkit_server.store.dto.response.StoreInfoResponse;
+import com.example.Tokkit_server.store.dto.response.StoreSimpleResponse;
 import com.example.Tokkit_server.store.service.StoreService;
 import com.example.Tokkit_server.store.service.command.StoreCommandService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,7 +29,7 @@ public class StoreController {
     @GetMapping("/nearby")
     @Operation(
             summary = "근처 가맹점 조회",
-            description = "사용자ㄴ색ㄷㄲ데ㅐ의 위치, 반경, 키워드, 카테고리를 기반으로 근처 가맹점을 조회합니다.\n\n"
+            description = "사용자의 위치, 반경, 키워드, 카테고리를 기반으로 근처 가맹점을 조회합니다.\n\n"
                     + "[storeCategory 가능한 값]\n"
                     + "- 음식점\n"
                     + "- 의료\n"
@@ -57,5 +58,12 @@ public class StoreController {
             @RequestParam Long merchantId,
             @RequestParam Long storeId) {
         return ApiResponse.onSuccess(storeService.getStoreInfo(merchantId, storeId));
+    }
+
+    @GetMapping("/simple")
+    @Operation(summary = "일반 가맹점 단건 조회", description = "storeId를 기반으로 가맹점 정보를 조회합니다.")
+    public ApiResponse<StoreSimpleResponse> getStoreSimpleInfo(@RequestParam Long storeId) {
+        StoreSimpleResponse response = storeService.getSimpleStoreInfo(storeId);
+        return ApiResponse.onSuccess(response);
     }
 }

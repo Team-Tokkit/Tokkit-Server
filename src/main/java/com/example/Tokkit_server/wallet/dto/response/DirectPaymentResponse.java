@@ -10,6 +10,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class DirectPaymentResponse {
+    private String paymentTime;
+    private Long amount;
     private Long remainingTokenBalance;
     private String message;
 }

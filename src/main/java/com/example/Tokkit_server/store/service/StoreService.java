@@ -12,6 +12,7 @@ import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.region.repository.RegionRepository;
 import com.example.Tokkit_server.store.dto.request.StoreCreateRequestDto;
 import com.example.Tokkit_server.store.dto.response.StoreInfoResponse;
+import com.example.Tokkit_server.store.dto.response.StoreSimpleResponse;
 import com.example.Tokkit_server.store.entity.Store;
 import com.example.Tokkit_server.store.repository.StoreRepository;
 import com.example.Tokkit_server.wallet.dto.response.WalletBalanceResponse;
@@ -79,4 +80,15 @@ public class StoreService {
 			.tokenBalance(wallet.getTokenBalance())
 			.build();
 	}
+
+	/**
+	 * 가맹점 단순 조회
+	 */
+	public StoreSimpleResponse getSimpleStoreInfo(Long storeId) {
+		Store store = storeRepository.findById(storeId)
+			.orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
+
+		return StoreSimpleResponse.from(store);
+	}
+
 }
