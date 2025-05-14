@@ -24,7 +24,6 @@ public class VoucherOwnership extends BaseTimeEntity {
     @JoinColumn(name = "voucher_id", nullable = false)
     private Voucher voucher;
 
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id", nullable = false)
     private Wallet wallet;
