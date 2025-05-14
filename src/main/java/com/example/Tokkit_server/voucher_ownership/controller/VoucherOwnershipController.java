@@ -4,6 +4,8 @@ import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.voucher_ownership.dto.response.VoucherOwnershipDetailResponseV2;
 import com.example.Tokkit_server.voucher_ownership.dto.response.VoucherOwnershipResponseV2;
+import org.springdoc.core.annotations.ParameterObject;
+
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

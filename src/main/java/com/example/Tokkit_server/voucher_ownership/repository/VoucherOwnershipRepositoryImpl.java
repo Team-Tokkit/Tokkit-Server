@@ -66,4 +66,5 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
 
         return new PageImpl<>(result, pageable, total);
     }
+
 }

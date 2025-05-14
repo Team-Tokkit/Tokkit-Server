@@ -3,6 +3,7 @@ package com.example.Tokkit_server.voucher.dto.response;
 import com.example.Tokkit_server.store.dto.response.StoreResponse;
 import com.example.Tokkit_server.voucher.entity.Voucher;
 import com.fasterxml.jackson.annotation.JsonFormat;
+
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.domain.Page;
@@ -17,6 +18,7 @@ public class VoucherDetailResponse {
     private Integer price;
     private Integer originalPrice;
     private Integer remainingCount;
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private LocalDateTime validDate;
     private String detailDescription;
