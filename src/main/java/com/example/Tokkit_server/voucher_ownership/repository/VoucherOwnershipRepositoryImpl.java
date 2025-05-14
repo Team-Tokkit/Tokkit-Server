@@ -32,9 +32,20 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
             jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");
         }
 
-        String sort = Optional.ofNullable(request.getSort()).orElse("createdAt");
-        String dir = Optional.ofNullable(request.getDirection()).orElse("desc");
-        jpql.append(" ORDER BY vo.remainingAmount ").append(dir);
+        String sort = Optional.ofNullable(request.getSort()).orElse("recent");
+
+        switch (sort) {
+            case "amount":
+                jpql.append(" ORDER BY vo.remainingAmount DESC");
+                break;
+            case "expiry":
+                jpql.append(" ORDER BY v.validDate ASC");
+                break;
+            case "recent":
+            default:
+                jpql.append(" ORDER BY vo.createdAt DESC");
+                break;
+        }
 
         TypedQuery<VoucherOwnership> query = em.createQuery(jpql.toString(), VoucherOwnership.class);
         query.setParameter("userId", request.getUserId());
