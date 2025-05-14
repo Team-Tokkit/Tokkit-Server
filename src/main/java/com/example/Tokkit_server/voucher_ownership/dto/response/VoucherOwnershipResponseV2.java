@@ -23,7 +23,7 @@ public class VoucherOwnershipResponseV2 {
     private LocalDateTime validDate;
     private String imageUrl;
 
-    public static VoucherOwnershipResponseV2 from(VoucherOwnership voucherOwnership) {
+    public static VoucherOwnershipResponseV2 from(VoucherOwnership voucherOwnership, String imageProxyBaseUrl) {
         Voucher voucher = voucherOwnership.getVoucher();
 
         return VoucherOwnershipResponseV2.builder()
@@ -37,7 +37,7 @@ public class VoucherOwnershipResponseV2 {
                 .validDate(voucher.getValidDate())
                 .imageUrl(
                         voucher.getImage() != null
-                                ? "http://localhost:8080/api/s3/" + voucher.getImage().getImageUrl()
+                                ? imageProxyBaseUrl + voucher.getImage().getImageUrl()
                                 : null
                 )
                 .build();

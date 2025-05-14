@@ -22,7 +22,7 @@ public class VoucherResponse {
     private String imageUrl;
 
 
-    public static VoucherResponse from (Voucher voucher) {
+    public static VoucherResponse from (Voucher voucher, String imageProxyBaseUrl) {
         return VoucherResponse.builder()
                 .id(voucher.getId())
                 .name(voucher.getName())
@@ -34,7 +34,7 @@ public class VoucherResponse {
                 .remainingCount(voucher.getRemainingCount())
                 .imageUrl(
                         voucher.getImage() != null ?
-                                "http://localhost:8080/api/s3/" + voucher.getImage().getImageUrl()
+                                imageProxyBaseUrl + voucher.getImage().getImageUrl()
                                 : null
                 )
                 .build();

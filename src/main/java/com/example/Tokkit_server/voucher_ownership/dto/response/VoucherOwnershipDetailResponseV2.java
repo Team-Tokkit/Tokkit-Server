@@ -27,7 +27,7 @@ public class VoucherOwnershipDetailResponseV2 {
 
     private Page<StoreResponse> stores;
 
-    public static VoucherOwnershipDetailResponseV2 from(VoucherOwnership ownership, Page<StoreResponse> stores) {
+    public static VoucherOwnershipDetailResponseV2 from(VoucherOwnership ownership, Page<StoreResponse> stores, String imageProxyBaseUrl) {
 
         return VoucherOwnershipDetailResponseV2.builder()
                 .id(ownership.getId())
@@ -42,7 +42,7 @@ public class VoucherOwnershipDetailResponseV2 {
                 .stores(stores)
                 .imageUrl(
                         ownership.getVoucher().getImage() != null ?
-                                "http://localhost:8080/api/s3/" + ownership.getVoucher().getImage().getImageUrl()
+                                imageProxyBaseUrl + ownership.getVoucher().getImage().getImageUrl()
                                 : null
                 )
                 .build();

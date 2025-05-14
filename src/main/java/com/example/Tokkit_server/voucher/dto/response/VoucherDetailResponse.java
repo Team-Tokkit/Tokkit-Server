@@ -26,7 +26,7 @@ public class VoucherDetailResponse {
   
     private Page<StoreResponse> stores;
 
-    public static VoucherDetailResponse from (Voucher voucher, Page<StoreResponse> stores) {
+    public static VoucherDetailResponse from (Voucher voucher, Page<StoreResponse> stores, String imageProxyBaseUrl) {
         return VoucherDetailResponse.builder()
                 .id(voucher.getId())
                 .name(voucher.getName())
@@ -40,7 +40,7 @@ public class VoucherDetailResponse {
                 .stores(stores)
                 .imageUrl(
                         voucher.getImage() != null ?
-                                "http://localhost:8080/api/s3/" + voucher.getImage().getImageUrl()
+                                imageProxyBaseUrl + voucher.getImage().getImageUrl()
                                 : null
                 )
                 .build();

@@ -18,6 +18,9 @@ public class S3Config {
     @Value("${cloud.aws.credentials.secret-key}")
     private String secretKey;
 
+    @Value("${proxy.image-url}")
+    private String proxyImageUrl;
+
     @Value("${cloud.aws.region.static}")
     private String region;
 
@@ -45,5 +48,10 @@ public class S3Config {
                         )
                 )
                 .build();
+    }
+
+    @Bean
+    public String imageProxyBaseUrl() {
+        return proxyImageUrl;
     }
 }

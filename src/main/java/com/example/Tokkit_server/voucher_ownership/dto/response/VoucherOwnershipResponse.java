@@ -17,7 +17,7 @@ public class VoucherOwnershipResponse {
     private VoucherOwnershipStatus status;
     private String imageUrl;
   
-    public static VoucherOwnershipResponse from(VoucherOwnership voucherOwnership) {
+    public static VoucherOwnershipResponse from(VoucherOwnership voucherOwnership, String imageProxyBaseUrl) {
         return VoucherOwnershipResponse.builder()
                 .id(voucherOwnership.getId())
                 .voucherName(voucherOwnership.getVoucher().getName())
@@ -27,7 +27,7 @@ public class VoucherOwnershipResponse {
                 .status(VoucherOwnershipStatus.AVAILABLE)
                 .imageUrl(
                         voucherOwnership.getVoucher().getImage() != null ?
-                                "http://localhost:8080/api/s3/" + voucherOwnership.getVoucher().getImage().getImageUrl()
+                                imageProxyBaseUrl + voucherOwnership.getVoucher().getImage().getImageUrl()
                                 : null
                 )
                 .build();
