@@ -31,10 +31,8 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
             jpql.append(" AND v.storeCategory = :category");
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
-            jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");
+            jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT(:keyword, '%'))");
         }
-
-
 
         String sort = Optional.ofNullable(request.getSort()).orElse("createdAt");
         String dir = Optional.ofNullable(request.getDirection()).orElse("desc");
