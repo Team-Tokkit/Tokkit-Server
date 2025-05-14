@@ -1,6 +1,8 @@
 package com.example.Tokkit_server.wallet.service.command;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 import com.example.Tokkit_server.wallet.enums.WalletType;
@@ -21,6 +23,7 @@ import com.example.Tokkit_server.wallet.dto.request.DirectPaymentRequest;
 import com.example.Tokkit_server.wallet.dto.response.DirectPaymentResponse;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.voucher.repository.VoucherRepository;
+import com.example.Tokkit_server.wallet.dto.response.PaymentOptionResponse;
 import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentRequest;
 import com.example.Tokkit_server.wallet.dto.request.VoucherPurchaseRequest;
@@ -260,6 +263,8 @@ public class WalletCommandService {
 
          //  12. 응답 반환
         return VoucherPaymentResponse.builder()
+            .paymentTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME))
+            .amount(request.getAmount())
             .remainingAmount(ownership.getRemainingAmount())
             .message("결제 성공")
             .build();
@@ -333,9 +338,56 @@ public class WalletCommandService {
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()
+            .paymentTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME))
+            .amount(request.getAmount())
             .remainingTokenBalance(userWallet.getTokenBalance())
             .message("토큰 직접 결제 성공")
             .build();
+    }
+
+
+    public List<PaymentOptionResponse> getPaymentOptions(Long userId, Long storeId) {
+        List<PaymentOptionResponse> result = new ArrayList<>();
+
+        // 1. 사용자 지갑의 토큰 잔액
+        Wallet wallet = walletRepository.findByUser_Id(userId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+
+        result.add(PaymentOptionResponse.builder()
+            .type("TOKEN")
+            .name("토큰으로 결제")
+            .balance(wallet.getTokenBalance())
+            .expireDate(null)
+            .usable(true)
+            .storeCategory("TOKEN") // 토큰은 별도 카테고리
+            .build());
+
+        // 2. 바우처 소유권 조회
+        List<VoucherOwnership> ownerships = voucherOwnershipRepository.findAllWithVoucherAndStoresByUserId(userId);
+       // 해당 userId가 소유한 지갑에 연결된 모든 바우처 소유권(VoucherOwnership)을 가져와라
+
+        for (VoucherOwnership o : ownerships) {
+            Voucher v = o.getVoucher();
+
+            boolean usableStore = v.getVoucherStores().stream()
+                .anyMatch(vs -> vs.getStore().getId().equals(storeId));
+
+            if (!usableStore || v.getValidDate().isBefore(LocalDateTime.now()) || o.getRemainingAmount() <= 0) {
+                continue;
+            }
+
+            result.add(PaymentOptionResponse.builder()
+                .type("VOUCHER")
+                .voucherOwnershipId(o.getId())
+                .name(v.getName())
+                .balance(o.getRemainingAmount())
+                .expireDate(v.getValidDate().toLocalDate().toString())
+                .usable(true)
+                .storeCategory(v.getStoreCategory().name())
+                .build());
+        }
+
+        return result;
     }
 
 }

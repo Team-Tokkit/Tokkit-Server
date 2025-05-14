@@ -21,6 +21,7 @@ import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentReq
 import com.example.Tokkit_server.wallet.dto.request.VoucherPurchaseRequest;
 import com.example.Tokkit_server.wallet.dto.response.DirectPaymentResponse;
 import com.example.Tokkit_server.wallet.dto.response.PasswordVerifyResponse;
+import com.example.Tokkit_server.wallet.dto.response.PaymentOptionResponse;
 import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
 import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
 import com.example.Tokkit_server.wallet.dto.response.VoucherPaymentResponse;
@@ -119,6 +120,15 @@ public class WalletController {
     public ApiResponse<PasswordVerifyResponse> verifyPassword(@RequestBody PasswordVerifyRequest request) {
         PasswordVerifyResponse response = walletAuthService.verifyPassword(request);
         return ApiResponse.onSuccess(response);
+    }
+
+
+    @GetMapping("/payment-options")
+    @Operation(summary = "결제 수단 목록 조회", description = "가맹점에서 사용 가능한 바우처 및 토큰 결제 옵션 목록을 조회합니다.")
+    public ApiResponse<List<PaymentOptionResponse>> getPaymentOptions(
+        @RequestParam Long userId,
+        @RequestParam Long storeId) {
+        return ApiResponse.onSuccess(commandService.getPaymentOptions(userId, storeId));
     }
 
 }
