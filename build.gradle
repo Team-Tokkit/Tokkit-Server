@@ -41,6 +41,15 @@ dependencies {
 	// JTS Point (공간 타입)을 JPA에서 인식하게 끔
 	implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
 	implementation 'org.locationtech.jts:jts-core:1.19.0' // JTS geometry
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
+	// Jackson
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 }
 
 tasks.named('test') {
