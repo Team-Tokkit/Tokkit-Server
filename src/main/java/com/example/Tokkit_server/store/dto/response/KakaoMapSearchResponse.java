@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.store.dto.response;
 
 import com.example.Tokkit_server.store.entity.Store;
+import com.example.Tokkit_server.store.enums.StoreCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -10,7 +11,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class KakaoMapStoreResponse {
+public class KakaoMapSearchResponse {
     private Long id;
     private String name;
     private String roadAddress;
@@ -18,9 +19,10 @@ public class KakaoMapStoreResponse {
     private double latitude;
     private double longitude;
     private double distance;
+    private StoreCategory storeCategory;
 
-    public static KakaoMapStoreResponse from(Store store , double distance) {
-       return KakaoMapStoreResponse.builder()
+    public static KakaoMapSearchResponse from(Store store, double distance) {
+        return KakaoMapSearchResponse.builder()
                 .id(store.getId())
                 .name(store.getStoreName())
                 .roadAddress(store.getRoadAddress())
@@ -28,6 +30,7 @@ public class KakaoMapStoreResponse {
                 .latitude(store.getLatitude())
                 .longitude(store.getLongitude())
                 .distance(distance)
+                .storeCategory(store.getStoreCategory())
                 .build();
     }
 }
