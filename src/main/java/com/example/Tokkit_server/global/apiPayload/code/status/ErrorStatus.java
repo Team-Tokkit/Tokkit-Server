@@ -45,7 +45,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "USER_001", "존재하지 않는 사용자입니다."),
 
 	// Kakao Map 관련
-	INVALID_RADIUS(HttpStatus.BAD_REQUEST, "KAKAO_001", "유효하지 않은 반경입니다.");
+	INVALID_RADIUS(HttpStatus.BAD_REQUEST, "RADIUS_001", "유효하지 않은 반경입니다."),
+
+	INVALID_LATITUDE(HttpStatus.BAD_REQUEST, "KAKAO_MAP_001", "유효하지 않은 좌표입니다.");
+
 
 
 	private final HttpStatus httpStatus;
