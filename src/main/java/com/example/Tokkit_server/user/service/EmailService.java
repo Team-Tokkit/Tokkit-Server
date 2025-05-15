@@ -3,10 +3,8 @@ package com.example.Tokkit_server.user.service;
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.user.entity.EmailValidation;
-import com.example.Tokkit_server.user.entity.SimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.user.repository.EmailValidationRepository;
-import com.example.Tokkit_server.user.repository.PasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.user.repository.UserRepository;
 import jakarta.mail.Message;
 import jakarta.mail.internet.InternetAddress;
@@ -32,9 +30,6 @@ public class EmailService {
 
     @Autowired
     private EmailValidationRepository emailRepository;
-
-    @Autowired
-    private PasswordResetEmailValidationRepository passwordResetEmailValidationRepository;
 
     @Autowired
     private UserRepository userRepository;
@@ -108,25 +103,25 @@ public class EmailService {
     }
 
     // 간편 비밀번호 변경
-    public void sendSimplePasswordVerification(String email) {
+    public void sendMessageForSimplePassword(String to) {
         try {
-            String code = createKey();
-            saveVerificationCode(email, code);
-
+            String newSpw = createSimplePassword();
             MimeMessage message = emailSender.createMimeMessage();
-            message.addRecipients(Message.RecipientType.TO, email);
-            message.setSubject("토킷(Tokkit) 간편 비밀번호 변경 인증번호입니다.");
+
+            insertSimplePw(to, newSpw);
+            message.addRecipients(Message.RecipientType.TO, to);
+            message.setSubject("토킷(Tokkit) 임시 간편 비밀번호입니다.");
 
             String msgg = "";
             msgg += "<div style='margin:20px; font-family:sans-serif;'>";
             msgg += "  <div style='padding:30px; border-radius:12px; background-color:#f2f7ff; border:1px solid #a0c4ff;'>";
-            msgg += "    <h2 style='color:#3f87ff;'>Tokkit 간편 비밀번호 변경 인증</h2>";
-            msgg += "    <p style='margin-top:10px; font-size:15px;'>앱에 아래 인증번호를 입력하여 변경을 완료해 주세요.</p>";
+            msgg += "    <h2 style='color:#3f87ff;'>Tokkit 임시 간편 비밀번호 안내</h2>";
+            msgg += "    <p style='margin-top:10px; font-size:15px;'>간편 비밀번호 변경 페이지에서 아래 임시 간편비밀번호를 입력 후 간편 비밀번호를 변경해주세요</p>";
             msgg += "    <div style='margin-top:20px; text-align:center;'>";
             msgg += "      <span style='display:inline-block; padding:15px 25px; background-color:#fff; border:2px dashed #8ecaff; border-radius:10px; font-size:22px; font-weight:bold; color:#333;'>";
-            msgg +=        code + "</span>";
+            msgg +=        newSpw + "</span>";
             msgg += "    </div>";
-            msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>토킷 서비스의 보안을 위해 발송된 인증 코드입니다.</p>";
+            msgg += "    <p style='margin-top:20px; font-size:13px; color:#999;'>Tokkit 보안을 위해 꼭 간편비밀번호를 변경해 주세요.</p>";
             msgg += "  </div>";
             msgg += "</div>";
 
@@ -138,17 +133,6 @@ public class EmailService {
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.EMAIL_NOT_SEND);
         }
-    }
-
-    private void saveVerificationCode(String email, String code) {
-        passwordResetEmailValidationRepository.deleteById(email); // 기존 삭제
-        SimplePasswordResetEmailValidation validation = SimplePasswordResetEmailValidation.builder()
-                .email(email)
-                .code(code)
-                .exp(new Date(System.currentTimeMillis() + 5 * 60 * 1000)) // 5분 유효
-                .isVerified(false)
-                .build();
-        passwordResetEmailValidationRepository.save(validation);
     }
 
 
@@ -194,6 +178,18 @@ public class EmailService {
                 // 0~9
             }
         }
+        return key.toString();
+    }
+
+    public static String createSimplePassword() {
+        StringBuilder key = new StringBuilder();
+        Random rnd = new Random();
+
+        for (int i = 0; i < 6; i++) {
+            int digit = rnd.nextInt(10); // 0~9 사이의 숫자
+            key.append(digit);
+        }
+
         return key.toString();
     }
 
@@ -267,8 +263,14 @@ public class EmailService {
 
 
     private void insertPw(String email, String pw) {
-        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         user.updatePassword(passwordEncoder.encode(pw));
+        userRepository.save(user);
+    }
+
+    private void insertSimplePw(String email, String pw) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        user.updateSimplePassword(passwordEncoder.encode(pw));
         userRepository.save(user);
     }
 }

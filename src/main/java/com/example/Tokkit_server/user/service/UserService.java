@@ -1,7 +1,5 @@
 package com.example.Tokkit_server.user.service;
 
-import java.util.Date;
-
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.notification.entity.NotificationCategorySetting;
@@ -14,10 +12,8 @@ import com.example.Tokkit_server.user.dto.request.UserInfoUpdateRequestDto;
 import com.example.Tokkit_server.user.dto.response.UserResponseDto;
 import com.example.Tokkit_server.user.dto.response.UserWalletResponseDto;
 import com.example.Tokkit_server.user.entity.EmailValidation;
-import com.example.Tokkit_server.user.entity.SimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.user.repository.EmailValidationRepository;
-import com.example.Tokkit_server.user.repository.PasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.service.command.WalletCommandService;
@@ -34,7 +30,6 @@ public class UserService {
     private final NotificationSettingRepository notificationSettingRepository;
     private final EmailValidationRepository emailValidationRepository;
     private final PasswordEncoder passwordEncoder;
-    private final PasswordResetEmailValidationRepository passwordResetEmailValidationRepository;
     private final WalletCommandService walletCommandService;
 
     @Transactional
@@ -103,37 +98,22 @@ public class UserService {
     }
 
     @Transactional
-    public void verifySimplePasswordCode(String email, String code) {
-        SimplePasswordResetEmailValidation validation = passwordResetEmailValidationRepository.findById(email)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
-
-        if (new Date().after(validation.getExp())) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
-        }
-
-        if (!validation.getCode().equals(code)) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
-        }
-
-        validation.setVerified(true);
-        passwordResetEmailValidationRepository.save(validation);
-    }
-
-    @Transactional
     public void updateSimplePassword(String email, String newSimplePassword) {
-        SimplePasswordResetEmailValidation validation = passwordResetEmailValidationRepository.findById(email)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
-
-        if (!validation.getIsVerified()) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR); // 인증 안됨
-        }
-
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         user.updateSimplePassword(passwordEncoder.encode(newSimplePassword));
     }
 
+    public void verifySimplePassword(String email, String simplePassword) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        boolean matches = user.matchSimplePassword(passwordEncoder, simplePassword);
+        if (!matches) {
+            throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
+        }
+    }
     @Transactional
     public void updateUserInfo(Long id, UserInfoUpdateRequestDto requestDto) {
         User user = userRepository.findById(id)

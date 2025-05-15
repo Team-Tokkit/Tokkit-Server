@@ -65,11 +65,11 @@ public class MerchantController {
         }
     }
 
-    @PostMapping("/simple-password/send-verification")
-    @Operation(summary = "간편 비밀번호 재설정 시 이메일 전송", description = "가맹점주가 간편 비밀번호를 재설정 하기 전에 이메일 인증을 하기 위해 인증 코드를 이메일로 전송합니다.")
-    public ApiResponse<?> sendSimplePasswordVerification(@AuthenticationPrincipal CustomMerchantDetails merchantDetails) {
+    @PostMapping("/find-simple-password")
+    @Operation(summary = "간편 비밀번호 초기화", description = "가맹점주가 간편 비밀번호를 잊었을 경우 랜덤 값으로 설정한 후 이메일로 전송합니다.")
+    public ApiResponse<?> sendSimplePasswordVerification(@RequestParam("email") String email) {
         try {
-            merchantEmailService.sendSimplePasswordVerification(merchantDetails.getEmail());
+            merchantEmailService.sendMessageForSimplePassword(email);
             return ApiResponse.onSuccess(SuccessStatus._OK);
         } catch (Exception e) {
             return ApiResponse.onFailure("500", e.getMessage(), null);
@@ -82,7 +82,7 @@ public class MerchantController {
             @AuthenticationPrincipal CustomMerchantDetails merchantDetails,
             @RequestBody MerchantSimplePasswordVerificationRequestDto requestDto) {
 
-        merchantService.verifySimplePasswordCode(merchantDetails.getEmail(), requestDto.getCode());
+        merchantService.verifySimplePassword(merchantDetails.getEmail(), requestDto.getSimplePassword());
 
         return ApiResponse.onSuccess(SuccessStatus._OK);
     }

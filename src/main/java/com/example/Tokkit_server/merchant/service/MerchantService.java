@@ -9,12 +9,9 @@ import com.example.Tokkit_server.merchant.dto.response.MerchantRegisterResponseD
 import com.example.Tokkit_server.merchant.dto.response.MerchantResponseDto;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.entity.MerchantEmailValidation;
-import com.example.Tokkit_server.merchant.entity.MerchantSimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.merchant.repository.MerchantEmailValidationRepository;
-import com.example.Tokkit_server.merchant.repository.MerchantPasswordResetEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.ocr.service.KakaoAddressSearchService;
-import com.example.Tokkit_server.ocr.utils.KakaoGeoClient;
 import com.example.Tokkit_server.ocr.utils.KakaoGeoResult;
 import com.example.Tokkit_server.region.entity.Region;
 import com.example.Tokkit_server.region.repository.RegionRepository;
@@ -44,7 +41,6 @@ public class MerchantService {
     private final StoreRepository storeRepository;
     private final WalletCommandService walletCommandService;
     private final PasswordEncoder passwordEncoder;
-    private final MerchantPasswordResetEmailValidationRepository merchantPasswordResetEmailValidationRepository;
     private final KakaoAddressSearchService kakaoAddressSearchService;
     private final GeometryFactory geometryFactory = new GeometryFactory();
 
@@ -143,36 +139,23 @@ public class MerchantService {
 
     // 간편 비밀번호 변경 시 이메일 인증
     @Transactional
-    public void verifySimplePasswordCode(String email, String code) {
-        MerchantSimplePasswordResetEmailValidation validation = merchantPasswordResetEmailValidationRepository.findById(email)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
+    public void verifySimplePassword(String email, String simplePassword) {
+        Merchant merchant = merchantRepository.findByEmail(email)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
-        if (new Date().after(validation.getExp())) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
+        boolean matches = merchant.matchSimplePassword(passwordEncoder, simplePassword);
+        if (!matches) {
+            throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
-
-        if (!validation.getCode().equals(code)) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
-        }
-
-        validation.setVerified(true);
-        merchantPasswordResetEmailValidationRepository.save(validation);
     }
 
     // 간편 비밀번호 변경
     @Transactional
     public void updateSimplePassword(String email, String newSimplePassword) {
-        MerchantSimplePasswordResetEmailValidation validation = merchantPasswordResetEmailValidationRepository.findById(email)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
-
-        if (!validation.getIsVerified()) {
-            throw new GeneralException(ErrorStatus.VERIFY_ERROR);
-        }
-
         Merchant merchant = merchantRepository.findByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
-        merchant.updateSimplePasword(passwordEncoder.encode(newSimplePassword));
+        merchant.updateSimplePassword(passwordEncoder.encode(newSimplePassword));
     }
 
     // 이메일 변경

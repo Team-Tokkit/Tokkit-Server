@@ -127,7 +127,11 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .exceptionHandling(config -> config.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.FORBIDDEN)))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/merchants/register", "/api/merchants/emailCheck", "/api/merchants/verification", "/api/merchants/findPw").permitAll()
+                        .requestMatchers(
+                                "/api/merchants/register",
+                                "/api/merchants/emailCheck",
+                                "/api/merchants/verification",
+                                "/api/merchants/findPw").permitAll()
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated())
                 .addFilterAt(merchantLoginFilter, UsernamePasswordAuthenticationFilter.class)

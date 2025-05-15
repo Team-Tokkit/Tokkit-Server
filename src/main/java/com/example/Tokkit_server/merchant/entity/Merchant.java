@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -64,9 +65,13 @@ public class Merchant extends BaseTimeEntity {
 
     public void updatePassword(String password) { this.password = password; }
 
-    public void updateSimplePasword(String newSimplePassword) { this.simplePassword = newSimplePassword; }
+    public void updateSimplePassword(String simplePassword) { this.simplePassword = simplePassword; }
 
     public void updateEmail(String newEmail) {
         this.email = newEmail;
+    }
+
+    public boolean matchSimplePassword(PasswordEncoder passwordEncoder, String checkSimplePassword) {
+        return passwordEncoder.matches(checkSimplePassword, getSimplePassword());
     }
 }

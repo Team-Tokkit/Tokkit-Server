@@ -1,14 +1,11 @@
 package com.example.Tokkit_server.user.controller;
 
 import com.example.Tokkit_server.global.apiPayload.ApiResponse;
-import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.code.status.SuccessStatus;
-import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.*;
 import com.example.Tokkit_server.user.dto.response.UserResponseDto;
 import com.example.Tokkit_server.user.dto.response.UserWalletResponseDto;
-import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.user.service.EmailService;
 import com.example.Tokkit_server.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -31,7 +28,6 @@ public class UserController {
 
     private final UserService userService;
     private final EmailService emailService;
-    private final UserRepository userRepository;
 
     @PostMapping("/register")
     @Operation(summary = "회원가입 요청", description = "회원가입 요청을 처리합니다.")
@@ -67,20 +63,20 @@ public class UserController {
         return ApiResponse.onSuccess(response);
     }
 
-    @PostMapping("/simple-password/send-verification")
-    @Operation(summary = "간편 비밀번호 재설정 시 이메일 전송", description = "유저가 간편 비밀번호를 재설정 하기 전에 이메일 인증을 하기 위해 인증 코드를 이메일로 전송합니다.")
-    public ApiResponse<?> sendSimplePasswordVerification(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        emailService.sendSimplePasswordVerification(userDetails.getUsername());
+    @PostMapping("/find-simple-password")
+    @Operation(summary = "간편 비밀번호 초기화", description = "유저가 간편 비밀번호를 잊었을 경우 랜덤 값으로 설정한 후 이메일로 전송합니다.")
+    public ApiResponse<?> sendSimplePasswordVerification(@RequestParam("email") String email) {
+        emailService.sendMessageForSimplePassword(email);
         return ApiResponse.onSuccess(SuccessStatus._OK);
     }
 
     @PostMapping("/simple-password/verify")
-    @Operation(summary = "간편 비밀번호 재설정 시 이메일 인증", description = "유저가 간편 비밀번호를 재설정 하기 전에 이메일 인증 코드를 확인합니다.")
-    public ApiResponse<?> verifySimplePasswordCode(
+    @Operation(summary = "간편 비밀번호 유효성 검증", description = "유저가 입력한 간편 비밀번호가 유저가 설정한 간편 비밀번호와 같은지 검증합니다.")
+    public ApiResponse<?> verifySimplePassword(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestBody SimplePasswordVerificationRequestDto request) {
 
-        userService.verifySimplePasswordCode(userDetails.getUsername(), request.getCode());
+        userService.verifySimplePassword(userDetails.getUsername(), request.getSimplePassword());
         return ApiResponse.onSuccess(SuccessStatus._OK);
     }
 

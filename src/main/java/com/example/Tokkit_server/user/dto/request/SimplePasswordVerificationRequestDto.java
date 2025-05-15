@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SimplePasswordVerificationRequestDto {
-    private String code;
+    private String simplePassword;
 }

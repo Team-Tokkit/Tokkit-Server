@@ -8,5 +8,5 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MerchantSimplePasswordVerificationRequestDto {
-    private String code;
+    private String simplePassword;
 }
