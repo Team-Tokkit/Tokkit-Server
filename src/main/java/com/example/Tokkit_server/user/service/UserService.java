@@ -12,6 +12,7 @@ import com.example.Tokkit_server.user.dto.request.EmailChangeRequestDto;
 import com.example.Tokkit_server.user.dto.request.UpdateUserPasswordRequestDto;
 import com.example.Tokkit_server.user.dto.request.UserInfoUpdateRequestDto;
 import com.example.Tokkit_server.user.dto.response.UserResponseDto;
+import com.example.Tokkit_server.user.dto.response.UserWalletResponseDto;
 import com.example.Tokkit_server.user.entity.EmailValidation;
 import com.example.Tokkit_server.user.entity.SimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.user.entity.User;
@@ -72,6 +73,11 @@ public class UserService {
     public UserResponseDto getUser(String email) {
         User user = userRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
         return UserResponseDto.from(user);
+    }
+
+    public UserWalletResponseDto getWalletInfo(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+        return UserWalletResponseDto.from(user);
     }
 
     @Transactional
