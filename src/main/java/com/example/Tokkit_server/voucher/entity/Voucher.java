@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
-
+import com.example.Tokkit_server.global.entity.VoucherImage;
 import com.example.Tokkit_server.store.entity.Store;
 import com.example.Tokkit_server.store.enums.StoreCategory;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
@@ -47,7 +47,6 @@ public class Voucher extends BaseTimeEntity {
     @Column(nullable = false)
     private Integer originalPrice;
 
-
     // 총 바우처 발행 개수
     @Column(nullable = false)
     private Integer totalCount;
@@ -55,7 +54,6 @@ public class Voucher extends BaseTimeEntity {
     // 남은 개수
     @Column(nullable = false)
     private Integer remainingCount;
-
 
     @Column(nullable = false)
     private LocalDateTime validDate;
@@ -79,6 +77,9 @@ public class Voucher extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private StoreCategory storeCategory;
+
+    @OneToOne(mappedBy = "voucher", cascade = CascadeType.ALL)
+    private VoucherImage image;
 
     public void addVoucherStore(Store store) {
         VoucherStore vs = VoucherStore.builder()
