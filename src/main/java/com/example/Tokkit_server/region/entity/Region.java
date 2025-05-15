@@ -14,11 +14,7 @@ public class Region {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Integer sidoCode;
-
     private String sidoName;
-
-    private Integer sigunguCode;
 
     private String sigunguName;
 }
