@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.global.entity;
 
+import com.example.Tokkit_server.voucher.entity.Voucher;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,4 +16,8 @@ public class VoucherImage extends BaseTimeEntity{
 
     @Column(nullable = false)
     private String imageUrl;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "voucher_id", nullable = false)
+    private Voucher voucher;
 }

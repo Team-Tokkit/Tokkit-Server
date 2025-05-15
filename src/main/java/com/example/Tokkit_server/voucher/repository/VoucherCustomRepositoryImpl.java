@@ -28,13 +28,11 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
         StringBuilder jpql = new StringBuilder("SELECT v FROM Voucher v WHERE 1=1");
 
         if (request.getStoreCategory() != null) {
-            jpql.append(" AND v.category = :category");
+            jpql.append(" AND v.storeCategory = :category");
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
-            jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");
+            jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT(:keyword, '%'))");
         }
-
-
 
         String sort = Optional.ofNullable(request.getSort()).orElse("createdAt");
         String dir = Optional.ofNullable(request.getDirection()).orElse("desc");
@@ -42,7 +40,7 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
 
         TypedQuery<Voucher> query = em.createQuery(jpql.toString(), Voucher.class);
 
-        if (request.getStoreCategory() != null) {
+        if ((request.getStoreCategory() != null)) {
             query.setParameter("category", request.getStoreCategory());
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
@@ -77,3 +75,4 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
         return new PageImpl<>(results, pageable, total);
     }
 }
+

@@ -24,9 +24,11 @@ public class VoucherDetailResponse {
     private String detailDescription;
     private String refundPolicy;
     private String contact;
+    private String imageUrl;
+  
     private Page<StoreResponse> stores;
 
-    public static VoucherDetailResponse from (Voucher voucher, Page<StoreResponse> stores) {
+    public static VoucherDetailResponse from (Voucher voucher, Page<StoreResponse> stores, String imageProxyBaseUrl) {
         return VoucherDetailResponse.builder()
                 .id(voucher.getId())
                 .name(voucher.getName())
@@ -38,6 +40,11 @@ public class VoucherDetailResponse {
                 .refundPolicy(voucher.getRefundPolicy())
                 .contact(voucher.getContact())
                 .stores(stores)
+                .imageUrl(
+                        voucher.getImage() != null ?
+                                imageProxyBaseUrl + voucher.getImage().getImageUrl()
+                                : null
+                )
                 .build();
     }
 }

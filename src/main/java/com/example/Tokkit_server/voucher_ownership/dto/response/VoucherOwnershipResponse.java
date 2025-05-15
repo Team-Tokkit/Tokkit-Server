@@ -15,8 +15,9 @@ public class VoucherOwnershipResponse {
     private Long remainingAmount;
     private Boolean isVoucher;
     private VoucherOwnershipStatus status;
-
-    public static VoucherOwnershipResponse from(VoucherOwnership voucherOwnership) {
+    private String imageUrl;
+  
+    public static VoucherOwnershipResponse from(VoucherOwnership voucherOwnership, String imageProxyBaseUrl) {
         return VoucherOwnershipResponse.builder()
                 .id(voucherOwnership.getId())
                 .voucherName(voucherOwnership.getVoucher().getName())
@@ -24,6 +25,11 @@ public class VoucherOwnershipResponse {
                 .remainingAmount(voucherOwnership.getRemainingAmount())
                 .isVoucher(voucherOwnership.getStatus() == VoucherOwnershipStatus.AVAILABLE)
                 .status(VoucherOwnershipStatus.AVAILABLE)
+                .imageUrl(
+                        voucherOwnership.getVoucher().getImage() != null ?
+                                imageProxyBaseUrl + voucherOwnership.getVoucher().getImage().getImageUrl()
+                                : null
+                )
                 .build();
     }
 }

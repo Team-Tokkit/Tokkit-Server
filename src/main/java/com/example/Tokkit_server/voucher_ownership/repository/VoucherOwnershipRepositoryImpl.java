@@ -24,23 +24,34 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
     public Page<VoucherOwnership> searchMyVoucher(VoucherOwnershipSearchRequest request, Pageable pageable) {
         StringBuilder jpql = new StringBuilder("SELECT vo FROM VoucherOwnership vo JOIN FETCH vo.voucher v WHERE vo.wallet.user.id = :userId");
 
-        if (request.getStoreCategory() != null ) {
-            jpql.append(" AND v.storeCategory = :category");
+        if (request.getStoreCategory() != null && !"ALL".equalsIgnoreCase(request.getStoreCategory().name())) {
+            jpql.append(" AND v.category.name = :category");
         }
 
         if (StringUtils.hasText(request.getSearchKeyword()) && !"ALL".equalsIgnoreCase(request.getSearchKeyword())) {
             jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");
         }
 
-        String sort = Optional.ofNullable(request.getSort()).orElse("createdAt");
-        String dir = Optional.ofNullable(request.getDirection()).orElse("desc");
-        jpql.append(" ORDER BY v.").append(sort).append(" ").append(dir);
+        String sort = Optional.ofNullable(request.getSort()).orElse("recent");
+
+        switch (sort) {
+            case "amount":
+                jpql.append(" ORDER BY vo.remainingAmount DESC");
+                break;
+            case "expiry":
+                jpql.append(" ORDER BY v.validDate ASC");
+                break;
+            case "recent":
+            default:
+                jpql.append(" ORDER BY vo.createdAt DESC");
+                break;
+        }
 
         TypedQuery<VoucherOwnership> query = em.createQuery(jpql.toString(), VoucherOwnership.class);
         query.setParameter("userId", request.getUserId());
 
-        if (request.getStoreCategory() != null) {
-            query.setParameter("category", request.getStoreCategory());
+        if (request.getStoreCategory() != null && !"ALL".equalsIgnoreCase(request.getStoreCategory().name())) {
+            query.setParameter("category", request.getStoreCategory().name());
         }
 
         if (StringUtils.hasText(request.getSearchKeyword()) && !"ALL".equalsIgnoreCase(request.getSearchKeyword())) {
@@ -67,7 +78,9 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
             JOIN w.user u
             WHERE u.id = :userId
         """, VoucherOwnership.class)
-            .setParameter("userId", userId)
-            .getResultList();
+                .setParameter("userId", userId)
+                .getResultList();
     }
 }
+
+
