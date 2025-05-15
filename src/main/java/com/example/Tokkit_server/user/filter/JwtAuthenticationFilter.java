@@ -1,8 +1,6 @@
 package com.example.Tokkit_server.user.filter;
 
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
-import com.example.Tokkit_server.user.entity.User;
-import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.user.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
 import jakarta.servlet.FilterChain;
@@ -10,7 +8,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
@@ -24,7 +21,6 @@ import java.io.IOException;
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
@@ -37,23 +33,18 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             try {
                 Claims claims = jwtUtil.parseToken(token);
-                String email = claims.getSubject();
 
-                User user = userRepository.findByEmail(email)
-                        .orElseThrow(() -> new RuntimeException("User not found from token"));
-
-                // roles가 null이면 ROLE_USER 기본 세팅
-                String roles = user.getRoles();
-                if (roles == null || roles.isBlank()) {
-                    roles = "ROLE_USER";
-                }
+                Long id = claims.get("id", Long.class); // JWT에 넣은 id
+                String name = claims.get("name", String.class);
+                String email = claims.getSubject(); // email
+                String role = claims.get("role", String.class);
 
                 CustomUserDetails userDetails = new CustomUserDetails(
-                        user.getId(),
-                        user.getName(),
-                        user.getEmail(),
-                        user.getPassword(),
-                        roles
+                        id,
+                        name,
+                        email,
+                        null, // password는 사용하지 않음
+                        role
                 );
 
                 UsernamePasswordAuthenticationToken authentication =
@@ -61,7 +52,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             } catch (Exception e) {
-                logger.warn("[JwtAuthenticationFilter] 인증 실패: {}" + e.getMessage());
+                logger.warn("[JwtAuthenticationFilter] 인증 실패: {}", e);
             }
         }
 

@@ -12,20 +12,19 @@ import java.util.Collections;
 public class CustomMerchantDetails implements UserDetails {
 
     private final Long id;
-    private final String name;
     private final String email;
     private final String password;
-    private final String roles;
+    private final String role;
     private final String businessNumber;
 
-    public CustomMerchantDetails(Merchant merchant) {
-        this.id = merchant.getId();
-        this.name = merchant.getName();
-        this.email = merchant.getEmail();
-        this.password = merchant.getPassword();
-        this.roles = merchant.getRoles();
-        this.businessNumber = merchant.getBusinessNumber();
+    public CustomMerchantDetails(Long id, String email, String businessNumber, String password, String role) {
+        this.id = id;
+        this.email = email;
+        this.businessNumber = businessNumber;
+        this.password = password;
+        this.role = role;
     }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

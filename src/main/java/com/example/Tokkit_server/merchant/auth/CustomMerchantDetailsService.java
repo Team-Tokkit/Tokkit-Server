@@ -20,7 +20,12 @@ public class CustomMerchantDetailsService implements UserDetailsService {
         log.info("[CustomMerchantDetailsService] 사업자등록번호로 가맹점주 검색: {}", businessNumber);
 
         return merchantRepository.findByBusinessNumber(businessNumber)
-                .map(CustomMerchantDetails::new)
-                .orElseThrow(() -> new UsernameNotFoundException("가맹점주를 찾을 수 없습니다: " + businessNumber));
+                .map(m -> new CustomMerchantDetails(
+                        m.getId(),
+                        m.getName(),
+                        m.getBusinessNumber(),
+                        m.getPassword(),
+                        m.getRoles())
+                ).orElseThrow(() -> new UsernameNotFoundException("가맹점주를 찾을 수 없습니다: " + businessNumber));
     }
 }

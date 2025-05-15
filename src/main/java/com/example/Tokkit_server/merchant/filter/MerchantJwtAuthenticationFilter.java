@@ -38,22 +38,24 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
 
             try {
                 Claims claims = jwtUtil.parseToken(token);
+                Long id = claims.get("id", Long.class);
                 String businessNumber = claims.getSubject();
+                String email = claims.get("email", String.class);
+                String role = claims.get("role", String.class);
 
-                Merchant merchant = merchantRepository.findByBusinessNumber(businessNumber)
-                        .orElseThrow(() -> new RuntimeException("Merchant not found from token"));
-
-                String roles = merchant.getRoles();
-                if (roles == null || roles.isBlank()) {
-                    roles = "ROLE_MERCHANT";
-                }
-
-                CustomMerchantDetails merchantDetails = new CustomMerchantDetails(merchant);
+                CustomMerchantDetails merchantDetails = new CustomMerchantDetails(
+                        id,
+                        businessNumber,
+                        email,
+                        null, // password 필요 없다면 null로
+                        role
+                );
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(merchantDetails, null, merchantDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
             } catch (Exception e) {
                 log.warn("[MerchantJwtAuthenticationFilter] 인증 실패: {}", e.getMessage());
             }

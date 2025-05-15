@@ -87,6 +87,7 @@ public class JwtUtil {
                 .header() //헤더 부분
                 .add("typ", "JWT") // JWT type
                 .and()
+                .claim("id", customUserDetails.getId())
                 .subject(customUserDetails.getUsername()) //Subject 에 username (email) 추가
                 .claim("role", authorities) //권한 추가
                 .issuedAt(Date.from(issuedAt)) // 현재 시간 추가
@@ -102,12 +103,14 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .header().add("typ", "JWT").and()
-                .subject(merchantDetails.getBusinessNumber()) // 사업자번호를 subject로!
+                .subject(merchantDetails.getBusinessNumber())
+                .claim("id", merchantDetails.getId())
                 .claim("role", authorities)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(expiration))
                 .signWith(secretKey)
                 .compact();
+
     }
 
 
