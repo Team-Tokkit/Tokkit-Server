@@ -13,8 +13,10 @@ import com.example.Tokkit_server.user.service.EmailService;
 import com.example.Tokkit_server.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
@@ -116,9 +118,17 @@ public class UserController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "로그아웃", description = "로그아웃을 진행합니다. 실제 사용은 되지 않으며 swagger용 api입니다.")
-    public ApiResponse<?> logout(@AuthenticationPrincipal UserDetails userDetails) {
-        // 실제 로그아웃 로직 추가 필요
+    @Operation(summary = "로그아웃", description = "JWT 환경에서 refreshToken 쿠키를 만료시킵니다.")
+    public ApiResponse<?> logout(HttpServletResponse response) {
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None") // 프론트가 다른 도메인이면 필요
+                .maxAge(0)
+                .build();
+
+        response.setHeader("Set-Cookie", deleteCookie.toString());
         return ApiResponse.onSuccess(null);
     }
 }

@@ -61,6 +61,7 @@ public class SecurityConfig {
             "/api/ocr/idCard",
             "/api/ocr/business",
             "/api/users/login",
+            "/api/users/logout",
             "/api/auth/reissue",
             "/api/auth/**",
             "/api/merchants/login",
