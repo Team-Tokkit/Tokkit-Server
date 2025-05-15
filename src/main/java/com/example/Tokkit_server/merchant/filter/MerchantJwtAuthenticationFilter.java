@@ -47,7 +47,7 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
                         id,
                         businessNumber,
                         email,
-                        null, // password 필요 없다면 null로
+                        null,
                         role
                 );
 
@@ -56,8 +56,15 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
+            } catch (io.jsonwebtoken.ExpiredJwtException e) {
+                log.warn("[MerchantJwtAuthenticationFilter] 만료된 토큰입니다: {}", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                return;
+
             } catch (Exception e) {
                 log.warn("[MerchantJwtAuthenticationFilter] 인증 실패: {}", e.getMessage());
+                response.setStatus(HttpServletResponse.SC_UNAUTHORIZED); // 401
+                return;
             }
         }
 

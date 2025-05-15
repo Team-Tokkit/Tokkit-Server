@@ -135,15 +135,15 @@ public class UserService {
     }
 
     @Transactional
-    public void updateUserInfo(Long userId, UserInfoUpdateRequestDto requestDto) {
-        User user = userRepository.findById(userId)
+    public void updateUserInfo(Long id, UserInfoUpdateRequestDto requestDto) {
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         user.updateNameAndPhoneNumber(requestDto.getName(), requestDto.getPhoneNumber());
     }
 
     @Transactional
-    public void updateEmail(Long userId, EmailChangeRequestDto requestDto) {
+    public void updateEmail(Long id, EmailChangeRequestDto requestDto) {
         EmailValidation validation = emailValidationRepository.findById(requestDto.getNewEmail())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED));
 
@@ -151,7 +151,7 @@ public class UserService {
             throw new GeneralException(ErrorStatus.EMAIL_NOT_VERIFIED);
         }
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(id)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         user.updateEmail(requestDto.getNewEmail());

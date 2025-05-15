@@ -31,6 +31,8 @@ public class CustomMerchantDetails implements UserDetails {
         return Collections.singleton(() -> "ROLE_MERCHANT");
     }
 
+    public Long getId() {return id;}
+
     @Override
     public String getUsername() {
         return email;
