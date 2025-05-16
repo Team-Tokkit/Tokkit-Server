@@ -53,9 +53,4 @@ public class VoucherOwnership extends BaseTimeEntity {
             this.status = VoucherOwnershipStatus.USED;
         }
     }
-
-    // 바우처 삭제 메서드
-    public void delete() {
-        this.status = VoucherOwnershipStatus.DELETED;
-    }
 }
