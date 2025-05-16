@@ -10,6 +10,7 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class TransactionHistoryResponse {
+    private Long id;
     private TransactionType type;
     private Long amount;
     private String description;

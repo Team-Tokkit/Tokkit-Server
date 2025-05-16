@@ -111,6 +111,7 @@ public class WalletCommandService {
 
         return transactions.stream()
             .map(t -> new TransactionHistoryResponse(
+                t.getId(),
                 t.getType(),
                 t.getAmount(),
                 t.getDescription(),
