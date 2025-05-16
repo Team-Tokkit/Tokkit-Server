@@ -86,7 +86,17 @@ public class SecurityConfig {
         userLoginFilter.setFilterProcessesUrl("/api/users/login");
 
         return http
-                .securityMatcher("/api/users/**", "api/ocr/**")
+                .securityMatcher(
+                        "/api/users/**",
+                        "/api/ocr/**",
+                        "/api/vouchers/**",
+                        "/api/my-vouchers/**",
+                        "/api/store/**",
+                        "/api/wallet/**",
+                        "/api/notice/**",
+                        "/api/notifications/**",
+                        "/api/regions/**"
+                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
@@ -119,7 +129,17 @@ public class SecurityConfig {
         merchantLoginFilter.setFilterProcessesUrl("/api/merchants/login");
 
         return http
-                .securityMatcher("/api/merchants/**", "/api/ocr/**")
+                .securityMatcher(
+                        "/api/merchants/**",
+                        "/api/ocr/**",
+                        "/api/vouchers/**",
+                        "/api/my-vouchers/**",
+                        "/api/store/**",
+                        "/api/wallet/**",
+                        "/api/notice/**",
+                        "/api/notifications/**",
+                        "/api/regions/**"
+                )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
                 .formLogin(form -> form.disable())
