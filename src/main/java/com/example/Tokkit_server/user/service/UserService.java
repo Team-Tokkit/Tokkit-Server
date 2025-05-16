@@ -97,23 +97,27 @@ public class UserService {
         return UserResponseDto.from(user);
     }
 
-    @Transactional
     public void updateSimplePassword(String email, String newSimplePassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        user.updateSimplePassword(passwordEncoder.encode(newSimplePassword));
+        String encoded = passwordEncoder.encode(newSimplePassword);
+        user.updateSimplePassword(encoded);
+
+        userRepository.save(user);
     }
 
     public void verifySimplePassword(String email, String simplePassword) {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        boolean matches = user.matchSimplePassword(passwordEncoder, simplePassword);
+        boolean matches = user.matchSimplePassword(simplePassword, passwordEncoder);
+
         if (!matches) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
     }
+
     @Transactional
     public void updateUserInfo(Long id, UserInfoUpdateRequestDto requestDto) {
         User user = userRepository.findById(id)

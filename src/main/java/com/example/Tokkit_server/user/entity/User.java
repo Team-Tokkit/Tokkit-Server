@@ -70,7 +70,7 @@ public class User extends BaseTimeEntity {
         return passwordEncoder.matches(checkPassword, getPassword());
     }
 
-    public boolean matchSimplePassword(PasswordEncoder passwordEncoder, String checkSimplePassword) {
+    public boolean matchSimplePassword(String checkSimplePassword, PasswordEncoder passwordEncoder) {
         return passwordEncoder.matches(checkSimplePassword, getSimplePassword());
     }
 
