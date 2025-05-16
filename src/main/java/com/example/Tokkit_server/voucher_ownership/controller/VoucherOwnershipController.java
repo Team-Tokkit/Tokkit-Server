@@ -28,18 +28,13 @@ public class VoucherOwnershipController {
 
     private final VoucherOwnershipService voucherOwnershipService;
 
-    /**
-     * [1] 내 바우처 전체 조회하기, 필터링 및 검색하기
-     */
     @GetMapping
     @Operation(summary = "내 바우처 조회 및 필터링/검색하기", description = "내가 보유한 바우처 목록을 조회하고 필터링 및 검색할 수 API입니다.")
     public ApiResponse<Page<VoucherOwnershipResponseV2>> getMyVouchers(@ModelAttribute VoucherOwnershipSearchRequest request, Pageable pageable) {
         Page<VoucherOwnershipResponseV2> myVouchers = voucherOwnershipService.searchMyVouchers(request, pageable);
         return ApiResponse.onSuccess(myVouchers);
     }
-    /**
-     * [2] 내 바우처 상세 조회하기 - 상위 5개의 사용처 조회 (default)
-     */
+
     @GetMapping("/details/{voucherOwnershipId}")
     public ApiResponse<VoucherOwnershipDetailResponseV2> getVoucherDetails(
             @PathVariable Long voucherOwnershipId, @RequestParam Long userId) {
@@ -48,9 +43,6 @@ public class VoucherOwnershipController {
         return ApiResponse.onSuccess(voucherDetail);
     }
 
-    /**
-     * [3] 내 바우처 상세 조회하기 - 사용처 전체 조회
-     */
     @GetMapping("/details/{voucherOwnershipId}/stores")
     @Operation(summary = "내 바우처 상세 조회하기 (사용처 전체 조회)", description = "내가 보유한 바우처의 사용처를 전체 조회하는 API입니다.")
     public ApiResponse<Page<StoreResponse>> getAllStoresByVoucherId(@PathVariable Long voucherOwnershipId, @RequestParam Long userId, Pageable pageable) {
@@ -58,13 +50,9 @@ public class VoucherOwnershipController {
         return ApiResponse.onSuccess(stores);
     }
 
-    /**
-     * [4] 바우처 삭제 - soft delete
-     */
     @DeleteMapping("/{voucherOwnershipId}")
     @Operation(summary = "내 바우처 삭제하기", description = "내가 보유한 바우처를 삭제하는 API입니다.")
     public ApiResponse<Void> deleteVoucherOwnership(@PathVariable Long voucherOwnershipId, @RequestParam Long userId) {
-        System.out.println("바우처 삭제 요청 들어옴: " + voucherOwnershipId + ", userId=" + userId);
         voucherOwnershipService.deleteVoucherOwnership(voucherOwnershipId, userId);
         return ApiResponse.onSuccess(null);
     }
