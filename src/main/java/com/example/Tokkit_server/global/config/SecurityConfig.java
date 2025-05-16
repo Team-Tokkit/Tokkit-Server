@@ -65,7 +65,7 @@ public class SecurityConfig {
             "/api/auth/reissue",
             "/api/auth/**",
             "/api/merchants/login",
-            "/swagger-ui/**",
+            "/api/swagger-ui/**",
             "/v3/api-docs/**"
     };
 

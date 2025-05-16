@@ -6,9 +6,11 @@ import com.example.Tokkit_server.store.dto.response.StoreInfoResponse;
 import com.example.Tokkit_server.store.dto.response.StoreSimpleResponse;
 import com.example.Tokkit_server.store.service.StoreService;
 import com.example.Tokkit_server.store.service.command.StoreCommandService;
+import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -40,6 +42,7 @@ public class StoreController {
             tags = {"Store"}
     )
     public ApiResponse<List<KakaoMapSearchResponse>> findNearbyStores(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
             @RequestParam(value = "lat", required = false) Double lat,
             @RequestParam(value = "lng", required = false) Double lng,
             @RequestParam(value = "radius", required = false) Integer radius,
@@ -47,7 +50,7 @@ public class StoreController {
             @RequestParam(value = "keyword", required = false) String keyword
     ) {
         return ApiResponse.onSuccess(
-                storeCommandService.findNearbyStores(lat, lng, radius, storeCategory, keyword)
+                storeCommandService.findNearbyStores(userDetails.getId(),lat, lng, radius, storeCategory, keyword)
         );
     }
 

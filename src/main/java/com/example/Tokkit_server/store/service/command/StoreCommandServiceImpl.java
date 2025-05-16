@@ -21,6 +21,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
 
     @Override
     public List<KakaoMapSearchResponse> findNearbyStores(
+            long userId,
             Double lat,
             Double lng,
             Integer radius,
@@ -42,7 +43,6 @@ public class StoreCommandServiceImpl implements StoreCommandService {
                     .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_CATEGORY_NOT_FOUND));
         }
 
-        Long userId = 1L; // TODO: JWT로 대체 예정
 
         List<Object[]> results = storeRepository.findNearbyStoresRaw(
                 userId,
@@ -62,7 +62,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
                         ((Double) row[4]),
                         ((Double) row[5]),
                         ((Double) row[7]),
-                        StoreCategory.valueOf((String) row[6])
+                        row[6] != null ? StoreCategory.valueOf((String) row[6]) : null
                 ))
                 .collect(Collectors.toList());
     }
