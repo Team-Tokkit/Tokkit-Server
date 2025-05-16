@@ -53,6 +53,7 @@ public class Wallet extends BaseTimeEntity {
 	@Column(nullable = false)
 	private WalletType walletType;
 
+
 	public void updateBalance(Long deposit, Long token) {
 		this.depositBalance = deposit;
 		this.tokenBalance = token;
