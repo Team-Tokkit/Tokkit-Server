@@ -52,6 +52,7 @@ public enum ErrorStatus implements BaseErrorCode {
 	VOUCHER_MERCHANT_NOT_MATCH(HttpStatus.BAD_REQUEST, "VOUCHER_006", "바우처의 사용처가 일치하지 않습니다."),
 	VOUCHER_STORE_NOT_USABLE(HttpStatus.BAD_REQUEST, "VOUCHER_007", "해당 매장에서 바우처를 사용할 수 없습니다."),
 	VOUCHER_NOT_OWNED_BY_USER(HttpStatus.FORBIDDEN, "VOUCHER_008", "이 바우처는 해당 사용자의 소유가 아닙니다."),
+	VOUCHER_ALREADY_DELETED(HttpStatus.BAD_REQUEST, "VOUCHER_009", "이미 삭제 처리된 바우처입니다."),
 
 
 	// User 관련
