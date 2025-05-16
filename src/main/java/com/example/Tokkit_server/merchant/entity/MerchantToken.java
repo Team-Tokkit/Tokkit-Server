@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.token.entity;
+package com.example.Tokkit_server.merchant.entity;
 
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 import jakarta.persistence.Entity;
@@ -12,7 +12,7 @@ import lombok.*;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Token extends BaseTimeEntity {
+public class MerchantToken extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

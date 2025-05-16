@@ -5,6 +5,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.example.Tokkit_server.wallet.enums.WalletType;
+import com.example.Tokkit_server.wallet.utils.AccountGenerator;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -46,6 +48,50 @@ public class WalletCommandService {
     private final UserRepository userRepository;
     private final VoucherRepository voucherRepository;
     private final MerchantRepository merchantRepository;
+
+    // 유저 - 전자 지갑 생성
+    @Transactional
+    public Wallet createInitialWalletForUser(Long userId) {
+        if (walletRepository.existsByUserId(userId)) {
+            return walletRepository.findByUserId(userId)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+        }
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        Wallet wallet = Wallet.builder()
+                .user(user)
+                .depositBalance(0L)
+                .tokenBalance(0L)
+                .walletType(WalletType.USER)
+                .accountNumber(AccountGenerator.generateAccountNumber())
+                .build();
+
+        return walletRepository.save(wallet);
+    }
+
+    // 가맹점주 - 전자 지갑 생성
+    @Transactional
+    public Wallet createInitialWalletForMerchant(Long merchantId) {
+        if (walletRepository.existsByMerchantId(merchantId)) {
+            return walletRepository.findByMerchantId(merchantId)
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
+        }
+
+        Merchant merchant = merchantRepository.findById(merchantId)
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+
+        Wallet wallet = Wallet.builder()
+                .merchant(merchant)
+                .depositBalance(0L)
+                .tokenBalance(0L)
+                .walletType(WalletType.MERCHANT)
+                .accountNumber(AccountGenerator.generateAccountNumber())
+                .build();
+
+        return walletRepository.save(wallet);
+    }
 
     /**
      * 지갑 잔액 조회

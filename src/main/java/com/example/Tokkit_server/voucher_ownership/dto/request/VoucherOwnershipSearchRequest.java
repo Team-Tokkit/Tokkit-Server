@@ -1,7 +1,6 @@
 package com.example.Tokkit_server.voucher_ownership.dto.request;
 
 import com.example.Tokkit_server.store.enums.StoreCategory;
-
 import lombok.Getter;
 import lombok.Setter;
 

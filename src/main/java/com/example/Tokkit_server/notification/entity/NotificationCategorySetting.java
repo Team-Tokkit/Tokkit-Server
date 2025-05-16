@@ -1,4 +1,4 @@
-package com.example.Tokkit_server.notification_category_setting.entity;
+package com.example.Tokkit_server.notification.entity;
 
 
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
