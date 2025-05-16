@@ -2,6 +2,9 @@ package com.example.Tokkit_server.wallet.controller;
 
 import java.util.List;
 
+import com.example.Tokkit_server.user.auth.CustomUserDetails;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -48,8 +51,8 @@ public class WalletController {
     // Controller 변경
     @GetMapping("/balance")
     @Operation(summary = "잔액 조회", description = "사용자 ID로 잔액 조회")
-    public ApiResponse<WalletBalanceResponse> getBalance(@RequestParam Long userId) {
-        return ApiResponse.onSuccess(commandService.getWalletBalance(userId));
+    public ApiResponse<WalletBalanceResponse> getBalance(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.onSuccess(commandService.getWalletBalance(userDetails.getId()));
     }
 
 
@@ -69,15 +72,15 @@ public class WalletController {
 
     @GetMapping("/transactions")
     @Operation(summary = "거래내역 조회", description = "내 지갑의 거래내역을 시간순으로 조회합니다.")
-    public ApiResponse<List<TransactionHistoryResponse>> getTransactionHistory(@RequestParam Long userId) {
-        return ApiResponse.onSuccess(commandService.getTransactionHistory(userId));
+    public ApiResponse<List<TransactionHistoryResponse>> getTransactionHistory(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.onSuccess(commandService.getTransactionHistory(userDetails.getId()));
     }
 
 
     @GetMapping("/transactions/recent")
     @Operation(summary = "최근 거래내역 조회", description = "가장 최근의 거래내역 10건을 조회합니다.")
-    public ApiResponse<List<TransactionHistoryResponse>> getRecentTransactions(@RequestParam Long userId) {
-        return ApiResponse.onSuccess(queryService.getRecentTransactions(userId));
+    public ApiResponse<List<TransactionHistoryResponse>> getRecentTransactions(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        return ApiResponse.onSuccess(queryService.getRecentTransactions(userDetails.getId()));
     }
 
 
@@ -126,9 +129,9 @@ public class WalletController {
     @GetMapping("/payment-options")
     @Operation(summary = "결제 수단 목록 조회", description = "가맹점에서 사용 가능한 바우처 및 토큰 결제 옵션 목록을 조회합니다.")
     public ApiResponse<List<PaymentOptionResponse>> getPaymentOptions(
-        @RequestParam Long userId,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam Long storeId) {
-        return ApiResponse.onSuccess(commandService.getPaymentOptions(userId, storeId));
+        return ApiResponse.onSuccess(commandService.getPaymentOptions(userDetails.getId(), storeId));
     }
 
 }

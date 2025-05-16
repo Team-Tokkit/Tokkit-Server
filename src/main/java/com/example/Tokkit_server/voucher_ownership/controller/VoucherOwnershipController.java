@@ -2,6 +2,7 @@ package com.example.Tokkit_server.voucher_ownership.controller;
 
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.voucher_ownership.dto.response.VoucherOwnershipDetailResponseV2;
 import com.example.Tokkit_server.voucher_ownership.dto.response.VoucherOwnershipResponseV2;
 import org.springdoc.core.annotations.ParameterObject;
@@ -9,6 +10,7 @@ import org.springdoc.core.annotations.ParameterObject;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -44,17 +46,17 @@ public class VoucherOwnershipController {
     // 내 바우처 상세 조회하기 - 상위 5개의 사용처 조회 (default)
     @GetMapping("/details/{voucherOwnershipId}")
     public ApiResponse<VoucherOwnershipDetailResponseV2> getVoucherDetails(
-            @PathVariable Long voucherOwnershipId, @RequestParam Long userId) {
+            @PathVariable Long voucherOwnershipId, @AuthenticationPrincipal CustomUserDetails userDetails) {
         Pageable pageable = PageRequest.of(0, 5);
-        VoucherOwnershipDetailResponseV2 voucherDetail = voucherOwnershipService.getVoucherDetail(voucherOwnershipId, userId, pageable);
+        VoucherOwnershipDetailResponseV2 voucherDetail = voucherOwnershipService.getVoucherDetail(voucherOwnershipId, userDetails.getId(), pageable);
         return ApiResponse.onSuccess(voucherDetail);
     }
 
     // 내 바우처 상세 조회하기 - 사용처 전체 조회
     @GetMapping("/details/{voucherOwnershipId}/stores")
     @Operation(summary = "내 바우처 상세 조회하기 (사용처 전체 조회)", description = "내가 보유한 바우처의 사용처를 전체 조회하는 API입니다.")
-    public ApiResponse<Page<StoreResponse>> getAllStoresByVoucherId(@PathVariable Long voucherOwnershipId, @RequestParam Long userId, Pageable pageable) {
-        Page<StoreResponse> stores = voucherOwnershipService.getAllStoresByVoucherId(voucherOwnershipId, userId, pageable);
+    public ApiResponse<Page<StoreResponse>> getAllStoresByVoucherId(@PathVariable Long voucherOwnershipId, @AuthenticationPrincipal CustomUserDetails userDetails, Pageable pageable) {
+        Page<StoreResponse> stores = voucherOwnershipService.getAllStoresByVoucherId(voucherOwnershipId, userDetails.getId(), pageable);
         return ApiResponse.onSuccess(stores);
     }
 } 
