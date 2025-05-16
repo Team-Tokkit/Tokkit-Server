@@ -88,7 +88,7 @@ public class SecurityConfig {
         return http
                 .securityMatcher(
                         "/api/users/**",
-                        "api/ocr/**",
+                        "/api/ocr/**",
                         "/api/vouchers/**",
                         "/api/my-vouchers/**",
                         "/api/store/**",
