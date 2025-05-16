@@ -26,7 +26,6 @@ public class VoucherOwnershipService {
     private final StoreRepository storeRepository;
     private final String imageProxyBaseUrl;
 
-
     /**
      * [1] 내 바우처 필터/검색/정렬 기반 목록 조회
      */

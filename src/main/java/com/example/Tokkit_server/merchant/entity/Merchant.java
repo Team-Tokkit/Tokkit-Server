@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @Entity
 @Getter
@@ -41,15 +42,36 @@ public class Merchant extends BaseTimeEntity {
     @Column(nullable = false)
     private String simplePassword;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String businessNumber;
 
     private Boolean isDormant;
 
     private String roles;
+
     @OneToOne(fetch = FetchType.LAZY, mappedBy = "merchant")
     private Wallet wallet;
 
     @OneToOne(mappedBy = "merchant")
     private Store store;
+
+    public void setWallet(Wallet wallet) {
+        this.wallet = wallet;
+    }
+
+    public void setStore(Store store) {
+        this.store = store;
+    }
+
+    public void updatePassword(String password) { this.password = password; }
+
+    public void updateSimplePassword(String simplePassword) { this.simplePassword = simplePassword; }
+
+    public void updateEmail(String newEmail) {
+        this.email = newEmail;
+    }
+
+    public boolean matchSimplePassword(PasswordEncoder passwordEncoder, String checkSimplePassword) {
+        return passwordEncoder.matches(checkSimplePassword, getSimplePassword());
+    }
 }
