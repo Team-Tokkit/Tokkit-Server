@@ -1,6 +1,5 @@
 package com.example.Tokkit_server.merchant.auth;
 
-import com.example.Tokkit_server.merchant.entity.Merchant;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -28,7 +27,7 @@ public class CustomMerchantDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(() -> "ROLE_MERCHANT");
+        return Collections.singleton(() -> "MERCHANT");
     }
 
     public Long getId() {return id;}
