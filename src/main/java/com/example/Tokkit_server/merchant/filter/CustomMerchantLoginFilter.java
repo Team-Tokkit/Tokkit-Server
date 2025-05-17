@@ -12,11 +12,14 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.io.IOException;
@@ -29,6 +32,7 @@ public class CustomMerchantLoginFilter extends UsernamePasswordAuthenticationFil
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;
+    private final ApplicationEventPublisher eventPublisher;
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
@@ -56,6 +60,9 @@ public class CustomMerchantLoginFilter extends UsernamePasswordAuthenticationFil
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                             FilterChain chain, Authentication authResult) throws IOException, ServletException {
 
+        SecurityContextHolder.getContext().setAuthentication(authResult);
+        eventPublisher.publishEvent(new AuthenticationSuccessEvent(authResult));
+
         CustomMerchantDetails merchantDetails = (CustomMerchantDetails) authResult.getPrincipal();
 
         String accessToken = jwtUtil.createJwtAccessToken(merchantDetails);
@@ -68,13 +75,11 @@ public class CustomMerchantLoginFilter extends UsernamePasswordAuthenticationFil
         response.setStatus(HttpServletResponse.SC_OK);
         new ObjectMapper().writeValue(response.getWriter(), apiResponse);
 
-        log.info("[MerchantLoginFilter] 로그인 성공 - JWT 발급 완료");
     }
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
                                               AuthenticationException failed) throws IOException, ServletException {
-        log.warn("[MerchantLoginFilter] 로그인 실패: {}", failed.getMessage());
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         response.setContentType("application/json;charset=UTF-8");
 
