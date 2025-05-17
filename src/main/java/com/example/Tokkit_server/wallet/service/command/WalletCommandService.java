@@ -100,7 +100,7 @@ public class WalletCommandService {
         Wallet wallet = walletRepository.findByUser_Id(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
-        return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance());
+        return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getUser().getName(), wallet.getAccountNumber());
     }
 
     public List<TransactionHistoryResponse> getTransactionHistory(Long userId) {
