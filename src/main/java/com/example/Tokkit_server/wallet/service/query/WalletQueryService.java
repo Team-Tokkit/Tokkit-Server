@@ -2,6 +2,7 @@ package com.example.Tokkit_server.wallet.service.query;
 
 import java.util.List;
 
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -9,6 +10,8 @@ import com.example.Tokkit_server.transaction.enums.TransactionType;
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.transaction.entity.Transaction;
+import com.example.Tokkit_server.user.entity.User;
+import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.dto.request.DepositToTokenRequest;
 import com.example.Tokkit_server.wallet.dto.request.TokenToDepositRequest;
@@ -24,20 +27,36 @@ import lombok.RequiredArgsConstructor;
 public class WalletQueryService {
     private final WalletRepository walletRepository;
     private final TransactionRepository transactionRepository;
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
+    /**
+     * 예금에서 토큰으로 바꾸기
+     */
     @Transactional
     public void convertDepositToToken(DepositToTokenRequest request) {
         Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
+        // 사용자 조회
+        User user = userRepository.findById(request.getUserId())
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        // 간편 비밀번호 검증
+        if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
+            throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
+        }
+
+        // 잔액 확인
         if (wallet.getDepositBalance() < request.getAmount()) {
             throw new GeneralException(ErrorStatus.INSUFFICIENT_BALANCE); // 잔액 부족 에러 처리
         }
 
+        // 잔액 업데이트
         wallet.updateBalance(wallet.getDepositBalance() - request.getAmount(),
                                wallet.getTokenBalance() + request.getAmount());
 
-        // 2. 거래내역
+        // 거래내역 기록
         Transaction transaction =  Transaction.builder()
             .wallet(wallet)
             .type(TransactionType.CONVERT)
@@ -48,19 +67,34 @@ public class WalletQueryService {
         transactionRepository.save(transaction);
     }
 
+
+    /**
+     * 토큰에서 예금으로 바꾸기
+     */
     @Transactional
     public void convertTokenToDeposit(TokenToDepositRequest request) {
         Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
+        // 사용자 조회
+        User user = userRepository.findById(request.getUserId())
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        // 간편 비밀번호 검증
+        if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
+            throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
+        }
+
+        // 반환 요청 잔액 비교
         if (wallet.getTokenBalance() < request.getAmount()) {
             throw new GeneralException(ErrorStatus.INSUFFICIENT_TOKEN_BALANCE); // 토큰 잔액 부족
         }
 
+        // 잔액 업데이트
         wallet.updateBalance(wallet.getDepositBalance() + request.getAmount(),
                                wallet.getTokenBalance() - request.getAmount());
 
-        // 2. 거래내역 저장
+        // 거래내역 저장
         Transaction transaction = Transaction.builder()
             .wallet(wallet)
             .type(TransactionType.CONVERT) // 변환 타입
@@ -71,6 +105,10 @@ public class WalletQueryService {
         transactionRepository.save(transaction);
     }
 
+
+    /**
+     * 거래내역 조회
+     */
     public List<TransactionHistoryResponse> getRecentTransactions(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
@@ -88,6 +126,10 @@ public class WalletQueryService {
             .toList();
     }
 
+
+    /**
+     * 거래상세내역 조회
+     */
     public TransactionDetailResponse getTransactionDetail(Long transactionId) {
         Transaction transaction = transactionRepository.findById(transactionId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.TRANSACTION_NOT_FOUND));
@@ -99,7 +141,4 @@ public class WalletQueryService {
             transaction.getCreatedAt()
         );
     }
-
-
-
 }
