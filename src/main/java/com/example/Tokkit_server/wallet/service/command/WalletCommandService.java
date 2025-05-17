@@ -7,6 +7,8 @@ import java.util.List;
 
 import com.example.Tokkit_server.wallet.enums.WalletType;
 import com.example.Tokkit_server.wallet.utils.AccountGenerator;
+
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -48,6 +50,8 @@ public class WalletCommandService {
     private final UserRepository userRepository;
     private final VoucherRepository voucherRepository;
     private final MerchantRepository merchantRepository;
+    private final PasswordEncoder passwordEncoder;
+
 
     // 유저 - 전자 지갑 생성
     @Transactional
@@ -62,7 +66,7 @@ public class WalletCommandService {
 
         Wallet wallet = Wallet.builder()
                 .user(user)
-                .depositBalance(0L)
+                .depositBalance(1000000L)
                 .tokenBalance(0L)
                 .walletType(WalletType.USER)
                 .accountNumber(AccountGenerator.generateAccountNumber())
@@ -84,7 +88,7 @@ public class WalletCommandService {
 
         Wallet wallet = Wallet.builder()
                 .merchant(merchant)
-                .depositBalance(0L)
+                .depositBalance(1000000L)
                 .tokenBalance(0L)
                 .walletType(WalletType.MERCHANT)
                 .accountNumber(AccountGenerator.generateAccountNumber())
@@ -102,6 +106,10 @@ public class WalletCommandService {
 
         return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getUser().getName(), wallet.getAccountNumber());
     }
+
+    /**
+     * 전체 거래내역 조회
+     */
 
     public List<TransactionHistoryResponse> getTransactionHistory(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
@@ -128,29 +136,39 @@ public class WalletCommandService {
         Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
-        // 2. 바우처 엔티티 조회
+
+        // 2. 사용자 조회 (간편 비밀번호 검증을 위해)
+        User user = userRepository.findById(request.getUserId())
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+
+        // 3. 간편 비밀번호 검증
+        if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
+            throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
+        }
+
+        // 4. 바우처 엔티티 조회
         Voucher voucher = voucherRepository.findById(request.getVoucherId())
             .orElseThrow(() -> new GeneralException(ErrorStatus.VOUCHER_NOT_FOUND));
 
         int amount = voucher.getPrice(); // 서버에서 금액 조회
 
-        // 3. 토큰 잔액확인
+        // 5. 토큰 잔액확인
         if (wallet.getTokenBalance() < amount) {
             throw new GeneralException(ErrorStatus.INSUFFICIENT_TOKEN_BALANCE); // 토큰 부족
         }
 
-        // 4. 바우처 수량 확인 및 차감
+        // 6. 바우처 수량 확인 및 차감
         if (voucher.getRemainingCount() <= 0) {
             throw new GeneralException(ErrorStatus.VOUCHER_SOLD_OUT);
         }
 
-        // 수량 차감
+        // 7. 수량 차감
         voucher.decreaseRemainingCount();
 
-        // 5. 토큰 차감
+        // 8. 토큰 차감
         wallet.updateBalance(wallet.getDepositBalance(), wallet.getTokenBalance() - amount);
 
-        // 6. VoucherOwnership(바우처 소유권) 생성
+        // 9. VoucherOwnership(바우처 소유권) 생성
         VoucherOwnership ownership = VoucherOwnership.builder()
             .voucher(voucher)
             .remainingAmount((long) amount)
@@ -160,7 +178,7 @@ public class WalletCommandService {
 
         VoucherOwnership savedOwnership = voucherOwnershipRepository.save(ownership);
 
-        // 7. 거래내역 저장
+        // 10. 거래내역 저장
         Transaction transaction = Transaction.builder()
             .wallet(wallet)
             .type(TransactionType.PURCHASE)
@@ -170,7 +188,7 @@ public class WalletCommandService {
             .build();
         transactionRepository.save(transaction);
 
-        // 8. 응답 반환
+        // 11. 응답 반환
         return VoucherPurchaseResponse.builder()
             .ownershipId(savedOwnership.getId())
             .message("바우처 구매 완료")
@@ -224,7 +242,7 @@ public class WalletCommandService {
         }
 
         // 7. 간편 비밀번호 체크
-        if (!user.getSimplePassword().equals(request.getSimplePassword())) {
+        if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
 
@@ -302,7 +320,7 @@ public class WalletCommandService {
 
 
         // 5. 간편 비밀번호  검증
-        if (!user.getSimplePassword().equals(request.getSimplePassword())) {
+        if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
 
