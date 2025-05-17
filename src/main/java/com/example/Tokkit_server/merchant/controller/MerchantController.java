@@ -8,7 +8,6 @@ import com.example.Tokkit_server.merchant.dto.response.MerchantRegisterResponseD
 import com.example.Tokkit_server.merchant.dto.response.MerchantResponseDto;
 import com.example.Tokkit_server.merchant.service.MerchantEmailService;
 import com.example.Tokkit_server.merchant.service.MerchantService;
-import com.example.Tokkit_server.user.dto.request.LoginRequestDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -108,7 +107,7 @@ public class MerchantController {
 
     @PostMapping("/login")
     @Operation(summary = "로그인", description = "로그인을 진행합니다. 실제 사용은 되지 않으며 swagger용 api입니다.")
-    public ApiResponse<?> login(@RequestBody LoginRequestDto loginRequest) {
+    public ApiResponse<?> login(@RequestBody MerchantLoginRequestDto loginRequest) {
         return ApiResponse.onSuccess(null);
     }
 
