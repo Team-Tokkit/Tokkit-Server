@@ -38,7 +38,6 @@ public class IdCardOcrService {
 
     public IdCardOcrResponseDto extractInfo(MultipartFile image) {
         try {
-            log.info("[신분증 OCR] 요청 시작");
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.MULTIPART_FORM_DATA);
@@ -50,7 +49,6 @@ public class IdCardOcrService {
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            log.info("[신분증 OCR] Naver API 요청 전송");
             ResponseEntity<JsonNode> response = restTemplate.exchange(
                     invokeUrl,
                     HttpMethod.POST,
@@ -75,7 +73,6 @@ public class IdCardOcrService {
 
             String issuedDate = extractDateAsCompactString(result.path("issueDate"), result.path("condition"));
 
-            log.info("[신분증 OCR] 추출 결과 - name: {}, rrnFront: {}, issuedDate: {}", name, rrnFront, issuedDate);
 
             return IdCardOcrResponseDto.builder()
                     .name(name)
@@ -84,7 +81,6 @@ public class IdCardOcrService {
                     .build();
 
         } catch (Exception e) {
-            log.error("[신분증 OCR 실패] {}", e.getMessage(), e);
             throw new GeneralException(ErrorStatus.OCR_PROCESSING_FAILED);
         }
     }

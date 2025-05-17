@@ -78,7 +78,6 @@ public class NotificationServiceImpl implements NotificationService {
         emitter.onTimeout(() -> sseEmitters.remove(userId));
         emitter.onError((e) -> sseEmitters.remove(userId));
 
-        log.info("SSE 구독 시작: userId={}", userId);
         return emitter;
     }
 

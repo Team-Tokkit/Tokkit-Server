@@ -1,42 +1,35 @@
 package com.example.Tokkit_server.wallet.service.command;
 
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.merchant.entity.Merchant;
+import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.transaction.entity.Transaction;
+import com.example.Tokkit_server.transaction.enums.TransactionType;
+import com.example.Tokkit_server.transaction.repository.TransactionRepository;
+import com.example.Tokkit_server.user.entity.User;
+import com.example.Tokkit_server.user.repository.UserRepository;
+import com.example.Tokkit_server.voucher.entity.Voucher;
+import com.example.Tokkit_server.voucher.repository.VoucherRepository;
+import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentRequest;
+import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
+import com.example.Tokkit_server.voucher_ownership.enums.VoucherOwnershipStatus;
+import com.example.Tokkit_server.voucher_ownership.repository.VoucherOwnershipRepository;
+import com.example.Tokkit_server.wallet.dto.request.DirectPaymentRequest;
+import com.example.Tokkit_server.wallet.dto.request.VoucherPurchaseRequest;
+import com.example.Tokkit_server.wallet.dto.response.*;
+import com.example.Tokkit_server.wallet.entity.Wallet;
+import com.example.Tokkit_server.wallet.enums.WalletType;
+import com.example.Tokkit_server.wallet.repository.WalletRepository;
+import com.example.Tokkit_server.wallet.utils.AccountGenerator;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.example.Tokkit_server.wallet.enums.WalletType;
-import com.example.Tokkit_server.wallet.utils.AccountGenerator;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.example.Tokkit_server.transaction.enums.TransactionType;
-import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.merchant.entity.Merchant;
-import com.example.Tokkit_server.transaction.entity.Transaction;
-import com.example.Tokkit_server.user.entity.User;
-import com.example.Tokkit_server.voucher.entity.Voucher;
-import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
-import com.example.Tokkit_server.voucher_ownership.enums.VoucherOwnershipStatus;
-import com.example.Tokkit_server.wallet.dto.request.DirectPaymentRequest;
-import com.example.Tokkit_server.wallet.dto.response.DirectPaymentResponse;
-import com.example.Tokkit_server.merchant.repository.MerchantRepository;
-import com.example.Tokkit_server.voucher.repository.VoucherRepository;
-import com.example.Tokkit_server.wallet.dto.response.PaymentOptionResponse;
-import com.example.Tokkit_server.wallet.entity.Wallet;
-import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentRequest;
-import com.example.Tokkit_server.wallet.dto.request.VoucherPurchaseRequest;
-import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
-import com.example.Tokkit_server.wallet.dto.response.VoucherPaymentResponse;
-import com.example.Tokkit_server.wallet.dto.response.VoucherPurchaseResponse;
-import com.example.Tokkit_server.wallet.dto.response.WalletBalanceResponse;
-import com.example.Tokkit_server.transaction.repository.TransactionRepository;
-import com.example.Tokkit_server.user.repository.UserRepository;
-import com.example.Tokkit_server.voucher_ownership.repository.VoucherOwnershipRepository;
-import com.example.Tokkit_server.wallet.repository.WalletRepository;
-
-import lombok.RequiredArgsConstructor;
 
 @Service
 @RequiredArgsConstructor
@@ -123,6 +116,7 @@ public class WalletCommandService {
      */
     @Transactional
     public VoucherPurchaseResponse purchaseVoucher(VoucherPurchaseRequest request) {
+
         // 1. 사용자 Wallet 조회
         Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
@@ -174,6 +168,7 @@ public class WalletCommandService {
             .ownershipId(savedOwnership.getId())
             .message("바우처 구매 완료")
             .build();
+
     }
 
 

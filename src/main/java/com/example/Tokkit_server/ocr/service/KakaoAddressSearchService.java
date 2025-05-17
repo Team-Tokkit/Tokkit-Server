@@ -41,8 +41,6 @@ public class KakaoAddressSearchService {
                 .build();
 
         try {
-            log.info("[Kakao API] 도로명 주소 검색 요청: {}", roadAddress);
-            log.info("[Kakao API] 요청 URI: {}", uri.toUriString());
 
             ResponseEntity<String> response = restTemplate.exchange(
                     uri.toUriString(),
@@ -51,8 +49,6 @@ public class KakaoAddressSearchService {
                     String.class
             );
 
-            log.info("[Kakao API] 응답 상태 코드: {}", response.getStatusCode());
-            log.debug("[Kakao API] 응답 바디: {}", response.getBody());
 
             JsonNode root = objectMapper.readTree(response.getBody());
             JsonNode documents = root.path("documents");
@@ -65,14 +61,11 @@ public class KakaoAddressSearchService {
                 double longitude = Double.parseDouble(x);
                 double latitude = Double.parseDouble(y);
 
-                log.info("[Kakao API] 위도: {}, 경도: {}, 우편번호: {}", latitude, longitude, zipCode);
 
                 return Optional.of(new KakaoGeoResult(longitude, latitude, zipCode));
             } else {
-                log.warn("[Kakao API] 결과 없음: 응답에 documents 항목이 비어 있음");
             }
         } catch (Exception e) {
-            log.error("[Kakao API] 주소 검색 실패: {}", e.getMessage(), e);
         }
 
         return Optional.empty();

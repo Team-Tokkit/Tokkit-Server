@@ -17,7 +17,6 @@ public class CustomMerchantDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String businessNumber) throws UsernameNotFoundException {
-        log.info("[CustomMerchantDetailsService] 사업자등록번호로 가맹점주 검색: {}", businessNumber);
 
         return merchantRepository.findByBusinessNumber(businessNumber)
                 .map(m -> new CustomMerchantDetails(

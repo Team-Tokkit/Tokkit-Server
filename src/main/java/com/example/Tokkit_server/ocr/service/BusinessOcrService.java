@@ -2,9 +2,8 @@ package com.example.Tokkit_server.ocr.service;
 
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
-import com.example.Tokkit_server.ocr.utils.MultipartInputStreamFileResource;
 import com.example.Tokkit_server.ocr.dto.BusinessOcrResponseDto;
-import com.example.Tokkit_server.ocr.utils.KakaoGeoResult;
+import com.example.Tokkit_server.ocr.utils.MultipartInputStreamFileResource;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +18,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 @Slf4j
 @Service
@@ -38,7 +36,6 @@ public class BusinessOcrService {
 
     public BusinessOcrResponseDto extractBusinessInfo(MultipartFile image) {
         try {
-            log.info("[OCR] 사업자등록증 OCR 시작");
 
             // 요청 헤더
             HttpHeaders headers = new HttpHeaders();
@@ -52,7 +49,6 @@ public class BusinessOcrService {
 
             HttpEntity<MultiValueMap<String, Object>> requestEntity = new HttpEntity<>(body, headers);
 
-            log.info("[OCR] Naver OCR API 요청 시작");
             ResponseEntity<JsonNode> response = restTemplate.exchange(
                     invokeUrl,
                     HttpMethod.POST,
@@ -76,7 +72,6 @@ public class BusinessOcrService {
             String ceoName = getTextOrNull(bizResult.get("repName"));
             String address = getTextOrNull(bizResult.get("bisAddress"));
 
-            log.info("[OCR] 추출 결과: number={}, storeName={}, ceoName={}, address={}", number, storeName, ceoName, address);
 
             return BusinessOcrResponseDto.of(
                     number,
@@ -86,7 +81,6 @@ public class BusinessOcrService {
             );
 
         } catch (Exception e) {
-            log.error("[OCR] OCR 처리 중 예외 발생", e);
             throw new GeneralException(ErrorStatus.OCR_PROCESSING_FAILED);
         }
     }
