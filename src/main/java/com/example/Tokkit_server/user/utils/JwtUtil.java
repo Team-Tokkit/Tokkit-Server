@@ -214,8 +214,6 @@ public class JwtUtil {
 
     public void validateToken(String token) {
         try {
-            // 구문 분석 시스템의 시계가 JWT를 생성한 시스템의 시계 오차 고려
-            // 약 3분 허용.
             long seconds = 3 *60;
             boolean isExpired = Jwts
                     .parser()
@@ -230,10 +228,10 @@ public class JwtUtil {
             }
 
         } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
-            //원하는 Exception throw
+
             throw new SecurityException("잘못된 토큰입니다.");
         } catch (ExpiredJwtException e) {
-            //원하는 Exception throw
+
             throw new ExpiredJwtException(null, null, "만료된 JWT 토큰입니다.");
         }
     }
