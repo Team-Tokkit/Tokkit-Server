@@ -10,4 +10,6 @@ import lombok.Getter;
 public class WalletBalanceResponse {
     private Long depositBalance;
     private Long tokenBalance;
+    private String name;
+    private String accountNumber;
 }
