@@ -1,5 +1,10 @@
 package com.example.Tokkit_server.global.config;
 
+import com.example.Tokkit_server.api_request_log.filter.ApiLoggingFilter;
+import com.example.Tokkit_server.api_request_log.repository.ApiRequestLogRepository;
+import com.example.Tokkit_server.global.filter.TraceIdFilter;
+import com.example.Tokkit_server.login_log.filter.LogoutLoggingFilter;
+import com.example.Tokkit_server.login_log.repository.LoginLogRepository;
 import com.example.Tokkit_server.merchant.auth.CustomMerchantDetailsService;
 import com.example.Tokkit_server.merchant.filter.CustomMerchantLoginFilter;
 import com.example.Tokkit_server.merchant.filter.MerchantJwtAuthenticationFilter;
@@ -9,8 +14,8 @@ import com.example.Tokkit_server.user.filter.CustomLoginFilter;
 import com.example.Tokkit_server.user.filter.JwtAuthenticationFilter;
 import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.user.utils.JwtUtil;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
@@ -41,13 +46,19 @@ public class SecurityConfig {
 
     private final CorsConfigurationSource corsConfigurationSource;
 
+    private final ApiRequestLogRepository apiRequestLogRepository;
+    private final LoginLogRepository userLoginLogRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
     public SecurityConfig(
             CustomUserDetailsService customUserDetailsService,
             CustomMerchantDetailsService customMerchantDetailsService,
             JwtUtil jwtUtil,
             UserRepository userRepository,
             MerchantRepository merchantRepository,
-            @Qualifier("apiConfigurationSource") CorsConfigurationSource corsConfigurationSource
+            ApplicationEventPublisher applicationEventPublisher,
+            LoginLogRepository userLoginLogRepository,
+            @Qualifier("apiConfigurationSource") CorsConfigurationSource corsConfigurationSource, ApiRequestLogRepository logRepository
     ) {
         this.customUserDetailsService = customUserDetailsService;
         this.customMerchantDetailsService = customMerchantDetailsService;
@@ -55,6 +66,9 @@ public class SecurityConfig {
         this.userRepository = userRepository;
         this.merchantRepository = merchantRepository;
         this.corsConfigurationSource = corsConfigurationSource;
+        this.apiRequestLogRepository = logRepository;
+        this.applicationEventPublisher = applicationEventPublisher;
+        this.userLoginLogRepository = userLoginLogRepository;
     }
 
     private final String[] allowedUrls = {
@@ -82,7 +96,7 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         AuthenticationManager manager = new ProviderManager(List.of(provider));
 
-        CustomLoginFilter userLoginFilter = new CustomLoginFilter(manager, jwtUtil);
+        CustomLoginFilter userLoginFilter = new CustomLoginFilter(manager, jwtUtil,applicationEventPublisher);
         userLoginFilter.setFilterProcessesUrl("/api/users/login");
 
         return http
@@ -112,8 +126,12 @@ public class SecurityConfig {
                                 "/api/users/findPw").permitAll()
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated())
+
+                .addFilterBefore(new TraceIdFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ApiLoggingFilter(apiRequestLogRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(userLoginFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 
@@ -125,7 +143,7 @@ public class SecurityConfig {
         provider.setPasswordEncoder(passwordEncoder());
         AuthenticationManager manager = new ProviderManager(List.of(provider));
 
-        CustomMerchantLoginFilter merchantLoginFilter = new CustomMerchantLoginFilter(manager, jwtUtil);
+        CustomMerchantLoginFilter merchantLoginFilter = new CustomMerchantLoginFilter(manager, jwtUtil,applicationEventPublisher);
         merchantLoginFilter.setFilterProcessesUrl("/api/merchants/login");
 
         return http
@@ -154,8 +172,11 @@ public class SecurityConfig {
                                 "/api/merchants/findPw").permitAll()
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated())
+                .addFilterBefore(new TraceIdFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
+                .addFilterBefore(new ApiLoggingFilter(apiRequestLogRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(merchantLoginFilter, UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new MerchantJwtAuthenticationFilter(jwtUtil, merchantRepository), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new MerchantJwtAuthenticationFilter(jwtUtil, merchantRepository), UsernamePasswordAuthenticationFilter.class)
                 .build();
     }
 }
