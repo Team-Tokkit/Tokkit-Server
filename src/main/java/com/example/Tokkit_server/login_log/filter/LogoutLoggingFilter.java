@@ -67,7 +67,8 @@ public class LogoutLoggingFilter extends OncePerRequestFilter {
             String ip = request.getRemoteAddr();
             String ua = request.getHeader("User-Agent");
 
-
+            log.info("[LOGOUT] traceId={}, userId={}, merchantId={}, ip={}, ua={}",
+                    traceId, userId, merchantId, ip, ua);
             logRepository.save(LoginLog.builder()
                     .userId(userId)
                     .merchantId(merchantId)
