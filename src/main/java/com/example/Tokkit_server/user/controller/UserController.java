@@ -5,7 +5,6 @@ import com.example.Tokkit_server.global.apiPayload.code.status.SuccessStatus;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.*;
 import com.example.Tokkit_server.user.dto.response.UserResponseDto;
-import com.example.Tokkit_server.user.dto.response.UserWalletResponseDto;
 import com.example.Tokkit_server.user.service.EmailService;
 import com.example.Tokkit_server.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,12 +39,6 @@ public class UserController {
     @Operation(summary = "내 정보 조회", description = "유저의 이름, 이메일, 전화번호를 조회합니다.")
     public ApiResponse<UserResponseDto> getUser(@AuthenticationPrincipal UserDetails userDetails) {
         return ApiResponse.onSuccess(userService.getUser(userDetails.getUsername()));
-    }
-
-    @GetMapping("/wallet")
-    @Operation(summary = "계좌 정보 조회", description = "유저의 이름, 계좌번호, 잔액을 조회합니다.")
-    public ApiResponse<UserWalletResponseDto> getWalletInfo(@AuthenticationPrincipal UserDetails userDetails) {
-        return ApiResponse.onSuccess(userService.getWalletInfo(userDetails.getUsername()));
     }
 
     @PostMapping("/findPw")
