@@ -15,6 +15,7 @@ public class UserWalletResponseDto {
     public String name;
     public String accountNumber;
     public Long tokenBalance;
+    public Long depositBalance;
 
     public static UserWalletResponseDto from(User user) {
         return UserWalletResponseDto.builder()
@@ -22,6 +23,7 @@ public class UserWalletResponseDto {
                 .name(user.getName())
                 .accountNumber(user.getWallet().getAccountNumber())
                 .tokenBalance(user.getWallet().getTokenBalance())
+                .depositBalance(user.getWallet().getDepositBalance())
                 .build();
     }
 }
