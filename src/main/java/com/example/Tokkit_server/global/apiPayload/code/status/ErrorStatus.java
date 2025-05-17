@@ -88,7 +88,10 @@ public enum ErrorStatus implements BaseErrorCode {
 	INVALID_RADIUS(HttpStatus.BAD_REQUEST, "RADIUS_001", "유효하지 않은 반경입니다."),
 	INVALID_LATITUDE(HttpStatus.BAD_REQUEST, "KAKAO_MAP_001", "유효하지 않은 좌표입니다."),
 	// Region 관련
-	INVALID_SIDO(HttpStatus.NOT_FOUND, "SIDO_404", "유효하지 않은 도/시입니다.");
+	INVALID_SIDO(HttpStatus.NOT_FOUND, "SIDO_404", "유효하지 않은 도/시입니다."), 
+	
+	// Pagination 관련
+	INVALID_PAGE(HttpStatus.BAD_REQUEST,"PAGE_400" ,"유효하지 않은 페이지 넘버입니다" );
 
 
 	private final HttpStatus httpStatus;

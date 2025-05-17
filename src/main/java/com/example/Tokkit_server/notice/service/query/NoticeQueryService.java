@@ -18,6 +18,9 @@ public class NoticeQueryService {
 
     // 공지사항 목록(전체) 조회
     public Page<NoticeResponseDto> getNotices(int page) {
+        if(page < 0) {
+            throw new GeneralException(ErrorStatus.INVALID_PAGE);
+        }
         Page<Notice> notices = noticeRepository.findAllByIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, SIZE));
         return notices.map(NoticeResponseDto::from);
     }
