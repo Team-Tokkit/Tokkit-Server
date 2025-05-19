@@ -1,5 +1,7 @@
 package com.example.Tokkit_server.global.util;
 
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
@@ -20,7 +22,7 @@ public class LoggingUtils {
         try {
             return getUserId();
         } catch (Exception e) {
-            return null;
+             throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
         }
     }
 

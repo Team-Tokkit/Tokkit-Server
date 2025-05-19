@@ -1,26 +1,27 @@
 package com.example.Tokkit_server.wallet.service.query;
 
-import java.util.List;
-
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import com.example.Tokkit_server.transaction.enums.TransactionType;
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.transaction.entity.Transaction;
+import com.example.Tokkit_server.transaction.enums.TransactionStatus;
+import com.example.Tokkit_server.transaction.enums.TransactionType;
+import com.example.Tokkit_server.transaction.repository.TransactionRepository;
+import com.example.Tokkit_server.transaction.service.query.TransactionLogService;
 import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.user.repository.UserRepository;
-import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.dto.request.DepositToTokenRequest;
 import com.example.Tokkit_server.wallet.dto.request.TokenToDepositRequest;
 import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
 import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
-import com.example.Tokkit_server.transaction.repository.TransactionRepository;
+import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.repository.WalletRepository;
-
 import lombok.RequiredArgsConstructor;
+import org.slf4j.MDC;
+import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -29,17 +30,34 @@ public class WalletQueryService {
     private final TransactionRepository transactionRepository;
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final TransactionLogService transactionLogService;
 
+    private void logAndSave(Wallet wallet, Long userId, Long merchantId,
+                            TransactionType type, TransactionStatus status, Long amount, String description) {
+        transactionLogService.logAndSave(
+                Transaction.builder()
+                        .wallet(wallet)
+                        .type(type)
+                        .status(status)
+                        .amount(amount)
+                        .txHash(null)
+                        .description(description)
+                        .traceId(MDC.get("traceId"))
+                        .build(),
+                userId,
+                merchantId
+        );
+    }
     /**
      * 예금에서 토큰으로 바꾸기
      */
     @Transactional
-    public void convertDepositToToken(DepositToTokenRequest request) {
-        Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
+    public void convertDepositToToken(Long userId, DepositToTokenRequest request) {
+        Wallet wallet = walletRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         // 사용자 조회
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 간편 비밀번호 검증
@@ -56,15 +74,13 @@ public class WalletQueryService {
         wallet.updateBalance(wallet.getDepositBalance() - request.getAmount(),
                                wallet.getTokenBalance() + request.getAmount());
 
-        // 거래내역 기록
-        Transaction transaction =  Transaction.builder()
-            .wallet(wallet)
-            .type(TransactionType.CONVERT)
-            .amount(request.getAmount())
-            .description("예금 ➝ 토큰 변환")
-            .build();
 
-        transactionRepository.save(transaction);
+        logAndSave(wallet, user.getId(), null,
+                TransactionType.CONVERT,
+                TransactionStatus.SUCCESS,
+                request.getAmount(),
+                "예금 ➝ 토큰 변환");
+
     }
 
 
@@ -72,12 +88,12 @@ public class WalletQueryService {
      * 토큰에서 예금으로 바꾸기
      */
     @Transactional
-    public void convertTokenToDeposit(TokenToDepositRequest request) {
-        Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
+    public void convertTokenToDeposit(Long userId ,TokenToDepositRequest request) {
+        Wallet wallet = walletRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         // 사용자 조회
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 간편 비밀번호 검증
@@ -94,15 +110,11 @@ public class WalletQueryService {
         wallet.updateBalance(wallet.getDepositBalance() + request.getAmount(),
                                wallet.getTokenBalance() - request.getAmount());
 
-        // 거래내역 저장
-        Transaction transaction = Transaction.builder()
-            .wallet(wallet)
-            .type(TransactionType.CONVERT) // 변환 타입
-            .amount(request.getAmount())
-            .description("토큰 ➝ 예금 변환")
-            .build();
-
-        transactionRepository.save(transaction);
+        logAndSave(wallet, user.getId(), null,
+                TransactionType.CONVERT,
+                TransactionStatus.SUCCESS,
+                request.getAmount(),
+                "토큰 ➝ 예금 변환");
     }
 
 

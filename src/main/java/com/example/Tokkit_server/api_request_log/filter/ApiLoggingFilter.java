@@ -66,10 +66,16 @@ public class ApiLoggingFilter extends OncePerRequestFilter {
             int time = (int) (System.currentTimeMillis() - start);
             String requestBody = new String(wrappedRequest.getContentAsByteArray(), StandardCharsets.UTF_8);
 
+            Long userId = null;
+            try {
+                userId = getUserIdOrNull();
+            } catch (Exception e) {
+                log.warn("[API LOG] userId 파싱 중 오류 발생: {}", e.getMessage());
+            }
             log.info("[API LOG][traceId={}] {} {}?{} status={} time={}ms ip={}",
                     traceId, method, uri, query, status, time, ip);
             logRepository.save(ApiRequestLog.builder()
-                    .userId(getUserIdOrNull())
+                    .userId(userId)
                     .method(method)
                     .endpoint(uri)
                     .queryParams(query)

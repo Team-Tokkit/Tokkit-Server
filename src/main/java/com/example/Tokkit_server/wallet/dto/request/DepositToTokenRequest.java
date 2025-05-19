@@ -4,7 +4,6 @@ import lombok.Getter;
 
 @Getter
 public class DepositToTokenRequest {
-    private Long userId;
     private Long amount;
     private String simplePassword;
 }

@@ -6,7 +6,6 @@ import lombok.Getter;
 @Getter
 @AllArgsConstructor
 public class VoucherPaymentRequest {
-    private Long userId;
     private Long voucherOwnershipId;  // 내가 가진 바우처 소유 id
     private Long merchantId;           // 결제하려는 가맹점주 id
     private Long storeId;              // 결게하려는 매장 id

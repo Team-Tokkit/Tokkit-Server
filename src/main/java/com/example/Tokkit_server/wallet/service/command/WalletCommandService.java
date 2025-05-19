@@ -144,15 +144,15 @@ public class WalletCommandService {
      * 토큰으로 바우처 구입
      */
     @Transactional
-    public VoucherPurchaseResponse purchaseVoucher(VoucherPurchaseRequest request) {
+    public VoucherPurchaseResponse purchaseVoucher(Long userId,VoucherPurchaseRequest request) {
 
         // 1. 사용자 Wallet 조회
-        Wallet wallet = walletRepository.findByUser_Id(request.getUserId())
+        Wallet wallet = walletRepository.findByUser_Id(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
 
         // 2. 사용자 조회 (간편 비밀번호 검증을 위해)
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 3. 간편 비밀번호 검증
@@ -207,10 +207,10 @@ public class WalletCommandService {
      * QR 코드로 넘어온 정보 인증  & 바우처로 결제
      */
     @Transactional
-    public VoucherPaymentResponse payWithVoucher(VoucherPaymentRequest request) {
+    public VoucherPaymentResponse payWithVoucher(Long userId,VoucherPaymentRequest request) {
 
         //  1. 사용자 조회
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
 
@@ -287,10 +287,10 @@ public class WalletCommandService {
      * QR 코드로 넘어온 정보 인증  & 토큰으로 결제
      */
     @Transactional
-    public DirectPaymentResponse payDirectlyWithToken(DirectPaymentRequest request) {
+    public DirectPaymentResponse payDirectlyWithToken(Long userId,DirectPaymentRequest request) {
 
         // 1. 사용자 조회
-        User user = userRepository.findById(request.getUserId())
+        User user = userRepository.findById(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
 
