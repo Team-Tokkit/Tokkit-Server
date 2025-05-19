@@ -9,7 +9,6 @@ import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherOwnershipS
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
 
 interface VoucherOwnershipRepositoryCustom {
-    Page<VoucherOwnership> searchMyVoucher(VoucherOwnershipSearchRequest request, Pageable pageable);
-
+    Page<VoucherOwnership> searchMyVoucher(VoucherOwnershipSearchRequest request, Long userId, Pageable pageable);
     List<VoucherOwnership> findAllWithVoucherAndStoresByUserId(Long userId);
 }

@@ -29,8 +29,8 @@ public class VoucherOwnershipService {
     /**
      * [1] 내 바우처 필터/검색/정렬 기반 목록 조회
      */
-    public Page<VoucherOwnershipResponseV2> searchMyVouchers(VoucherOwnershipSearchRequest request, Pageable pageable) {
-        return voucherOwnershipRepository.searchMyVoucher(request, pageable)
+    public Page<VoucherOwnershipResponseV2> searchMyVouchers(VoucherOwnershipSearchRequest request, Long userId, Pageable pageable) {
+        return voucherOwnershipRepository.searchMyVoucher(request, userId, pageable)
                 .map(voucherOwnership -> VoucherOwnershipResponseV2.from(voucherOwnership, imageProxyBaseUrl)); // 람다 사용
     }
 
@@ -45,7 +45,7 @@ public class VoucherOwnershipService {
         Page<StoreResponse> stores = storeRepository.findByVoucherId(
                 voucherOwnership.getVoucher().getId(), pageable);
 
-        return VoucherOwnershipDetailResponseV2.from(voucherOwnership, stores, imageProxyBaseUrl); // s3Url 전달
+        return VoucherOwnershipDetailResponseV2.from(voucherOwnership, stores, imageProxyBaseUrl);
     }
 
     /**
