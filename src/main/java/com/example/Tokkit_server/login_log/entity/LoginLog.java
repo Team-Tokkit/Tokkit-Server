@@ -1,6 +1,6 @@
 package com.example.Tokkit_server.login_log.entity;
 
-import com.example.Tokkit_server.api_request_log.enums.Event;
+import com.example.Tokkit_server.login_log.enums.Event;
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
