@@ -1,6 +1,5 @@
 package com.example.Tokkit_server.global.config;
 
-import com.example.Tokkit_server.api_request_log.filter.ApiLoggingFilter;
 import com.example.Tokkit_server.api_request_log.repository.ApiRequestLogRepository;
 import com.example.Tokkit_server.global.filter.TraceIdFilter;
 import com.example.Tokkit_server.login_log.filter.LogoutLoggingFilter;
@@ -129,7 +128,6 @@ public class SecurityConfig {
 
                 .addFilterBefore(new TraceIdFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new ApiLoggingFilter(apiRequestLogRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(userLoginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -174,7 +172,6 @@ public class SecurityConfig {
                         .anyRequest().authenticated())
                 .addFilterBefore(new TraceIdFilter(), UsernamePasswordAuthenticationFilter.class)
                 .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new ApiLoggingFilter(apiRequestLogRepository), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(merchantLoginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new MerchantJwtAuthenticationFilter(jwtUtil, merchantRepository), UsernamePasswordAuthenticationFilter.class)
                 .build();
