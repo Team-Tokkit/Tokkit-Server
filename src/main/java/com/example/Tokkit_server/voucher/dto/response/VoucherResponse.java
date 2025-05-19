@@ -19,6 +19,7 @@ public class VoucherResponse {
     private LocalDateTime validDate;
     private String contact;
     private Integer remainingCount;
+    private Integer totalCount;
     private String imageUrl;
 
 
@@ -32,6 +33,7 @@ public class VoucherResponse {
                 .validDate(voucher.getValidDate())
                 .contact(voucher.getContact())
                 .remainingCount(voucher.getRemainingCount())
+                .totalCount(voucher.getTotalCount())
                 .imageUrl(
                         voucher.getImage() != null ?
                                 imageProxyBaseUrl + voucher.getImage().getImageUrl()
