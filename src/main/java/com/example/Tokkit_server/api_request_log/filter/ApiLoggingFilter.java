@@ -51,7 +51,8 @@ public class ApiLoggingFilter extends OncePerRequestFilter {
                 uri.startsWith("/api/users/findPw") ||
                 uri.startsWith("/api/users/password-update") ||
                 uri.startsWith("/api/merchants/verification") ||
-                uri.startsWith("/api/merchants/emailCheck")
+                uri.startsWith("/api/merchants/emailCheck")||
+                uri.startsWith("/api/s3/")
         ) {
             filterChain.doFilter(request, response);
             return;
