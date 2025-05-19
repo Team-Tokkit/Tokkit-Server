@@ -1,7 +1,5 @@
 package com.example.Tokkit_server.global.util;
 
-import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
@@ -10,20 +8,14 @@ import org.springframework.security.core.context.SecurityContextHolder;
 public class LoggingUtils {
 
 
-    public static Long getUserId() {
+
+
+    public static Long getUserIdOrNull() {
         Object principal = getAuthentication().getPrincipal();
         if (principal instanceof CustomUserDetails customUser) {
             return customUser.getId();
         }
-        throw new IllegalStateException("User ID not found in security context");
-    }
-
-    public static Long getUserIdOrNull() {
-        try {
-            return getUserId();
-        } catch (Exception e) {
-             throw new GeneralException(ErrorStatus.USER_NOT_FOUND);
-        }
+        return null;
     }
 
     public static String getClientIp(HttpServletRequest request) {
