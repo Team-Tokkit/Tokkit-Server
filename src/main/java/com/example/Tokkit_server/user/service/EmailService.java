@@ -197,11 +197,9 @@ public class EmailService {
         MimeMessage message = createMessage(to);
         try{
             //예외처리
-            log.info("[EmailService] 메일 전송 시도중...");
 
             emailSender.send(message);
 
-            log.info("[EmailService] 메일 전송 성공!");
 
         }catch(MailException es){
             es.printStackTrace();

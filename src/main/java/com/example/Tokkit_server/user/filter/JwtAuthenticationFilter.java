@@ -35,17 +35,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
             try {
                 Claims claims = jwtUtil.parseToken(token);
-                log.info(String.valueOf(claims));
 
                 Object rawId = claims.get("id");
-                log.info(rawId.toString());
                 Long id = (rawId instanceof Integer) ? ((Integer) rawId).longValue() : (Long) rawId;
 
                 String name = claims.get("name", String.class);
                 String email = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-                log.info("✅ CustomUserDetails 생성자 전달 id: {}", id);
 
                 CustomUserDetails userDetails = new CustomUserDetails(
                         id,
@@ -55,7 +52,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         role
                 );
 
-                log.info("✅ userDetails.getId(): {}", userDetails.getId());
 
                 UsernamePasswordAuthenticationToken authentication =
                         new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());

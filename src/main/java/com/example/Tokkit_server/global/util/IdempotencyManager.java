@@ -1,16 +1,14 @@
 package com.example.Tokkit_server.global.util;
 
-import java.time.Duration;
-import java.util.function.Supplier;
-
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
-import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
-
-import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
+import java.time.Duration;
+import java.util.function.Supplier;
 
 @Component
 @RequiredArgsConstructor
@@ -38,14 +36,12 @@ public class IdempotencyManager {
 
         // 처리 중 상태 등록 : 동시에 2개 이상 처리되지 않도록 락 역할을 함
         Boolean locked = redisTemplate.opsForValue().setIfAbsent(processKey, "IN_PROGRESS", TTL_PROCESS);
-        log.info("Redis Set: key={}, locked={}", processKey, locked);
 
 
         if (Boolean.FALSE.equals(locked)) { // 이미 처리 중인 요청일 경우
 
             // 결과 캐시가 존재하면 그것을 반환
             T cached = (T) redisTemplate.opsForValue().get(resultKey);
-            log.info("Redis Get: key={}, result={}", resultKey, cached); //  캐시된 응답 로그
 
 
 

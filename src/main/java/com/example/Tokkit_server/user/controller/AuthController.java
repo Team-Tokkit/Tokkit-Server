@@ -25,7 +25,6 @@ public class AuthController {
     @Operation(summary = "토큰 재발급 요청", description = "토큰 재발급 요청을 보내는 API입니다.")
     public ApiResponse<?> reissue(@RequestBody JwtDto jwtDto) throws SignatureException {
 
-        log.info("[ Auth Controller ] 토큰을 재발급합니다. ");
 
         return ApiResponse.onSuccess(authService.reissueToken(jwtDto));
     }

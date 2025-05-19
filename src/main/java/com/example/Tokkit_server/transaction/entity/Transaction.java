@@ -1,24 +1,12 @@
 package com.example.Tokkit_server.transaction.entity;
 
 
+import com.example.Tokkit_server.global.entity.BaseTimeEntity;
+import com.example.Tokkit_server.transaction.enums.TransactionStatus;
 import com.example.Tokkit_server.transaction.enums.TransactionType;
 import com.example.Tokkit_server.wallet.entity.Wallet;
-import com.example.Tokkit_server.global.entity.BaseTimeEntity;
-
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import jakarta.persistence.*;
+import lombok.*;
 
 @Entity
 @Getter
@@ -31,11 +19,22 @@ public class Transaction extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(nullable = false)
     private Long amount;
 
+    @Column(nullable = false)
     private String txHash;
 
+    @Column(nullable = false)
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private TransactionStatus status;
+
+    @Column(nullable = false)
+    private String traceId;
+
+    private String failureReason;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "wallet_id")

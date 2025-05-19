@@ -4,7 +4,6 @@ import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.entity.MerchantEmailValidation;
-import com.example.Tokkit_server.merchant.entity.MerchantSimplePasswordResetEmailValidation;
 import com.example.Tokkit_server.merchant.repository.MerchantEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import jakarta.mail.Message;
@@ -185,12 +184,9 @@ public class MerchantEmailService {
     public void sendMessage(String to)throws Exception {
         MimeMessage message = createMessage(to);
         try{
-            //예외처리
-            log.info("[EmailService] 메일 전송 시도중...");
 
             emailSender.send(message);
 
-            log.info("[EmailService] 메일 전송 성공!");
 
         }catch(MailException es){
             es.printStackTrace();

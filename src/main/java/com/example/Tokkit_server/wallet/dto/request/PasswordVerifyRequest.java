@@ -5,6 +5,5 @@ import lombok.Getter;
 
 @Getter
 public class PasswordVerifyRequest {
-    private Long userId;
     private String simplePassword;
 }

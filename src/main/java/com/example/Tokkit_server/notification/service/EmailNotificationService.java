@@ -21,9 +21,7 @@ public class EmailNotificationService {
             message.setText(text);
 
             mailSender.send(message);
-            log.info("[EmailNotificationService] 이메일 전송 성공: to={}, subject={}", to, subject);
         } catch (Exception e) {
-            log.error("[EmailNotificationService] 이메일 전송 실패: {}", e.getMessage());
         }
     }
 }
