@@ -41,29 +41,26 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
         Long userId = LoggingUtils.getUserIdOrNull();
         if (userId == null) return;
 
-        // traceId
         String traceId = MDC.get("traceId");
 
-        // 정규화된 endpoint
         String endpoint = (String) request.getAttribute(HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
-        if (endpoint == null) endpoint = request.getRequestURI(); // fallback
+        if (endpoint == null) endpoint = request.getRequestURI();
 
-        // 응답 상태 및 시간 계산
         int status = response.getStatus();
         long startTime = (long) request.getAttribute(START_TIME_ATTR);
         int responseTimeMs = (int) (System.currentTimeMillis() - startTime);
 
-        // Query 파라미터
         String queryParams = request.getQueryString();
 
-        // Request Body (캐싱 필터 필요)
         String requestBody = null;
         if (request instanceof ContentCachingRequestWrapper wrapper) {
             byte[] buf = wrapper.getContentAsByteArray();
             requestBody = new String(buf, StandardCharsets.UTF_8);
         }
-
-        // 로그 저장
+        String ip = request.getRemoteAddr();
+        if ("0:0:0:0:0:0:0:1".equals(ip)) {
+            ip = "127.0.0.1";
+        }
         ApiRequestLog logEntity = ApiRequestLog.builder()
                 .userId(userId)
                 .method(request.getMethod())
@@ -73,7 +70,7 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
                 .responseStatus(status)
                 .responseTimeMs(responseTimeMs)
                 .timestamp(LocalDateTime.now())
-                .ipAddress(request.getRemoteAddr())
+                .ipAddress(ip)
                 .traceId(traceId)
                 .build();
 
