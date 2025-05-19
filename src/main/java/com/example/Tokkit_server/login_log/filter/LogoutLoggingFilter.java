@@ -1,6 +1,6 @@
 package com.example.Tokkit_server.login_log.filter;
 
-import com.example.Tokkit_server.api_request_log.enums.Event;
+import com.example.Tokkit_server.login_log.enums.Event;
 import com.example.Tokkit_server.login_log.entity.LoginLog;
 import com.example.Tokkit_server.login_log.repository.LoginLogRepository;
 import com.example.Tokkit_server.user.utils.JwtUtil;

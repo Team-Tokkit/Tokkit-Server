@@ -1,6 +1,6 @@
 package com.example.Tokkit_server.login_log.listener;
 
-import com.example.Tokkit_server.api_request_log.enums.Event;
+import com.example.Tokkit_server.login_log.enums.Event;
 import com.example.Tokkit_server.login_log.entity.LoginLog;
 import com.example.Tokkit_server.login_log.repository.LoginLogRepository;
 import com.example.Tokkit_server.merchant.auth.CustomMerchantDetails;

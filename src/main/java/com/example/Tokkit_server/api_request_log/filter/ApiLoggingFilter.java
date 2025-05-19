@@ -23,7 +23,7 @@ import static com.example.Tokkit_server.global.util.LoggingUtils.getUserIdOrNull
 @Component
 public class ApiLoggingFilter extends OncePerRequestFilter {
 
-    private  ApiRequestLogRepository logRepository;
+    private ApiRequestLogRepository logRepository;
 
     public ApiLoggingFilter(ApiRequestLogRepository logRepository) {
         this.logRepository = logRepository;
@@ -40,7 +40,19 @@ public class ApiLoggingFilter extends OncePerRequestFilter {
                 uri.startsWith("/api/users/login") ||
                 uri.startsWith("/api/users/logout") ||
                 uri.startsWith("/api/merchants/login") ||
-                uri.startsWith("/api/merchants/logout")) {
+                uri.startsWith("/api/merchants/logout") ||
+                uri.startsWith("/api/ocr/idCard") ||
+                uri.startsWith("/api/ocr/business") ||
+                uri.startsWith("/api/regions/sigugu") ||
+                uri.startsWith("/api/regions/sido") ||
+                uri.startsWith("/api/merchant/register") ||
+                uri.startsWith("/api/users/register") ||
+                uri.startsWith("/api/merchant/findPw") ||
+                uri.startsWith("/api/users/findPw") ||
+                uri.startsWith("/api/users/password-update") ||
+                uri.startsWith("/api/merchants/verification") ||
+                uri.startsWith("/api/merchants/emailCheck")
+        ) {
             filterChain.doFilter(request, response);
             return;
         }
