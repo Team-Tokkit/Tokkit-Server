@@ -78,6 +78,8 @@ public class SecurityConfig {
             "/api/auth/reissue",
             "/api/auth/**",
             "/api/merchants/login",
+            "/api/regions/sido",
+            "/api/regions/sigungu",
             "/api/swagger-ui/**",
             "/v3/api-docs/**"
     };
@@ -167,7 +169,9 @@ public class SecurityConfig {
                                 "/api/merchants/register",
                                 "/api/merchants/emailCheck",
                                 "/api/merchants/verification",
-                                "/api/merchants/findPw").permitAll()
+                                "/api/merchants/findPw",
+                                "/api/regions/**"
+                                ).permitAll()
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated())
                 .addFilterBefore(new TraceIdFilter(), UsernamePasswordAuthenticationFilter.class)
