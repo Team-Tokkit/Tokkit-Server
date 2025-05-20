@@ -25,12 +25,16 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
 
     @Override
     public Page<Voucher> searchVouchers(VoucherSearchRequest request, Pageable pageable) {
-        StringBuilder jpql = new StringBuilder("SELECT v FROM Voucher v WHERE 1=1");
+        StringBuilder countJpql = new StringBuilder("SELECT COUNT(v) FROM Voucher v WHERE 1=1");
+
+        StringBuilder jpql = new StringBuilder("SELECT v FROM Voucher v LEFT JOIN FETCH v.image WHERE 1=1");
 
         if (request.getStoreCategory() != null) {
+            countJpql.append(" AND v.storeCategory = :category");
             jpql.append(" AND v.storeCategory = :category");
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
+            countJpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT(:keyword, '%'))");
             jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT(:keyword, '%'))");
         }
 
@@ -38,21 +42,27 @@ public class VoucherCustomRepositoryImpl implements VoucherCustomRepository {
         String dir = Optional.ofNullable(request.getDirection()).orElse("desc");
         jpql.append(" ORDER BY v.").append(sort).append(" ").append(dir);
 
-        TypedQuery<Voucher> query = em.createQuery(jpql.toString(), Voucher.class);
+        TypedQuery<Long> countQuery = em.createQuery(countJpql.toString(), Long.class);
+        if (request.getStoreCategory() != null) {
+            countQuery.setParameter("category", request.getStoreCategory());
+        }
+        if (StringUtils.hasText(request.getSearchKeyword())) {
+            countQuery.setParameter("keyword", request.getSearchKeyword());
+        }
+        long total = countQuery.getSingleResult();
 
-        if ((request.getStoreCategory() != null)) {
+        TypedQuery<Voucher> query = em.createQuery(jpql.toString(), Voucher.class);
+        if (request.getStoreCategory() != null) {
             query.setParameter("category", request.getStoreCategory());
         }
         if (StringUtils.hasText(request.getSearchKeyword())) {
             query.setParameter("keyword", request.getSearchKeyword());
         }
 
-        int total = query.getResultList().size();
-
         List<Voucher> result = query
-            .setFirstResult((int) pageable.getOffset())
-            .setMaxResults(pageable.getPageSize())
-            .getResultList();
+                .setFirstResult((int) pageable.getOffset())
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
 
         return new PageImpl<>(result, pageable, total);
     }

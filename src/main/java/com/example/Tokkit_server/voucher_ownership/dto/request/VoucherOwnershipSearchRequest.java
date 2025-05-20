@@ -11,5 +11,4 @@ public class VoucherOwnershipSearchRequest {
     private String searchKeyword;
     private String sort;
     private String direction;
-    private Long userId;
 }

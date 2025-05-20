@@ -32,8 +32,10 @@ public class VoucherOwnershipController {
 
     @GetMapping
     @Operation(summary = "내 바우처 조회 및 필터링/검색하기", description = "내가 보유한 바우처 목록을 조회하고 필터링 및 검색할 수 API입니다.")
-    public ApiResponse<Page<VoucherOwnershipResponseV2>> getMyVouchers(@ModelAttribute VoucherOwnershipSearchRequest request, Pageable pageable) {
-        Page<VoucherOwnershipResponseV2> myVouchers = voucherOwnershipService.searchMyVouchers(request, pageable);
+    public ApiResponse<Page<VoucherOwnershipResponseV2>> getMyVouchers(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                                                       @ParameterObject VoucherOwnershipSearchRequest request,
+                                                                       Pageable pageable) {
+        Page<VoucherOwnershipResponseV2> myVouchers = voucherOwnershipService.searchMyVouchers(request, userDetails.getId(),pageable);
         return ApiResponse.onSuccess(myVouchers);
     }
 

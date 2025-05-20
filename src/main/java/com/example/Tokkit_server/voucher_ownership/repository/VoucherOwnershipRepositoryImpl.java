@@ -21,7 +21,7 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
     private EntityManager em;
 
     @Override
-    public Page<VoucherOwnership> searchMyVoucher(VoucherOwnershipSearchRequest request, Pageable pageable) {
+    public Page<VoucherOwnership> searchMyVoucher(VoucherOwnershipSearchRequest request, Long userId, Pageable pageable) {
         StringBuilder jpql = new StringBuilder("SELECT vo FROM VoucherOwnership vo JOIN FETCH vo.voucher v WHERE vo.wallet.user.id = :userId");
 
         jpql.append(" AND vo.status != 'DELETED'");
@@ -50,8 +50,8 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
         }
 
         TypedQuery<VoucherOwnership> query = em.createQuery(jpql.toString(), VoucherOwnership.class);
-        query.setParameter("userId", request.getUserId());
-
+//        query.setParameter("userId", request.getUserId());
+        query.setParameter("userId", userId);
         if (request.getStoreCategory() != null && !"ALL".equalsIgnoreCase(request.getStoreCategory().name())) {
             query.setParameter("category", request.getStoreCategory().name());
         }
@@ -83,6 +83,7 @@ public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositor
                 .setParameter("userId", userId)
                 .getResultList();
     }
+
 }
 
 
