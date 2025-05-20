@@ -44,6 +44,9 @@ public class Wallet extends BaseTimeEntity {
 	@Column(nullable = false)
 	private String accountNumber;
 
+	@Column(name = "wallet_address", nullable = false, unique = true)
+	private String walletAddress; // 스마트컨트랙트 address
+
 	@Column(nullable = false)
 	private Long depositBalance;
 
