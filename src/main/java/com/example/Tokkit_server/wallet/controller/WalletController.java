@@ -32,7 +32,6 @@ public class WalletController {
         return ApiResponse.onSuccess(commandService.getWalletBalance(userDetails.getId()));
     }
 
-
     @PostMapping("/convert/deposit-to-token")
     @Operation(summary = "예금 ➝ 토큰 전환", description = "예금 잔액을 토큰으로 변환합니다.")
     public ApiResponse<String> convertDepositToToken(@AuthenticationPrincipal CustomUserDetails userDetails,
@@ -65,8 +64,8 @@ public class WalletController {
 
     @GetMapping("/transactions/{id}")
     @Operation(summary = "거래 상세 조회", description = "특정 거래 상세 정보를 조회합니다.")
-    public ApiResponse<TransactionDetailResponse> getTransactionDetail( @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(queryService.getTransactionDetail(userDetails.getId()));
+    public ApiResponse<TransactionDetailResponse> getTransactionDetail(@PathVariable Long id) {
+        return ApiResponse.onSuccess(queryService.getTransactionDetail(id));
     }
 
 

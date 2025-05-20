@@ -58,7 +58,7 @@ public class StoreService {
 	public StoreInfoResponse getStoreInfo(Long merchantId, Long storeId) {
 		Store store = storeRepository.findByIdAndMerchantId(storeId, merchantId)
 			.orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
-		return new StoreInfoResponse(store);
+		return new StoreInfoResponse(store, merchantId);
 	}
 
 
