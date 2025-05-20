@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/wallet")
+@RequestMapping("/api/users/wallet")
 @RequiredArgsConstructor
 @Tag(name = "Wallet", description = "전자지갑 관련 API")
 public class WalletController {
