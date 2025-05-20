@@ -13,11 +13,13 @@ import lombok.NoArgsConstructor;
 public class MerchantRegisterResponseDto {
     public Long id;
     public String storeName;
+    public String accountNumber;
 
     public static MerchantRegisterResponseDto from(Merchant merchant) {
         return MerchantRegisterResponseDto.builder()
                 .id(merchant.getId())
                 .storeName(merchant.getStore().getStoreName())
+                .accountNumber(merchant.getWallet().getAccountNumber())
                 .build();
     }
 }
