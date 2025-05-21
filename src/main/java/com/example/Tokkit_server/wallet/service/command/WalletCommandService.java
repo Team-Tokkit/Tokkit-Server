@@ -24,12 +24,18 @@ import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.enums.WalletType;
 import com.example.Tokkit_server.wallet.repository.WalletRepository;
 import com.example.Tokkit_server.wallet.utils.AccountGenerator;
+import com.example.contract.service.TokkitTokenService;
+
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.math.BigInteger;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -47,16 +53,39 @@ public class WalletCommandService {
     private final MerchantRepository merchantRepository;
     private final PasswordEncoder passwordEncoder;
     private final TransactionLogService transactionLogService;
+    private final TokkitTokenService tokkitTokenService;
 
+    /**
+     * txHash 없는 기본형
+     */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-                            TransactionType type, TransactionStatus status, Long amount, String description) {
+        TransactionType type, TransactionStatus status, Long amount, String description) {
+        transactionLogService.logAndSave(
+            Transaction.builder()
+                .wallet(wallet)
+                .type(type)
+                .status(status)
+                .amount(amount)
+                .description(description)
+                .traceId(MDC.get("traceId"))
+                .build(),
+            userId,
+            merchantId
+        );
+    }
+
+    /**
+     * txHash 있는 확장형
+     */
+    private void logAndSave(Wallet wallet, Long userId, Long merchantId,
+                            TransactionType type, TransactionStatus status, Long amount, String description, String txHash) {
         transactionLogService.logAndSave(
                 Transaction.builder()
                         .wallet(wallet)
                         .type(type)
                         .status(status)
                         .amount(amount)
-                        .txHash(null)
+                        .txHash(txHash)
                         .description(description)
                         .traceId(MDC.get("traceId"))
                         .build(),
@@ -77,15 +106,24 @@ public class WalletCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-        Wallet wallet = Wallet.builder()
+        // 스마트컨트랙트 지갑 주소 생성
+        try {
+            ECKeyPair keyPair = Keys.createEcKeyPair();
+            String walletAddress = "0x" + Keys.getAddress(keyPair.getPublicKey());
+
+            Wallet wallet = Wallet.builder()
                 .user(user)
                 .depositBalance(1000000L)
                 .tokenBalance(0L)
                 .walletType(WalletType.USER)
                 .accountNumber(AccountGenerator.generateAccountNumber())
+                .walletAddress(walletAddress)
                 .build();
 
-        return walletRepository.save(wallet);
+            return walletRepository.save(wallet);
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+        }
     }
 
     // 가맹점주 - 전자 지갑 생성
@@ -99,25 +137,40 @@ public class WalletCommandService {
         Merchant merchant = merchantRepository.findById(merchantId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
-        Wallet wallet = Wallet.builder()
+        try {
+            ECKeyPair keyPair = Keys.createEcKeyPair();
+            String walletAddress = "0x" + Keys.getAddress(keyPair.getPublicKey());
+
+            Wallet wallet = Wallet.builder()
                 .merchant(merchant)
                 .depositBalance(1000000L)
                 .tokenBalance(0L)
                 .walletType(WalletType.MERCHANT)
                 .accountNumber(AccountGenerator.generateAccountNumber())
+                .walletAddress(walletAddress)
                 .build();
 
-        return walletRepository.save(wallet);
+            return walletRepository.save(wallet);
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus._INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
-     * 지갑 잔액 조회
+     * 실시간 스마트컨트랙트 기준 지갑 잔액 조회
      */
     public WalletBalanceResponse getWalletBalance(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
-        return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getUser().getName(), wallet.getAccountNumber());
+        BigInteger onChainBalance;
+        try {
+            onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.TOKEN_BALANCE_QUERY_FAILED);
+        }
+
+        return new WalletBalanceResponse(wallet.getDepositBalance(), onChainBalance.longValue(), wallet.getUser().getName(), wallet.getAccountNumber());
     }
 
     /**
@@ -181,6 +234,7 @@ public class WalletCommandService {
 
         // 8. 토큰 차감
         wallet.updateBalance(wallet.getDepositBalance(), wallet.getTokenBalance() - amount);
+
 
         // 9. VoucherOwnership(바우처 소유권) 생성
         VoucherOwnership ownership = VoucherOwnership.builder()
@@ -263,14 +317,28 @@ public class WalletCommandService {
         //  10. 가맹점주 Wallet 정산
         Wallet merchantWallet = walletRepository.findByMerchant_Id(request.getMerchantId()).orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
 
+
         merchantWallet.updateBalance(
             merchantWallet.getDepositBalance(),
             merchantWallet.getTokenBalance() + request.getAmount());
 
 
+        // 스마트 컨트랙트 적용
+        TransactionReceipt receipt;
+        try{
+            receipt = tokkitTokenService.payToMerchant(
+                merchantWallet.getWalletAddress(),
+                BigInteger.valueOf(request.getAmount()),
+                "Voucher settlement from User ID : " + user.getId());
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.TOKEN_TRANSFER_FAILED);
+        }
+        String txHash = receipt.getTransactionHash();
+
+
         //  11. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-                request.getAmount(), "바우처 정산 수령 - User ID: " + user.getId());
+                request.getAmount(), "바우처 정산 수령 - User ID: " + user.getId(), txHash);
 
 
         //  12. 응답 반환
@@ -317,6 +385,19 @@ public class WalletCommandService {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
 
+        TransactionReceipt receipt;
+        try {
+
+            receipt = tokkitTokenService.transfer(
+                merchantWallet.getWalletAddress(),
+                BigInteger.valueOf(request.getAmount())
+            );
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.TOKEN_TRANSFER_FAILED);
+        }
+
+        String txHash = receipt.getTransactionHash();
+
         // 6. 사용자 토큰 차감
         userWallet.updateBalance(
             userWallet.getDepositBalance(),
@@ -333,12 +414,12 @@ public class WalletCommandService {
 
         // 8. 유저 거래 내역 저장
         logAndSave(userWallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-                request.getAmount(), "토큰 직접 결제 - Merchant ID: " + merchant.getId());
+                request.getAmount(), "토큰 직접 결제 - Merchant ID: " + merchant.getId(), txHash);
 
 
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-                request.getAmount(), "토큰 직접 결제 정산 수령 - From User ID: " + user.getId());
+                request.getAmount(), "토큰 직접 결제 정산 수령 - From User ID: " + user.getId(), txHash);
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()
