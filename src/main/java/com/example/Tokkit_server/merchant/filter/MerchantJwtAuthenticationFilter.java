@@ -31,6 +31,14 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
+        // 유저 요청 건너뛰기
+        String uri = request.getRequestURI();
+
+        if (uri.startsWith("/api/users/")) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String bearerToken = request.getHeader("Authorization");
 
         if (bearerToken != null && bearerToken.startsWith("Bearer ")) {
@@ -45,8 +53,8 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
 
                 CustomMerchantDetails merchantDetails = new CustomMerchantDetails(
                         id,
-                        businessNumber,
                         email,
+                        businessNumber,
                         null,
                         role
                 );
@@ -55,6 +63,8 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
                         new UsernamePasswordAuthenticationToken(merchantDetails, null, merchantDetails.getAuthorities());
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
+
+                log.info("[MerchantJwtAuthenticationFilter] 인증 성공: merchantId={}, email={}", merchantDetails.getId(), merchantDetails.getEmail());
 
             } catch (io.jsonwebtoken.ExpiredJwtException e) {
                 log.warn("[MerchantJwtAuthenticationFilter] 만료된 토큰입니다: {}", e.getMessage());

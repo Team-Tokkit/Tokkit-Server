@@ -23,7 +23,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 
 @RestController
-@RequestMapping("/api/my-vouchers")
+@RequestMapping("/api/users/my-vouchers")
 @RequiredArgsConstructor
 @Tag(name = "MyVouchers", description = "내 바우처 관련 API")
 public class VoucherOwnershipController {
