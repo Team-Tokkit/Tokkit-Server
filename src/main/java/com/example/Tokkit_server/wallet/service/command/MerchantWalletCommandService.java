@@ -15,7 +15,11 @@ import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +54,18 @@ public class MerchantWalletCommandService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
 
         return new MerchantWalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getMerchant().getStore().getStoreName(), wallet.getAccountNumber());
+    }
+
+    /**
+     * 일일 매출 조회
+     */
+    public Long getDailyIncome(Long merchantId) {
+        Optional<Wallet> wallet = walletRepository.findByMerchantId(merchantId);
+
+        LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
+        LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);
+
+        return transactionRepository.findTodayRevenueByWalletId(wallet.get().getId(), startOfDay, endOfDay);
     }
 
     /**

@@ -29,6 +29,17 @@ public class MerchantWalletController {
         return ApiResponse.onSuccess(commandService.getWalletBalance(merchantDetails.getId()));
     }
 
+    @GetMapping("/daily-income")
+    @Operation(summary = "오늘 매출 조회", description = "가맹점주의 일일 매출을 조회합니다.")
+    public ApiResponse<MerchantDailyIncomeResponse> getDailyIncome(@AuthenticationPrincipal CustomMerchantDetails merchantDetails) {
+        Long merchantId = merchantDetails.getId();
+        Long revenue = commandService.getDailyIncome(merchantId);
+
+        MerchantDailyIncomeResponse responseDto = new MerchantDailyIncomeResponse(revenue);
+        return ApiResponse.onSuccess(responseDto);
+
+    }
+
 
     @PostMapping("/convert/token-to-deposit")
     @Operation(summary = "토큰 ➝ 예금 전환", description = "보유한 토큰을 예금으로 전환합니다.")
