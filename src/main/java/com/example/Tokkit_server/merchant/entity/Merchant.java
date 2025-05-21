@@ -72,6 +72,6 @@ public class Merchant extends BaseTimeEntity {
     }
 
     public boolean matchSimplePassword(PasswordEncoder passwordEncoder, String simplePassword) {
-        return passwordEncoder.matches(getSimplePassword(),simplePassword);
+        return passwordEncoder.matches(simplePassword, getSimplePassword());
     }
 }
