@@ -11,7 +11,8 @@ public class NoticeRequestDto {
     private String content;
 
     public Notice to() {
-        return Notice.builder()                .title(title)
+        return Notice.builder()
+                .title(title)
                 .content(content)
                 .build();
     }
