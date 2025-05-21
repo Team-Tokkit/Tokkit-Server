@@ -63,7 +63,6 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
                 authentication.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 
-//                log.info("[MerchantJwtAuthenticationFilter] 인증 성공: merchantId={}, email={}", merchantDetails.getId(), merchantDetails.getEmail());
 
             } catch (io.jsonwebtoken.ExpiredJwtException e) {
                 log.warn("[MerchantJwtAuthenticationFilter] 만료된 토큰입니다: {}", e.getMessage());
