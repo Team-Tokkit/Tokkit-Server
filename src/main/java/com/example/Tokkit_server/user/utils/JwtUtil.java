@@ -259,4 +259,19 @@ public class JwtUtil {
         Claims claims = parseToken(token);
         return claims.get("id", Long.class);
     }
+
+    public boolean isMerchantToken(String token) throws SignatureException {
+        String role = getRoles(token);
+        return role != null && role.contains("MERCHANT");
+    }
+
+    public boolean isUserToken(String token) throws SignatureException {
+        String role = getRoles(token);
+        return role != null && role.contains("USER");
+    }
+
+    public Long extractMerchantId(String token) {
+        Claims claims = parseToken(token);
+        return claims.get("id", Long.class); // 동일한 id 필드를 사용
+    }
 }
