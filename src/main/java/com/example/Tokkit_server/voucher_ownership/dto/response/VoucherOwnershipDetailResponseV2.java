@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.voucher_ownership.dto.response;
 
 import com.example.Tokkit_server.store.dto.response.StoreResponse;
+import com.example.Tokkit_server.voucher.entity.Voucher;
 import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
 import com.example.Tokkit_server.voucher_ownership.enums.VoucherOwnershipStatus;
 import com.fasterxml.jackson.annotation.JsonFormat;
@@ -20,7 +21,7 @@ public class VoucherOwnershipDetailResponseV2 {
     private LocalDateTime voucherValidDate;
     private String voucherDetailDescription;
     private String voucherRefundPolicy;
-    private Integer originalPrice;
+    private Integer price;
     private Long remainingAmount;
     private VoucherOwnershipStatus status;
     private String imageUrl;
@@ -36,7 +37,7 @@ public class VoucherOwnershipDetailResponseV2 {
                 .voucherValidDate(ownership.getVoucher().getValidDate())
                 .voucherDetailDescription(ownership.getVoucher().getDetailDescription())
                 .voucherRefundPolicy(ownership.getVoucher().getRefundPolicy())
-                .originalPrice(ownership.getVoucher().getOriginalPrice())
+                .price(ownership.getVoucher().getPrice())
                 .remainingAmount(ownership.getRemainingAmount())
                 .status(ownership.getStatus())
                 .stores(stores)

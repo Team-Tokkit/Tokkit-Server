@@ -20,8 +20,11 @@ public class ApiRequestLog extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Long userId;
+
+    @Column(nullable = true)
+    private Long merchantId;
 
     @Column(nullable = false, length = 10)
     private String method;

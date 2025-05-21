@@ -104,13 +104,12 @@ public class SecurityConfig {
                 .securityMatcher(
                         "/api/users/**",
                         "/api/ocr/**",
-                        "/api/vouchers/**",
-                        "/api/my-vouchers/**",
-                        "/api/store/**",
-                        "/api/wallet/**",
-                        "/api/notice/**",
-                        "/api/notifications/**",
-                        "/api/regions/**"
+                        "/api/users/vouchers/**",
+                        "/api/users/my-vouchers/**",
+                        "/api/users/store/**",
+                        "/api/users/wallet/**",
+                        "/api/users/notice/**",
+                        "/api/users/notifications/**"
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))
                 .csrf(csrf -> csrf.disable())
@@ -150,12 +149,11 @@ public class SecurityConfig {
                 .securityMatcher(
                         "/api/merchants/**",
                         "/api/ocr/**",
-                        "/api/vouchers/**",
-                        "/api/my-vouchers/**",
-                        "/api/store/**",
-                        "/api/wallet/**",
-                        "/api/notice/**",
-                        "/api/notifications/**",
+                        "/api/merchants/vouchers/**",
+                        "/api/merchants/my-vouchers/**",
+                        "/api/merchants/wallet/**",
+                        "/api/merchants/notice/**",
+                        "/api/merchants/notifications/**",
                         "/api/regions/**"
                 )
                 .cors(cors -> cors.configurationSource(corsConfigurationSource))

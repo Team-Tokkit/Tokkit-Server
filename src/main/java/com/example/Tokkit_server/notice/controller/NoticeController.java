@@ -12,7 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/notice")
+@RequestMapping("/api/users/notice")
 @RequiredArgsConstructor
 @Tag(name = "Notice", description = "공지사항 관련 API")
 public class NoticeController {

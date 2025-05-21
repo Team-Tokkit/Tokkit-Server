@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/wallet")
+@RequestMapping("/api/users/wallet")
 @RequiredArgsConstructor
 @Tag(name = "Wallet", description = "전자지갑 관련 API")
 public class WalletController {
@@ -31,7 +31,6 @@ public class WalletController {
     public ApiResponse<WalletBalanceResponse> getBalance(@AuthenticationPrincipal CustomUserDetails userDetails) {
         return ApiResponse.onSuccess(commandService.getWalletBalance(userDetails.getId()));
     }
-
 
     @PostMapping("/convert/deposit-to-token")
     @Operation(summary = "예금 ➝ 토큰 전환", description = "예금 잔액을 토큰으로 변환합니다.")
@@ -65,8 +64,8 @@ public class WalletController {
 
     @GetMapping("/transactions/{id}")
     @Operation(summary = "거래 상세 조회", description = "특정 거래 상세 정보를 조회합니다.")
-    public ApiResponse<TransactionDetailResponse> getTransactionDetail( @AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(queryService.getTransactionDetail(userDetails.getId()));
+    public ApiResponse<TransactionDetailResponse> getTransactionDetail(@PathVariable Long id) {
+        return ApiResponse.onSuccess(queryService.getTransactionDetail(id));
     }
 
 

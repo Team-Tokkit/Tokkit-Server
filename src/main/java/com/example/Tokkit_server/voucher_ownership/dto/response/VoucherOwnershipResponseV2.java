@@ -15,7 +15,7 @@ public class VoucherOwnershipResponseV2 {
     private Long id;
     private String name;
     private String contact;
-    private Integer originalPrice;
+    private Integer price;
     private Long remainingAmount;
     private Boolean isVoucher;
     private VoucherOwnershipStatus status;
@@ -30,7 +30,7 @@ public class VoucherOwnershipResponseV2 {
                 .id(voucherOwnership.getId())
                 .name(voucher.getName())
                 .contact(voucher.getContact())
-                .originalPrice(voucher.getOriginalPrice())
+                .price(voucher.getPrice())
                 .remainingAmount(voucherOwnership.getRemainingAmount())
                 .isVoucher(voucherOwnership.getStatus() == VoucherOwnershipStatus.AVAILABLE)
                 .status(voucherOwnership.getStatus())
