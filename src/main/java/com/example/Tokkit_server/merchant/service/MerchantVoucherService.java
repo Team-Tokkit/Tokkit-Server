@@ -16,10 +16,18 @@ public class MerchantVoucherService {
     private final String imageProxyBaseUrl;
 
     /**
-     * [1] Merchant의 전체 바우처 목록 조회
+     * [1] Merchant의 전체 바우처 목록 조회 및 검색
      */
-    public Page<VoucherResponse> getAllVouchers(Long merchantId, Pageable pageable) {
-        Page<Voucher> vouchers = voucherRepository.findAllByMerchantId(merchantId, pageable);
+    public Page<VoucherResponse> getAllVouchers(Long merchantId, String keyword, Pageable pageable) {
+        Page<Voucher> vouchers;
+
+        // 바우처 이름으로 검색
+        if (keyword == null || keyword.trim().isEmpty()) {
+            vouchers = voucherRepository.findAllByMerchantId(merchantId, pageable);
+        } else {
+            vouchers = voucherRepository.findByMerchantIdAndNameContaining(merchantId, keyword, pageable);
+        }
+
         return vouchers.map(voucher -> VoucherResponse.from(voucher, imageProxyBaseUrl));
     }
 
