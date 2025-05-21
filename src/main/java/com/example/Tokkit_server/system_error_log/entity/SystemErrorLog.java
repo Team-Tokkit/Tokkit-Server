@@ -21,6 +21,9 @@ public class SystemErrorLog extends BaseTimeEntity {
     @Column(nullable = true)
     private Long userId;
 
+    @Column(nullable = true)
+    private Long merchantId;
+
     @Column(nullable = false, length = 255)
     private String endpoint;
 
