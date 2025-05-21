@@ -23,6 +23,9 @@ public class ApiRequestLog extends BaseTimeEntity {
     @Column(nullable = false)
     private Long userId;
 
+    @Column(nullable = false)
+    private Long merchantId;
+
     @Column(nullable = false, length = 10)
     private String method;
 
