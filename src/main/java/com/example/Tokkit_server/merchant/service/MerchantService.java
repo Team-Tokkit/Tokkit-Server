@@ -139,11 +139,12 @@ public class MerchantService {
 
     // 간편 비밀번호 변경 시 이메일 인증
     @Transactional
-    public void verifySimplePassword(String email, String simplePassword) {
-        Merchant merchant = merchantRepository.findByEmail(email)
+    public void verifySimplePassword(Long merchantId, String simplePassword) {
+        Merchant merchant = merchantRepository.findById(merchantId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
         boolean matches = merchant.matchSimplePassword(passwordEncoder, simplePassword);
+
         if (!matches) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
@@ -155,7 +156,10 @@ public class MerchantService {
         Merchant merchant = merchantRepository.findByEmail(email)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
-        merchant.updateSimplePassword(passwordEncoder.encode(newSimplePassword));
+        String encoded = passwordEncoder.encode(newSimplePassword);
+        merchant.updateSimplePassword(encoded);
+
+        merchantRepository.save(merchant);
     }
 
     // 이메일 변경
