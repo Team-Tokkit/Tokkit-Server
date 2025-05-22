@@ -80,18 +80,21 @@ public enum ErrorStatus implements BaseErrorCode {
 	// ocr 관련
 	OCR_PROCESSING_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"OCR_001", "OCR 처리에 실패했습니다."),
 
-	// kakao api 관련
-	ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "KAKAO_001", "존재하지 않는 주소입니다."),
-	INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "KAKAO_002", "유효하지 않은 주소입니다. 카카오 주소 검색 실패."),
-
-	// Kakao Map 관련
-	INVALID_RADIUS(HttpStatus.BAD_REQUEST, "RADIUS_001", "유효하지 않은 반경입니다."),
-	INVALID_LATITUDE(HttpStatus.BAD_REQUEST, "KAKAO_MAP_001", "유효하지 않은 좌표입니다."),
-	// Region 관련
-	INVALID_SIDO(HttpStatus.NOT_FOUND, "SIDO_404", "유효하지 않은 도/시입니다."), 
+	// Map 관련
+	ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "MAP_001", "존재하지 않는 주소입니다."),
+	INVALID_ADDRESS(HttpStatus.BAD_REQUEST, "MAP_002", "유효하지 않은 주소입니다. 카카오 주소 검색 실패."),
+	INVALID_RADIUS(HttpStatus.BAD_REQUEST, "MAP_003", "유효하지 않은 반경입니다."),
+	INVALID_LATITUDE(HttpStatus.BAD_REQUEST, "MAP_004", "유효하지 않은 좌표입니다."),
+	INVALID_SIDO(HttpStatus.NOT_FOUND, "MAP_005", "유효하지 않은 도/시입니다."),
 	
 	// Pagination 관련
-	INVALID_PAGE(HttpStatus.BAD_REQUEST,"PAGE_400" ,"유효하지 않은 페이지 넘버입니다" );
+	INVALID_PAGE(HttpStatus.BAD_REQUEST,"PAGE_400" ,"유효하지 않은 페이지 넘버입니다."),
+
+	// 스마트컨트랙트 (Token) 관련
+	TOKEN_TRANSFER_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"TOKEN_001" , "스마트컨트랙트 전송 중 오류가 발생했습니다."),
+	TOKEN_MINT_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"TOKEN_002" , "토큰 발행(mint) 처리 중 오류가 발생했습니다."),
+	TOKEN_BALANCE_QUERY_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "TOKEN_003", "스마트컨트랙트 잔액 조회 중 오류가 발생했습니다."),
+	TOKEN_BURN_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "TOKEN_004", "토큰 소각(burn) 처리 중 오류가 발생했습니다.");
 
 
 	private final HttpStatus httpStatus;

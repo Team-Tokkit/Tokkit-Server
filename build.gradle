@@ -79,6 +79,9 @@ dependencies {
 	implementation 'com.fasterxml.jackson.core:jackson-annotations'
 	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
+	// Web3j (스마트컨트랙트 통신용)
+	implementation 'org.web3j:core:4.10.3'
+	implementation 'org.web3j:codegen:4.10.3'
 }
 
 tasks.named('test') {
