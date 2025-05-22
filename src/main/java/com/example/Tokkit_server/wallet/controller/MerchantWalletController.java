@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/merchant/wallet")
+@RequestMapping("/api/merchants/wallet")
 @RequiredArgsConstructor
 @Tag(name = "Merchant Wallet", description = "가맹점주 전자지갑 관련 API")
 public class MerchantWalletController {
@@ -25,8 +25,19 @@ public class MerchantWalletController {
 
     @GetMapping("/balance")
     @Operation(summary = "잔액 조회", description = "사용자 ID로 잔액 조회")
-    public ApiResponse<WalletBalanceResponse> getBalance(@AuthenticationPrincipal CustomMerchantDetails merchantDetails) {
+    public ApiResponse<MerchantWalletBalanceResponse> getBalance(@AuthenticationPrincipal CustomMerchantDetails merchantDetails) {
         return ApiResponse.onSuccess(commandService.getWalletBalance(merchantDetails.getId()));
+    }
+
+    @GetMapping("/daily-income")
+    @Operation(summary = "오늘 매출 조회", description = "가맹점주의 일일 매출을 조회합니다.")
+    public ApiResponse<MerchantDailyIncomeResponse> getDailyIncome(@AuthenticationPrincipal CustomMerchantDetails merchantDetails) {
+        Long merchantId = merchantDetails.getId();
+        Long revenue = commandService.getDailyIncome(merchantId);
+
+        MerchantDailyIncomeResponse responseDto = new MerchantDailyIncomeResponse(revenue);
+        return ApiResponse.onSuccess(responseDto);
+
     }
 
 

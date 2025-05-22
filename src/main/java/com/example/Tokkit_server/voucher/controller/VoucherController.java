@@ -22,7 +22,7 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/vouchers")
+@RequestMapping("/api/users/vouchers")
 @Tag(name = "Vouchers", description = "바우처 관련 API")
 public class VoucherController {
 

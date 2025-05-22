@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/store")
+@RequestMapping("/api/users/store")
 @RequiredArgsConstructor
 @Tag(name = "Store", description = "가맹점 관련 API")
 

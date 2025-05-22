@@ -11,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
-
 @Slf4j
 @Service
 @RequiredArgsConstructor
@@ -24,12 +23,15 @@ public class SystemErrorLogService {
         String endpoint = Optional.ofNullable(request.getRequestURI()).orElse("UNKNOWN");
         String errorMessage = Optional.ofNullable(e.getMessage()).orElse("No message");
         String stackTrace = getStackTraceAsString(e);
-        Long userId = extractUserIdFromRequest(request);
 
-        log.error("[SYSTEM ERROR] endpoint: {}, traceId: {}, userId: {}, message: {}", endpoint, traceId, userId, errorMessage);
+        UserOrMerchant userOrMerchant = extractUserOrMerchantIdFromRequest(request);
+
+        log.error("[SYSTEM ERROR] endpoint: {}, traceId: {}, userId: {}, merchantId: {}, message: {}",
+                endpoint, traceId, userOrMerchant.userId(), userOrMerchant.merchantId(), errorMessage);
 
         SystemErrorLog logEntity = SystemErrorLog.builder()
-                .userId(userId)
+                .userId(userOrMerchant.userId())
+                .merchantId(userOrMerchant.merchantId())
                 .endpoint(endpoint)
                 .errorMessage(errorMessage)
                 .stackTrace(stackTrace)
@@ -42,16 +44,20 @@ public class SystemErrorLogService {
         systemErrorLogRepository.save(logEntity);
     }
 
-    private Long extractUserIdFromRequest(HttpServletRequest request) {
+    private UserOrMerchant extractUserOrMerchantIdFromRequest(HttpServletRequest request) {
         try {
             String token = jwtUtil.resolveAccessToken(request);
             if (token != null && jwtUtil.isTokenValid(token)) {
-                return jwtUtil.extractUserId(token);
+                if (jwtUtil.isUserToken(token)) {
+                    return new UserOrMerchant(jwtUtil.extractUserId(token), null);
+                } else if (jwtUtil.isMerchantToken(token)) {
+                    return new UserOrMerchant(null, jwtUtil.extractMerchantId(token));
+                }
             }
         } catch (Exception ex) {
-            log.warn("[SystemErrorLog] Failed to extract userId from JWT: {}", ex.getMessage());
+            log.warn("[SystemErrorLog] Failed to extract login info from JWT: {}", ex.getMessage());
         }
-        return null;
+        return new UserOrMerchant(null, null);
     }
 
     private String getStackTraceAsString(Throwable t) {
@@ -61,4 +67,7 @@ public class SystemErrorLogService {
         }
         return sb.toString();
     }
+
+    private record UserOrMerchant(Long userId, Long merchantId) {}
 }
+
