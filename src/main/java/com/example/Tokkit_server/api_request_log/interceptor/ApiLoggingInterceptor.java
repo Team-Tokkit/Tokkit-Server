@@ -8,6 +8,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
@@ -39,10 +40,11 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
                                 Object handler,
                                 Exception ex) {
 
-        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        // 로그인되지 않은 상태면 조용히 종료
-        if (principal == null || principal.equals("anonymousUser")) return;
+        if (authentication == null || authentication.getPrincipal() == null || authentication.getPrincipal().equals("anonymousUser")) {
+            return;
+        }
 
         Long userId = LoggingUtils.getUserIdOrNull();
         Long merchantId = LoggingUtils.getMerchantIdOrNull();
