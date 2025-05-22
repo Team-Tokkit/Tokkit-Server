@@ -32,7 +32,7 @@ public class MerchantWalletQueryService {
     private final TransactionLogService transactionLogService;
 
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-                            TransactionType type, TransactionStatus status, Long amount, String description) {
+                            TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
         transactionLogService.logAndSave(
                 Transaction.builder()
                         .wallet(wallet)
@@ -41,6 +41,7 @@ public class MerchantWalletQueryService {
                         .amount(amount)
                         .txHash(null)
                         .description(description)
+                        .displayDescription(displayDescription)
                         .traceId(MDC.get("traceId"))
                         .build(),
                 userId,
@@ -78,7 +79,9 @@ public class MerchantWalletQueryService {
                 TransactionType.CONVERT,
                 TransactionStatus.SUCCESS,
                 request.getAmount(),
-                "토큰 ➝ 예금 변환");
+                "토큰 ➝ 예금 변환",
+                "토큰 ➝ 예금"
+                );
     }
 
     /**
@@ -96,7 +99,7 @@ public class MerchantWalletQueryService {
                         t.getId(),
                         t.getType(),
                         t.getAmount(),
-                        t.getDescription(),
+                        t.getDisplayDescription(),
                         t.getCreatedAt()))
                 .toList();
     }
@@ -112,7 +115,7 @@ public class MerchantWalletQueryService {
                 transaction.getId(),
                 transaction.getType(),
                 transaction.getAmount(),
-                transaction.getDescription(),
+                transaction.getDisplayDescription(),
                 transaction.getCreatedAt()
         );
     }

@@ -49,7 +49,7 @@ public class WalletCommandService {
     private final TransactionLogService transactionLogService;
 
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-                            TransactionType type, TransactionStatus status, Long amount, String description) {
+                            TransactionType type, TransactionStatus status, Long amount, String logDescription, String displayDescription) {
         transactionLogService.logAndSave(
                 Transaction.builder()
                         .wallet(wallet)
@@ -57,7 +57,8 @@ public class WalletCommandService {
                         .status(status)
                         .amount(amount)
                         .txHash(null)
-                        .description(description)
+                        .description(logDescription)
+                        .displayDescription(displayDescription)
                         .traceId(MDC.get("traceId"))
                         .build(),
                 userId,
@@ -135,7 +136,7 @@ public class WalletCommandService {
                 t.getId(),
                 t.getType(),
                 t.getAmount(),
-                t.getDescription(),
+                t.getDisplayDescription(),
                 t.getCreatedAt()
             )).toList();
     }
@@ -192,8 +193,15 @@ public class WalletCommandService {
 
         VoucherOwnership savedOwnership = voucherOwnershipRepository.save(ownership);
 
+        // create log description
+        String logDescription = "바우처 구매 - Voucher ID: " + voucher.getId() + ", 금액: " + amount + "원";
+
+        // create response description
+        String displayDescription = voucher.getName() + " 구매";
+
+
         logAndSave(wallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-                (long) amount, "바우처 구매 - Voucher ID: " + voucher.getId() + ", 금액: " + amount + "원");
+                (long) amount, logDescription, displayDescription);
         // 11. 응답 반환
         return VoucherPurchaseResponse.builder()
             .ownershipId(savedOwnership.getId())
@@ -256,9 +264,15 @@ public class WalletCommandService {
         //  8. 잔액 차감
         ownership.useAmount(request.getAmount());
 
+        // create log description
+        String logDescription = "QR 바우처 결제 - Merchant ID: " + request.getMerchantId();
+
+        // create display description
+        String displayDescription = voucher.getMerchant().getName() + " 바우처 결제";
+
         //  9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-                request.getAmount(), "QR 바우처 결제 - Merchant ID: " + request.getMerchantId());
+                request.getAmount(), logDescription, displayDescription);
 
         //  10. 가맹점주 Wallet 정산
         Wallet merchantWallet = walletRepository.findByMerchant_Id(request.getMerchantId()).orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
@@ -267,11 +281,15 @@ public class WalletCommandService {
             merchantWallet.getDepositBalance(),
             merchantWallet.getTokenBalance() + request.getAmount());
 
+        // create log description
+        String merchantLogDescription = "바우처 정산 수령 - User ID: " + user.getId();
+
+        // create display description
+        String merchantDisplayDescription = voucher.getName() + " 바우처 정산";
 
         //  11. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-                request.getAmount(), "바우처 정산 수령 - User ID: " + user.getId());
-
+                request.getAmount(), merchantLogDescription, merchantDisplayDescription);
 
         //  12. 응답 반환
         return VoucherPaymentResponse.builder()
@@ -330,15 +348,25 @@ public class WalletCommandService {
             merchantWallet.getTokenBalance() + request.getAmount()
         );
 
+        // create log description
+        String logDescription = "토큰 직접 결제 - Merchant ID: " + merchant.getId();
+
+        // create display description
+        String displayDescription = merchant.getStore().getStoreName();
 
         // 8. 유저 거래 내역 저장
         logAndSave(userWallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-                request.getAmount(), "토큰 직접 결제 - Merchant ID: " + merchant.getId());
+                request.getAmount(), logDescription, displayDescription);
 
+        // create log description
+        String merchantLogDescription = "토큰 직접 결제 정산 수령 - From User ID: " + user.getId();
+
+        // create display description
+        String merchantDisplayDescription = "토큰 정산";
 
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-                request.getAmount(), "토큰 직접 결제 정산 수령 - From User ID: " + user.getId());
+                request.getAmount(), merchantLogDescription, merchantDisplayDescription);
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()

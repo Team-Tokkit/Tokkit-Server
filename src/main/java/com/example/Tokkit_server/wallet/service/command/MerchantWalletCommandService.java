@@ -83,7 +83,7 @@ public class MerchantWalletCommandService {
                         t.getId(),
                         t.getType(),
                         t.getAmount(),
-                        t.getDescription(),
+                        t.getDisplayDescription(),
                         t.getCreatedAt()
                 )).toList();
     }
