@@ -57,7 +57,7 @@ public class MerchantController {
     public ApiResponse<?> updateMerchantPassword(@AuthenticationPrincipal CustomMerchantDetails merchantDetails,
                                                  @RequestBody UpdateMerchantPasswordRequestDto requestDto) {
         try {
-            MerchantResponseDto responseDto = merchantService.updateMerchantPassword(merchantDetails.getEmail(), requestDto);
+            MerchantResponseDto responseDto = merchantService.updateMerchantPassword(merchantDetails.getUsername(), requestDto);
             return ApiResponse.onSuccess(responseDto);
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
@@ -67,21 +67,16 @@ public class MerchantController {
     @PostMapping("/find-simple-password")
     @Operation(summary = "간편 비밀번호 초기화", description = "가맹점주가 간편 비밀번호를 잊었을 경우 랜덤 값으로 설정한 후 이메일로 전송합니다.")
     public ApiResponse<?> sendSimplePasswordVerification(@RequestParam("email") String email) {
-        try {
             merchantEmailService.sendMessageForSimplePassword(email);
             return ApiResponse.onSuccess(SuccessStatus._OK);
-        } catch (Exception e) {
-            return ApiResponse.onFailure("500", e.getMessage(), null);
-        }
     }
 
     @PostMapping("/simple-password/verify")
-    @Operation(summary = "간편 비밀번호 재설정 시 이메일 인증", description = "유저가 간편 비밀번호를 재설정 하기 전에 이메일 인증 코드를 확인합니다.")
+    @Operation(summary = "간편 비밀번호 유효성 검증", description = "가맹점주가 입력한 간편 비밀번호가 가맹점주가 설정한 간편 비밀번호와 일치하는지 검증합니다.")
     public ApiResponse<?> verifySimplePasswordCode(
             @AuthenticationPrincipal CustomMerchantDetails merchantDetails,
             @RequestBody MerchantSimplePasswordVerificationRequestDto requestDto) {
-
-        merchantService.verifySimplePassword(merchantDetails.getEmail(), requestDto.getSimplePassword());
+            merchantService.verifySimplePassword(merchantDetails.getId(), requestDto.getSimplePassword());
 
         return ApiResponse.onSuccess(SuccessStatus._OK);
     }
@@ -92,7 +87,7 @@ public class MerchantController {
             @AuthenticationPrincipal CustomMerchantDetails merchantDetails,
             @RequestBody MerchantSimplePasswordResetRequestDto requestDto) {
 
-        merchantService.updateSimplePassword(merchantDetails.getEmail(), requestDto.getSimplePassword());
+        merchantService.updateSimplePassword(merchantDetails.getUsername(), requestDto.getSimplePassword());
         return ApiResponse.onSuccess(SuccessStatus._OK);
     }
 

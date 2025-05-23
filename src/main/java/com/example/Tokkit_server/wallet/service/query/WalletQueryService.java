@@ -15,12 +15,16 @@ import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
 import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
 import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.repository.WalletRepository;
+import com.example.contract.service.TokkitTokenService;
+
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -31,7 +35,11 @@ public class WalletQueryService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final TransactionLogService transactionLogService;
+    private final TokkitTokenService tokkitTokenService;
 
+    /**
+     * txHash 없는 기본형
+     */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
                             TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
         transactionLogService.logAndSave(
@@ -49,6 +57,29 @@ public class WalletQueryService {
                 merchantId
         );
     }
+
+    /**
+     * txHash 있는 확장형
+     */
+    private void logAndSave(Wallet wallet, Long userId, Long merchantId,
+        TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription, String txHash) {
+        transactionLogService.logAndSave(
+            Transaction.builder()
+                .wallet(wallet)
+                .type(type)
+                .status(status)
+                .amount(amount)
+                .txHash(txHash)
+                .description(description)
+                .displayDescription(displayDescription)
+                .traceId(MDC.get("traceId"))
+                .build(),
+            userId,
+            merchantId
+        );
+    }
+
+
     /**
      * 예금에서 토큰으로 바꾸기
      */
@@ -75,15 +106,21 @@ public class WalletQueryService {
         wallet.updateBalance(wallet.getDepositBalance() - request.getAmount(),
                                wallet.getTokenBalance() + request.getAmount());
 
+        TransactionReceipt receipt;
+        try {
+            receipt = tokkitTokenService.mint(wallet.getWalletAddress(), BigInteger.valueOf(request.getAmount()));
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.TOKEN_MINT_FAILED);
+        }
+        String txHash = receipt.getTransactionHash();
 
         logAndSave(wallet, user.getId(), null,
                 TransactionType.CONVERT,
                 TransactionStatus.SUCCESS,
                 request.getAmount(),
                 "예금 ➝ 토큰 변환",
-                "예금 ➝ 토큰"
-                );
-
+                "예금 ➝ 토큰",
+                txHash);
     }
 
 
@@ -109,17 +146,30 @@ public class WalletQueryService {
             throw new GeneralException(ErrorStatus.INSUFFICIENT_TOKEN_BALANCE); // 토큰 잔액 부족
         }
 
+
+        // 스마트컨트랙트에 burn 요청
+        String txHash;
+        try {
+            TransactionReceipt receipt = tokkitTokenService.burn(wallet.getWalletAddress(), BigInteger.valueOf(request.getAmount()));
+            txHash = receipt.getTransactionHash();
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.TOKEN_BURN_FAILED);
+        }
+
+
         // 잔액 업데이트
         wallet.updateBalance(wallet.getDepositBalance() + request.getAmount(),
                                wallet.getTokenBalance() - request.getAmount());
+
+
 
         logAndSave(wallet, user.getId(), null,
                 TransactionType.CONVERT,
                 TransactionStatus.SUCCESS,
                 request.getAmount(),
                 "토큰 ➝ 예금 변환",
-                "토큰 ➝ 예금"
-                );
+                "토큰 ➝ 예금",
+                txHash);
     }
 
 
