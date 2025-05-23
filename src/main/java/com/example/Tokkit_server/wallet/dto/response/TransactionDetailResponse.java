@@ -13,6 +13,6 @@ public class TransactionDetailResponse {
     private Long id;
     private TransactionType type;
     private Long amount;
-    private String description;
+    private String displayDescription;
     private LocalDateTime createdAt;
 }
