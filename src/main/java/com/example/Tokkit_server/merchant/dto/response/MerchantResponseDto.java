@@ -16,9 +16,13 @@ public class MerchantResponseDto {
     public String name;
     public String storeName;
     public String email;
+    public String businessNumber;
     public String phoneNumber;
     public String accountNumber;
     public String roadAddress;
+    public String sido;
+    public String sigungu;
+    private String storeCategory;
 
     public static MerchantResponseDto from(Merchant merchant) {
         return MerchantResponseDto.builder()
@@ -26,9 +30,13 @@ public class MerchantResponseDto {
                 .name(merchant.getName())
                 .storeName(merchant.getStore().getStoreName())
                 .email(merchant.getEmail())
+                .businessNumber(merchant.getBusinessNumber())
                 .phoneNumber(merchant.getPhoneNumber())
                 .accountNumber(merchant.getWallet().getAccountNumber())
                 .roadAddress(merchant.getStore().getRoadAddress())
+                .sido(merchant.getStore().getRegion().getSidoName())
+                .sigungu(merchant.getStore().getRegion().getSigunguName())
+                .storeCategory(String.valueOf(merchant.getStore().getStoreCategory()))
                 .build();
     }
 }

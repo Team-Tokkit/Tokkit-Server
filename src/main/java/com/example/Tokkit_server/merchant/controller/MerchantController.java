@@ -6,15 +6,22 @@ import com.example.Tokkit_server.merchant.auth.CustomMerchantDetails;
 import com.example.Tokkit_server.merchant.dto.request.*;
 import com.example.Tokkit_server.merchant.dto.response.MerchantRegisterResponseDto;
 import com.example.Tokkit_server.merchant.dto.response.MerchantResponseDto;
+import com.example.Tokkit_server.merchant.entity.Merchant;
+import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.merchant.service.MerchantEmailService;
 import com.example.Tokkit_server.merchant.service.MerchantService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+import java.util.Optional;
 
 @Slf4j
 @RestController
@@ -25,6 +32,7 @@ public class MerchantController {
 
     private final MerchantService merchantService;
     private final MerchantEmailService merchantEmailService;
+    private final MerchantRepository merchantRepository;
 
     @PostMapping("/register")
     @Operation(summary = "회원가입 요청", description = "회원가입 요청을 처리합니다.")
@@ -42,12 +50,25 @@ public class MerchantController {
 
     @PostMapping("/findPw")
     @Operation(summary = "비밀번호 찾기(재설정)", description = "가맹점주의 비밀번호를 랜덤한 값으로 설정한 후 이메일로 전송합니다.")
-    public ApiResponse<?> passwordReIssuance(@RequestParam("email") String email) {
+    public ApiResponse<?> passwordReIssuance(@RequestParam("businessNumber") String businessNumber) {
         try {
+            Optional<Merchant> optionalMerchant = merchantRepository.findByBusinessNumber(businessNumber);
+
+            if (optionalMerchant.isEmpty()) {
+                return ApiResponse.onFailure("404", "해당 사업자번호로 등록된 가맹점이 없습니다.", null);
+            }
+
+            Merchant merchant = optionalMerchant.get();
+
+            String email = merchant.getEmail();
+
+            if (email == null || email.isBlank()) {
+                return ApiResponse.onFailure("400", "가맹점 정보에 이메일이 등록되어 있지 않습니다.", null);
+            }
+
             merchantEmailService.sendMessageForPassword(email);
-            return ApiResponse.onSuccess("임시 비밀번호 발급 성공, 가입시 사용한 이메일로 임시 비밀번호를 전송했으니 확인 후 로그인하세요.");
+            return ApiResponse.onSuccess(Map.of("email", email));
         } catch (Exception e) {
-            log.error("임시 비밀번호 발급 실퍄", e);
             return ApiResponse.onFailure("500", "임시 비밀번호 발급에 실패했습니다.", null);
         }
     }
@@ -57,7 +78,7 @@ public class MerchantController {
     public ApiResponse<?> updateMerchantPassword(@AuthenticationPrincipal CustomMerchantDetails merchantDetails,
                                                  @RequestBody UpdateMerchantPasswordRequestDto requestDto) {
         try {
-            MerchantResponseDto responseDto = merchantService.updateMerchantPassword(merchantDetails.getUsername(), requestDto);
+            MerchantResponseDto responseDto = merchantService.updateMerchantPassword(merchantDetails.getBusinessNumber(), requestDto);
             return ApiResponse.onSuccess(responseDto);
         } catch (IllegalArgumentException e) {
             return ApiResponse.onFailure("400", e.getMessage(), null);
@@ -87,7 +108,7 @@ public class MerchantController {
             @AuthenticationPrincipal CustomMerchantDetails merchantDetails,
             @RequestBody MerchantSimplePasswordResetRequestDto requestDto) {
 
-        merchantService.updateSimplePassword(merchantDetails.getUsername(), requestDto.getSimplePassword());
+        merchantService.updateSimplePassword(merchantDetails.getBusinessNumber(), requestDto.getSimplePassword());
         return ApiResponse.onSuccess(SuccessStatus._OK);
     }
 
@@ -107,9 +128,18 @@ public class MerchantController {
     }
 
     @PostMapping("/logout")
-    @Operation(summary = "로그아웃", description = "로그아웃을 진행합니다. 실제 사용은 되지 않으며 swagger용 api입니다.")
-    public ApiResponse<?> logout(@AuthenticationPrincipal UserDetails userDetails) {
+    @Operation(summary = "가맹점 로그아웃", description = "JWT 환경에서 refreshToken 쿠키를 만료시킵니다.")
+    public ApiResponse<?> logout(HttpServletResponse response) {
+        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .httpOnly(true)
+                .secure(true)
+                .sameSite("None") // 프론트와 도메인이 다르면 꼭 필요
+                .maxAge(0)
+                .build();
 
-        return ApiResponse.onSuccess(null);
+        response.setHeader("Set-Cookie", deleteCookie.toString());
+        return ApiResponse.onSuccess("로그아웃 완료");
     }
+
 }

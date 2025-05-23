@@ -116,8 +116,8 @@ public class MerchantService {
 
     // 비밀번호 변경
     @Transactional
-    public MerchantResponseDto updateMerchantPassword(String email, UpdateMerchantPasswordRequestDto requestDto) {
-        Merchant merchant = merchantRepository.findByEmail(email)
+    public MerchantResponseDto updateMerchantPassword(String businessNumber, UpdateMerchantPasswordRequestDto requestDto) {
+        Merchant merchant = merchantRepository.findByBusinessNumber(businessNumber)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
         if (requestDto.getPassword() == null || requestDto.getNewPassword() == null) {
@@ -137,7 +137,7 @@ public class MerchantService {
         return MerchantResponseDto.from(merchant);
     }
 
-    // 간편 비밀번호 변경 시 이메일 인증
+    // 간편 비밀번호 검증
     @Transactional
     public void verifySimplePassword(Long merchantId, String simplePassword) {
         Merchant merchant = merchantRepository.findById(merchantId)
@@ -152,8 +152,8 @@ public class MerchantService {
 
     // 간편 비밀번호 변경
     @Transactional
-    public void updateSimplePassword(String email, String newSimplePassword) {
-        Merchant merchant = merchantRepository.findByEmail(email)
+    public void updateSimplePassword(String businessNumber, String newSimplePassword) {
+        Merchant merchant = merchantRepository.findByBusinessNumber(businessNumber)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
         String encoded = passwordEncoder.encode(newSimplePassword);

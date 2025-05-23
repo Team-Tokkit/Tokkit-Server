@@ -102,6 +102,7 @@ public class JwtUtil {
                 .header().add("typ", "JWT").and()
                 .subject(merchantDetails.getBusinessNumber())
                 .claim("id", merchantDetails.getId())
+                .claim("email", merchantDetails.getUsername())
                 .claim("role", authorities)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(expiration))
