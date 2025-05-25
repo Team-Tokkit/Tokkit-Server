@@ -109,7 +109,7 @@ public class WalletCommandService {
         // 스마트컨트랙트 지갑 주소 생성
         try {
             ECKeyPair keyPair = Keys.createEcKeyPair();
-            String walletAddress = "0x" + Keys.getAddress(keyPair.getPublicKey());
+            String walletAddress = Keys.getAddress(keyPair.getPublicKey());
 
             Wallet wallet = Wallet.builder()
                 .user(user)
@@ -139,7 +139,7 @@ public class WalletCommandService {
 
         try {
             ECKeyPair keyPair = Keys.createEcKeyPair();
-            String walletAddress = "0x" + Keys.getAddress(keyPair.getPublicKey());
+            String walletAddress = Keys.getAddress(keyPair.getPublicKey());
 
             Wallet wallet = Wallet.builder()
                 .merchant(merchant)
