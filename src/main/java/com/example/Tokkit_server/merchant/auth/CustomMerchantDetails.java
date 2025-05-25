@@ -27,7 +27,7 @@ public class CustomMerchantDetails implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.singleton(() -> "MERCHANT");
+        return Collections.singleton(() -> "ROLE_MERCHANT");
     }
 
     public Long getId() {return id;}
