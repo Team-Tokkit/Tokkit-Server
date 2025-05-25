@@ -59,7 +59,6 @@ public class JwtUtil {
         accessExpMs = access;
         refreshExpMs = refresh;
         tokenRepository = tokenRepo;
-        System.out.println("JWE Secret Length = " + jweSecret.getBytes(StandardCharsets.UTF_8).length);
     }
 
     // JWT 토큰을 입력으로 받아 토큰의 subject 로부터 사용자 Email 추출하는 메서드
