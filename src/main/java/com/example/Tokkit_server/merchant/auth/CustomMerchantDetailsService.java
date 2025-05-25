@@ -21,7 +21,7 @@ public class CustomMerchantDetailsService implements UserDetailsService {
         return merchantRepository.findByBusinessNumber(businessNumber)
                 .map(m -> new CustomMerchantDetails(
                         m.getId(),
-                        m.getName(),
+                        m.getEmail(),
                         m.getBusinessNumber(),
                         m.getPassword(),
                         m.getRoles())

@@ -295,7 +295,7 @@ public class WalletCommandService {
         String logDescription = "QR 바우처 결제 - Merchant ID: " + request.getMerchantId();
 
         // create display description
-        String displayDescription = voucher.getMerchant().getName() + " 바우처 결제";
+        String displayDescription = voucher.getMerchant().getStore().getStoreName() + " 바우처 결제";
 
         //  9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
