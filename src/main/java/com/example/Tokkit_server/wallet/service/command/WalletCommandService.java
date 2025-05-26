@@ -108,8 +108,7 @@ public class WalletCommandService {
 
         // 스마트컨트랙트 지갑 주소 생성
         try {
-            ECKeyPair keyPair = Keys.createEcKeyPair();
-            String walletAddress = Keys.getAddress(keyPair.getPublicKey());
+            String walletAddress = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266";
 
             Wallet wallet = Wallet.builder()
                 .user(user)
@@ -138,8 +137,8 @@ public class WalletCommandService {
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
         try {
-            ECKeyPair keyPair = Keys.createEcKeyPair();
-            String walletAddress = Keys.getAddress(keyPair.getPublicKey());
+
+            String walletAddress = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
 
             Wallet wallet = Wallet.builder()
                 .merchant(merchant)
