@@ -12,6 +12,9 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class ContractAddressDto {
+
     @JsonProperty("TokkitToken")
     private String TokkitToken;
+
+    private String network; // ex: "localhost" or "main net"
 }
