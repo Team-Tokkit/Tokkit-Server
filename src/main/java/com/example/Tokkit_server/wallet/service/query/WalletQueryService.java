@@ -198,8 +198,9 @@ public class WalletQueryService {
             transaction.getId(),
             transaction.getType(),
             transaction.getAmount(),
-            transaction.getDescription(),
-            transaction.getCreatedAt()
+            transaction.getDisplayDescription(),
+            transaction.getCreatedAt(),
+            transaction.getTxHash()
         );
     }
 }

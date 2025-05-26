@@ -4,6 +4,8 @@ import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.store.entity.Store;
+import com.example.Tokkit_server.store.repository.StoreRepository;
 import com.example.Tokkit_server.transaction.entity.Transaction;
 import com.example.Tokkit_server.transaction.enums.TransactionStatus;
 import com.example.Tokkit_server.transaction.enums.TransactionType;
@@ -38,6 +40,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -52,12 +55,13 @@ public class WalletCommandService {
     private final PasswordEncoder passwordEncoder;
     private final TransactionLogService transactionLogService;
     private final TokkitTokenService tokkitTokenService;
+    private final StoreRepository storeRepository;
 
     /**
      * txHash 없는 기본형
      */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-        TransactionType type, TransactionStatus status, Long amount, String description) {
+        TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
         transactionLogService.logAndSave(
             Transaction.builder()
                 .wallet(wallet)
@@ -65,6 +69,7 @@ public class WalletCommandService {
                 .status(status)
                 .amount(amount)
                 .description(description)
+                .displayDescription(displayDescription)
                 .traceId(MDC.get("traceId"))
                 .build(),
             userId,
@@ -76,7 +81,7 @@ public class WalletCommandService {
      * txHash 있는 확장형
      */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-        TransactionType type, TransactionStatus status, Long amount, String description, String txHash) {
+        TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription, String txHash) {
         transactionLogService.logAndSave(
             Transaction.builder()
                 .wallet(wallet)
@@ -85,6 +90,7 @@ public class WalletCommandService {
                 .amount(amount)
                 .txHash(txHash)
                 .description(description)
+                .displayDescription(displayDescription)
                 .traceId(MDC.get("traceId"))
                 .build(),
             userId,
@@ -185,7 +191,7 @@ public class WalletCommandService {
                 t.getId(),
                 t.getType(),
                 t.getAmount(),
-                t.getDescription(),
+                t.getDisplayDescription(),
                 t.getCreatedAt()
             )).toList();
     }
@@ -243,8 +249,14 @@ public class WalletCommandService {
 
         VoucherOwnership savedOwnership = voucherOwnershipRepository.save(ownership);
 
+        // Description 생성
+        String logDescription = "바우처 구매 - Voucher ID: " + voucher.getId() + ", 금액: " + amount + "원";
+        String displayDescription = voucher.getName();
+
         logAndSave(wallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-            (long) amount, "바우처 구매 - Voucher ID: " + voucher.getId() + ", 금액: " + amount + "원");
+            (long) amount, logDescription, displayDescription);
+
+
         // 11. 응답 반환
         return VoucherPurchaseResponse.builder()
             .ownershipId(savedOwnership.getId())
@@ -307,9 +319,16 @@ public class WalletCommandService {
         //  8. 잔액 차감
         ownership.useAmount(request.getAmount());
 
+        // User Description 생성
+        String userLogDescription = "QR 바우처 결제 - Merchant ID: " + request.getMerchantId();
+        Store store = storeRepository.findById(request.getStoreId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
+
+        String userDisplayDescription = store.getStoreName();
+
         //  9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-            request.getAmount(), "QR 바우처 결제 - Merchant ID: " + request.getMerchantId());
+            request.getAmount(), userLogDescription, userDisplayDescription);
 
         //  10. 가맹점주 Wallet 정산
         Wallet merchantWallet = walletRepository.findByMerchant_Id(request.getMerchantId()).orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
@@ -332,10 +351,13 @@ public class WalletCommandService {
         }
         String txHash = receipt.getTransactionHash();
 
+        // Merchant Description 생성
+        String merchantLogDescription = "바우처 정산 수령 - User ID: " + user.getId();
+        String merchantDisplayDescription = user.getName();
 
         //  11. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-            request.getAmount(), "바우처 정산 수령 - User ID: " + user.getId(), txHash);
+            request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
 
 
         //  12. 응답 반환
@@ -409,15 +431,28 @@ public class WalletCommandService {
             merchantWallet.getTokenBalance() + request.getAmount()
         );
 
+        // User Description 생성
+        String userLogDescription = "토큰 직접 결제 - Merchant ID: " + merchant.getId();
+
+        Merchant toMerchant = merchantRepository.findById(request.getMerchantId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+
+        Store store = storeRepository.findByMerchantId(toMerchant.getId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
+
+        String userDisplayDescription = store.getStoreName();
 
         // 8. 유저 거래 내역 저장
         logAndSave(userWallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-            request.getAmount(), "토큰 직접 결제 - Merchant ID: " + merchant.getId(), txHash);
+            request.getAmount(), userLogDescription, userDisplayDescription, txHash);
 
+        // Merchant Description 생성
+        String merchantLogDescription = "토큰 직접 결제 수령 - User ID: " + user.getId();
+        String merchantDisplayDescription = user.getName();
 
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-            request.getAmount(), "토큰 직접 결제 정산 수령 - From User ID: " + user.getId(), txHash);
+            request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()

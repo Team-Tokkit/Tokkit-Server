@@ -7,6 +7,7 @@ import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentReq
 import com.example.Tokkit_server.wallet.dto.request.*;
 import com.example.Tokkit_server.wallet.dto.response.*;
 import com.example.Tokkit_server.wallet.service.command.WalletCommandService;
+import com.example.Tokkit_server.wallet.service.query.BlockchainQueryService;
 import com.example.Tokkit_server.wallet.service.query.WalletQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,7 @@ import java.util.List;
 public class WalletController {
     private final WalletQueryService queryService;
     private final WalletCommandService commandService;
+    private final BlockchainQueryService blockchainQueryService;
     private final IdempotencyManager idempotencyManager;
 
     // Controller 변경
@@ -68,6 +70,11 @@ public class WalletController {
         return ApiResponse.onSuccess(queryService.getTransactionDetail(id));
     }
 
+    @GetMapping("/tx/{txHash}")
+    @Operation(summary = "txHash 상세 조회", description = "특정 거래에 대해 블록체인 상세 정보를 조회합니다.")
+    public ApiResponse<TxDetailResponse> getTxDetail(@PathVariable String txHash) {
+        return ApiResponse.onSuccess(blockchainQueryService.getTxHashDetail(txHash));
+    }
 
     @PostMapping("/voucher/purchase")
     @Operation(summary = "바우처 구매", description = "토큰으로 바우처를 구매합니다.")
