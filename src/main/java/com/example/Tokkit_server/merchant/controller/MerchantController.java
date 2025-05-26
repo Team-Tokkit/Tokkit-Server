@@ -6,6 +6,7 @@ import com.example.Tokkit_server.merchant.auth.CustomMerchantDetails;
 import com.example.Tokkit_server.merchant.dto.request.*;
 import com.example.Tokkit_server.merchant.dto.response.MerchantRegisterResponseDto;
 import com.example.Tokkit_server.merchant.dto.response.MerchantResponseDto;
+import com.example.Tokkit_server.merchant.dto.response.MerchantRoleResponseDto;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.merchant.service.MerchantEmailService;
@@ -33,6 +34,12 @@ public class MerchantController {
     private final MerchantService merchantService;
     private final MerchantEmailService merchantEmailService;
     private final MerchantRepository merchantRepository;
+
+    @GetMapping("/roles")
+    @Operation(summary = "역할 조회 요청", description = "로그인 된 가맹점주의 역할을 조회합니다.(페이지 접근 권한 설정용)")
+    public ApiResponse<MerchantRoleResponseDto> getMerchantRoles(@AuthenticationPrincipal CustomMerchantDetails merchantDetails) {
+        return ApiResponse.onSuccess(MerchantRoleResponseDto.of(merchantDetails));
+    }
 
     @PostMapping("/register")
     @Operation(summary = "회원가입 요청", description = "회원가입 요청을 처리합니다.")
@@ -130,16 +137,26 @@ public class MerchantController {
     @PostMapping("/logout")
     @Operation(summary = "가맹점 로그아웃", description = "JWT 환경에서 refreshToken 쿠키를 만료시킵니다.")
     public ApiResponse<?> logout(HttpServletResponse response) {
-        ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
+        // accessToken도 삭제해야 하는 이유
+        ResponseCookie deleteAccessToken = ResponseCookie.from("accessToken", "")
                 .path("/")
                 .httpOnly(true)
-                .secure(true)
-                .sameSite("None") // 프론트와 도메인이 다르면 꼭 필요
+                .secure(false) // 운영 시 true
+                .sameSite("Lax") // 운영 시 None
                 .maxAge(0)
                 .build();
 
-        response.setHeader("Set-Cookie", deleteCookie.toString());
+        ResponseCookie deleteRefreshToken = ResponseCookie.from("refreshToken", "")
+                .path("/")
+                .httpOnly(true)
+                .secure(false)
+                .sameSite("Lax")
+                .maxAge(0)
+                .build();
+
+        response.addHeader("Set-Cookie", deleteAccessToken.toString());
+        response.addHeader("Set-Cookie", deleteRefreshToken.toString());
+
         return ApiResponse.onSuccess("로그아웃 완료");
     }
-
 }
