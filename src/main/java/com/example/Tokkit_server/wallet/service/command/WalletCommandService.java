@@ -33,8 +33,6 @@ import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.web3j.crypto.ECKeyPair;
-import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
@@ -406,6 +404,7 @@ public class WalletCommandService {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
 
+        // 스마트 컨트랙트 적용
         TransactionReceipt receipt;
         try {
 
@@ -464,7 +463,9 @@ public class WalletCommandService {
             .build();
     }
 
-
+    /**
+     * 결제 수단 조회 API
+     */
     public List<PaymentOptionResponse> getPaymentOptions(Long userId, Long storeId) {
         List<PaymentOptionResponse> result = new ArrayList<>();
 

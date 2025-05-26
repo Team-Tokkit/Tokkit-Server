@@ -1,5 +1,6 @@
 package com.example.contract.service;
 
+import com.example.contract.storage.ContractAddressStorage;
 import com.example.contract.token.TokkitToken;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +21,23 @@ public class TokkitTokenService {
     private final Web3j web3j;
     private final Credentials credentials;
     private final ContractGasProvider gasProvider;
-    private final String tokkitTokenAddress;
+    private final ContractAddressStorage contractAddressStorage;
+
+    private TokkitToken contract;
 
     /**
      * 스마트 컨트랙트 로드
      */
     public TokkitToken loadContract() {
-        log.info("스마트 컨트랙트 주소: {}", tokkitTokenAddress);
-        return TokkitToken.load(tokkitTokenAddress, web3j, credentials, gasProvider);
+        if (contract == null) {
+            String address = contractAddressStorage.getTokkitTokenAddress();
+            if (address == null || address.isEmpty()) {
+                throw new IllegalStateException("❌ 컨트랙트 주소가 아직 설정되지 않았습니다.");
+            }
+            log.info("✅ 스마트 컨트랙트 주소: {}", address);
+            this.contract = TokkitToken.load(address, web3j, credentials, gasProvider);
+        }
+        return contract;
     }
 
     /**
