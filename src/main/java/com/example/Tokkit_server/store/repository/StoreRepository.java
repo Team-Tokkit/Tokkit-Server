@@ -52,4 +52,6 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
 
 
     Optional<Store> findByIdAndMerchantId(Long storeId, Long merchantId);
+
+    Optional<Store> findByMerchantId(Long merchantId);
 }
