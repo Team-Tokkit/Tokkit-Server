@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class NoticeQueryService {
     private final NoticeRepository noticeRepository;
-    private final int SIZE = 5;
+    private final int SIZE = 7;
 
     // 공지사항 목록(전체) 조회
     public Page<NoticeResponseDto> getNotices(int page) {
