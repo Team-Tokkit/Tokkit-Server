@@ -35,7 +35,7 @@ public class CustomUserDetails implements UserDetails {
                 authorities.add(new SimpleGrantedAuthority(role.trim()));
             }
         } else {
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            authorities.add(new SimpleGrantedAuthority("USER"));
         }
         return authorities;
     }

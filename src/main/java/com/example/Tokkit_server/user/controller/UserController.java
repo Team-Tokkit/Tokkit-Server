@@ -5,7 +5,6 @@ import com.example.Tokkit_server.global.apiPayload.code.status.SuccessStatus;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.*;
 import com.example.Tokkit_server.user.dto.response.UserResponseDto;
-import com.example.Tokkit_server.user.dto.response.UserRoleResponseDto;
 import com.example.Tokkit_server.user.service.EmailService;
 import com.example.Tokkit_server.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -28,11 +27,6 @@ public class UserController {
 
     private final UserService userService;
     private final EmailService emailService;
-
-    @GetMapping("/roles")
-    public ApiResponse<UserRoleResponseDto> getUserRoles(@AuthenticationPrincipal CustomUserDetails userDetails) {
-        return ApiResponse.onSuccess(UserRoleResponseDto.of(userDetails));
-    }
 
     @PostMapping("/register")
     @Operation(summary = "회원가입 요청", description = "회원가입 요청을 처리합니다.")
@@ -118,8 +112,8 @@ public class UserController {
         ResponseCookie deleteCookie = ResponseCookie.from("refreshToken", "")
                 .path("/")
                 .httpOnly(true)
-                .secure(false)           // 여기 false로 바꾸기 -> 배포시 변경 필요
-                .sameSite("Lax")         // 로컬에서는 Lax로
+                .secure(true)
+                .sameSite("None") // 프론트가 다른 도메인이면 필요
                 .maxAge(0)
                 .build();
 

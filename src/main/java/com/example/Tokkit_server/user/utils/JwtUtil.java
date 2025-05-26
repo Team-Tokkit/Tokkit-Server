@@ -6,13 +6,13 @@ import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.JwtDto;
 import com.example.Tokkit_server.user.entity.Token;
 import com.example.Tokkit_server.user.repository.TokenRepository;
-import com.nimbusds.jose.EncryptionMethod;
-import com.nimbusds.jose.JWEAlgorithm;
-import com.nimbusds.jose.JWEHeader;
-import com.nimbusds.jose.crypto.DirectDecrypter;
-import com.nimbusds.jose.crypto.DirectEncrypter;
-import com.nimbusds.jwt.EncryptedJWT;
-import com.nimbusds.jwt.JWTClaimsSet;
+
+
+
+
+
+
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -30,8 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 import java.time.Instant;
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+
+
 import java.util.stream.Collectors;
 
 
@@ -39,52 +39,46 @@ import java.util.stream.Collectors;
 @Component
 public class JwtUtil {
 
-    private final SecretKey jwsSecretKey;
-    private final byte[] jweSecretKey;
+    private final SecretKey secretKey;
+
     private final Long accessExpMs;
     private final Long refreshExpMs;
     private final TokenRepository tokenRepository;
 
     public JwtUtil(
-            @Value("${spring.jwt.secret}") String jwsSecret,
-            @Value(("${spring.jwt.jwe.secret}")) String jweSecret,
+            @Value("${spring.jwt.secret}") String secret,
             @Value("${spring.jwt.token.access-expiration-time}") Long access,
             @Value("${spring.jwt.token.refresh-expiration-time}") Long refresh,
             TokenRepository tokenRepo
     ) {
 
-        this.jwsSecretKey = new SecretKeySpec(jwsSecret.getBytes(StandardCharsets.UTF_8),
+        secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
                 Jwts.SIG.HS256.key().build().getAlgorithm());
-        this.jweSecretKey = jweSecret.getBytes(StandardCharsets.UTF_8);
+
         accessExpMs = access;
         refreshExpMs = refresh;
         tokenRepository = tokenRepo;
+
     }
 
     // JWT 토큰을 입력으로 받아 토큰의 subject 로부터 사용자 Email 추출하는 메서드
     public String getEmail(String token) throws SignatureException {
         return Jwts.parser()
-                .verifyWith(jwsSecretKey)
+                .verifyWith(secretKey)
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
                 .getSubject();
     }
 
-    public String getRoles(String token) {
-        try {
-            // 우선 JWE 방식으로 복호화 시도
-            Claims claims = parseToken(token);  // JWE 해석용 함수
-            return claims.get("role", String.class);
-        } catch (Exception e) {
-            // JWS 토큰이 들어왔을 경우 (예외적으로만 허용)
-            return Jwts.parser()
-                    .verifyWith(jwsSecretKey)
-                    .build()
-                    .parseSignedClaims(token)
-                    .getPayload()
-                    .get("role", String.class);
-        }
+    // JWT 토큰을 입력으로 받아 토큰의 claim 에서 사용자 권한을 추출하는 메서드
+    public String getRoles(String token) throws SignatureException{
+        return Jwts.parser()
+                .verifyWith(secretKey)
+                .build()
+                .parseSignedClaims(token)
+                .getPayload()
+                .get("role", String.class);
     }
 
     // Token 발급하는 메서드
@@ -107,7 +101,7 @@ public class JwtUtil {
                 .claim("role", authorities) //권한 추가
                 .issuedAt(Date.from(issuedAt)) // 현재 시간 추가
                 .expiration(Date.from(expiration)) //만료 시간 추가
-                .signWith(jwsSecretKey) //signature 추가
+                .signWith(secretKey) //signature 추가
                 .compact(); //합치기
     }
 
@@ -124,22 +118,16 @@ public class JwtUtil {
                 .claim("role", authorities)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(expiration))
-                .signWith(jwsSecretKey)
+                .signWith(secretKey)
                 .compact();
 
     }
 
 
+    // principalDetails 객체에 대해 새로운 JWT 액세스 토큰을 생성
     public String createJwtAccessToken(CustomUserDetails customUserDetails) {
-        String authorities = customUserDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-        return generateEncryptedAccessToken(
-                customUserDetails.getId(),
-                customUserDetails.getUsername(),
-                authorities,
-                accessExpMs
-        );
+        Instant expiration = Instant.now().plusMillis(accessExpMs);
+        return tokenProvider(customUserDetails, expiration);
     }
 
     // principalDetails 객체에 대해 새로운 JWT 리프레시 토큰을 생성
@@ -154,20 +142,11 @@ public class JwtUtil {
                 .build()
         );
 
-
         return refreshToken;
     }
 
     public String createJwtAccessToken(CustomMerchantDetails merchantDetails) {
-        String authorities = merchantDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .collect(Collectors.joining(","));
-        return generateEncryptedAccessToken(
-                merchantDetails.getId(),
-                merchantDetails.getBusinessNumber(),
-                authorities,
-                accessExpMs
-        );
+        return tokenProvider(merchantDetails, Instant.now().plusMillis(accessExpMs));
     }
 
     public String createJwtRefreshToken(CustomMerchantDetails merchantDetails) {
@@ -179,47 +158,19 @@ public class JwtUtil {
         return refresh;
     }
 
-    private String generateEncryptedAccessToken(Long id, String subject, String role, Long expirationMillis) {
-        try {
-            JWTClaimsSet claims = new JWTClaimsSet.Builder()
-                    .subject(subject)
-                    .claim("id", id)
-                    .claim("role", role)
-                    .issueTime(new Date())
-                    .expirationTime(new Date(System.currentTimeMillis() + expirationMillis))
-                    .build();
-
-            JWEHeader header = new JWEHeader(JWEAlgorithm.DIR, EncryptionMethod.A128GCM);
-            EncryptedJWT jwt = new EncryptedJWT(header, claims);
-            jwt.encrypt(new DirectEncrypter(jweSecretKey));
-
-            return jwt.serialize();
-        } catch (Exception e) {
-            throw new RuntimeException("JWE Access Token 생성 실패", e);
-        }
-    }
-
-
-    // 기존 JWS -> JWE 복호화 방식으로 변경
     public Claims parseToken(String token) {
         try {
-            EncryptedJWT jwt = EncryptedJWT.parse(token);
-            jwt.decrypt(new DirectDecrypter(jweSecretKey));
-            JWTClaimsSet jwtClaims = jwt.getJWTClaimsSet();
-
-            Map<String, Object> claimsMap = new HashMap<>();
-            claimsMap.put("sub", jwtClaims.getSubject());
-            claimsMap.put("id", jwtClaims.getLongClaim("id"));
-            claimsMap.put("role", jwtClaims.getStringClaim("role"));
-
-            return Jwts.claims(claimsMap);  // 이렇게 하면 Claims로 변환 가능
-
+            return Jwts.parser()
+                    .verifyWith(secretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload();
         } catch (ExpiredJwtException e) {
-            log.warn("[ JwtUtil ] 만료된 JWE 토큰입니다. {}", e.getMessage());
-            throw new ExpiredJwtException(null, null, "만료된 JWE 토큰입니다.");
-        } catch (Exception e) {
-            log.error("[ JwtUtil ] 잘못된 JWE 토큰입니다. {}", e.getMessage());
-            throw new SecurityException("잘못된 JWE 토큰입니다.", e);
+            log.warn("[ JwtUtil ] 만료된 토큰입니다. {}", e.getMessage());
+            throw new ExpiredJwtException(null, null, "만료된 JWT 토큰입니다.");
+        } catch (SecurityException | MalformedJwtException | UnsupportedJwtException | IllegalArgumentException e) {
+            log.error("[ JwtUtil ] 잘못된 토큰입니다. {}", e.getMessage());
+            throw new SecurityException("잘못된 JWT 토큰입니다.");
         }
     }
 
@@ -278,7 +229,7 @@ public class JwtUtil {
             boolean isExpired = Jwts
                     .parser()
                     .clockSkewSeconds(seconds)
-                    .verifyWith(jwsSecretKey)
+                    .verifyWith(secretKey)
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()

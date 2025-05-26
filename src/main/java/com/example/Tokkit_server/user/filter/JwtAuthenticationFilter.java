@@ -51,13 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String email = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-                if (role == null || !role.contains("USER")) {
-                    log.warn("[JwtAuthenticationFilter] USER 토큰이 아닙니다. role = {}", role);
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403 Forbidden
-                    return;
-                }
-
-
                 CustomUserDetails userDetails = new CustomUserDetails(
                         id,
                         name,

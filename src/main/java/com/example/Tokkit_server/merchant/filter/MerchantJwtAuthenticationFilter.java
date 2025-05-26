@@ -50,12 +50,6 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
                 String businessNumber = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-                if (role == null || !role.contains("MERCHANT")) {
-                    log.warn("[MerchantJwtAuthenticationFilter] MERCHANT 토큰이 아닙니다. role = {}", role);
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN); // 403
-                    return;
-                }
-
                 CustomMerchantDetails merchantDetails = new CustomMerchantDetails(
                         id,
                         email,
