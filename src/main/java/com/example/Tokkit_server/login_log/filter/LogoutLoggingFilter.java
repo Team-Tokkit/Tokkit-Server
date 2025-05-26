@@ -52,7 +52,7 @@ public class LogoutLoggingFilter extends OncePerRequestFilter {
                 String role = null;
                 try {
                     role = jwtUtil.getRoles(token);
-                } catch (SignatureException e) {
+                } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
 
