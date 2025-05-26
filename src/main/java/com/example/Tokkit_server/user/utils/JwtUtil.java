@@ -71,14 +71,20 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // JWT 토큰을 입력으로 받아 토큰의 claim 에서 사용자 권한을 추출하는 메서드
-    public String getRoles(String token) throws SignatureException{
-        return Jwts.parser()
-                .verifyWith(jwsSecretKey)
-                .build()
-                .parseSignedClaims(token)
-                .getPayload()
-                .get("role", String.class);
+    public String getRoles(String token) {
+        try {
+            // 우선 JWE 방식으로 복호화 시도
+            Claims claims = parseToken(token);  // JWE 해석용 함수
+            return claims.get("role", String.class);
+        } catch (Exception e) {
+            // JWS 토큰이 들어왔을 경우 (예외적으로만 허용)
+            return Jwts.parser()
+                    .verifyWith(jwsSecretKey)
+                    .build()
+                    .parseSignedClaims(token)
+                    .getPayload()
+                    .get("role", String.class);
+        }
     }
 
     // Token 발급하는 메서드
