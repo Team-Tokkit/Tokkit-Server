@@ -15,4 +15,5 @@ public class TransactionDetailResponse {
     private Long amount;
     private String displayDescription;
     private LocalDateTime createdAt;
+    private String txHash;
 }
