@@ -31,6 +31,8 @@ import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
@@ -76,19 +78,19 @@ public class WalletCommandService {
      * txHash 있는 확장형
      */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-                            TransactionType type, TransactionStatus status, Long amount, String description, String txHash) {
+        TransactionType type, TransactionStatus status, Long amount, String description, String txHash) {
         transactionLogService.logAndSave(
-                Transaction.builder()
-                        .wallet(wallet)
-                        .type(type)
-                        .status(status)
-                        .amount(amount)
-                        .txHash(txHash)
-                        .description(description)
-                        .traceId(MDC.get("traceId"))
-                        .build(),
-                userId,
-                merchantId
+            Transaction.builder()
+                .wallet(wallet)
+                .type(type)
+                .status(status)
+                .amount(amount)
+                .txHash(txHash)
+                .description(description)
+                .traceId(MDC.get("traceId"))
+                .build(),
+            userId,
+            merchantId
         );
     }
 
@@ -98,11 +100,11 @@ public class WalletCommandService {
     public Wallet createInitialWalletForUser(Long userId) {
         if (walletRepository.existsByUserId(userId)) {
             return walletRepository.findByUserId(userId)
-                    .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
         }
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 스마트컨트랙트 지갑 주소 생성
         try {
@@ -128,11 +130,11 @@ public class WalletCommandService {
     public Wallet createInitialWalletForMerchant(Long merchantId) {
         if (walletRepository.existsByMerchantId(merchantId)) {
             return walletRepository.findByMerchantId(merchantId)
-                    .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
         }
 
         Merchant merchant = merchantRepository.findById(merchantId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+            .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
         try {
 
@@ -244,7 +246,7 @@ public class WalletCommandService {
         VoucherOwnership savedOwnership = voucherOwnershipRepository.save(ownership);
 
         logAndSave(wallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-                (long) amount, "바우처 구매 - Voucher ID: " + voucher.getId() + ", 금액: " + amount + "원");
+            (long) amount, "바우처 구매 - Voucher ID: " + voucher.getId() + ", 금액: " + amount + "원");
         // 11. 응답 반환
         return VoucherPurchaseResponse.builder()
             .ownershipId(savedOwnership.getId())
@@ -309,7 +311,7 @@ public class WalletCommandService {
 
         //  9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-                request.getAmount(), "QR 바우처 결제 - Merchant ID: " + request.getMerchantId());
+            request.getAmount(), "QR 바우처 결제 - Merchant ID: " + request.getMerchantId());
 
         //  10. 가맹점주 Wallet 정산
         Wallet merchantWallet = walletRepository.findByMerchant_Id(request.getMerchantId()).orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
@@ -335,7 +337,7 @@ public class WalletCommandService {
 
         //  11. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-                request.getAmount(), "바우처 정산 수령 - User ID: " + user.getId(), txHash);
+            request.getAmount(), "바우처 정산 수령 - User ID: " + user.getId(), txHash);
 
 
         //  12. 응답 반환
@@ -411,12 +413,12 @@ public class WalletCommandService {
 
         // 8. 유저 거래 내역 저장
         logAndSave(userWallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-                request.getAmount(), "토큰 직접 결제 - Merchant ID: " + merchant.getId(), txHash);
+            request.getAmount(), "토큰 직접 결제 - Merchant ID: " + merchant.getId(), txHash);
 
 
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-                request.getAmount(), "토큰 직접 결제 정산 수령 - From User ID: " + user.getId(), txHash);
+            request.getAmount(), "토큰 직접 결제 정산 수령 - From User ID: " + user.getId(), txHash);
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()
@@ -446,7 +448,7 @@ public class WalletCommandService {
 
         // 2. 바우처 소유권 조회
         List<VoucherOwnership> ownerships = voucherOwnershipRepository.findAllWithVoucherAndStoresByUserId(userId);
-       // 해당 userId가 소유한 지갑에 연결된 모든 바우처 소유권(VoucherOwnership)을 가져와라
+        // 해당 userId가 소유한 지갑에 연결된 모든 바우처 소유권(VoucherOwnership)을 가져와라
 
         for (VoucherOwnership o : ownerships) {
             Voucher v = o.getVoucher();

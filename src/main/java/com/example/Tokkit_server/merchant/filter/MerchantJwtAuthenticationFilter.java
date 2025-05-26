@@ -46,8 +46,8 @@ public class MerchantJwtAuthenticationFilter extends OncePerRequestFilter {
             try {
                 Claims claims = jwtUtil.parseToken(token);
                 Long id = claims.get("id", Long.class);
-                String businessNumber = claims.getSubject();
                 String email = claims.get("email", String.class);
+                String businessNumber = claims.getSubject();
                 String role = claims.get("role", String.class);
 
                 CustomMerchantDetails merchantDetails = new CustomMerchantDetails(

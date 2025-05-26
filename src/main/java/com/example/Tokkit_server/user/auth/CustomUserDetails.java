@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.user.auth;
 
 import com.example.Tokkit_server.user.entity.User;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,6 +10,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+@Getter
 public class CustomUserDetails implements UserDetails {
 
     private final Long id;
@@ -33,7 +35,7 @@ public class CustomUserDetails implements UserDetails {
                 authorities.add(new SimpleGrantedAuthority(role.trim()));
             }
         } else {
-            authorities.add(new SimpleGrantedAuthority("ROLE_USER"));
+            authorities.add(new SimpleGrantedAuthority("USER"));
         }
         return authorities;
     }

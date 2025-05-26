@@ -6,6 +6,13 @@ import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.user.dto.request.JwtDto;
 import com.example.Tokkit_server.user.entity.Token;
 import com.example.Tokkit_server.user.repository.TokenRepository;
+
+
+
+
+
+
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.Jwts;
@@ -23,6 +30,8 @@ import java.nio.charset.StandardCharsets;
 import java.security.SignatureException;
 import java.time.Instant;
 import java.util.Date;
+
+
 import java.util.stream.Collectors;
 
 
@@ -31,6 +40,7 @@ import java.util.stream.Collectors;
 public class JwtUtil {
 
     private final SecretKey secretKey;
+
     private final Long accessExpMs;
     private final Long refreshExpMs;
     private final TokenRepository tokenRepository;
@@ -44,9 +54,11 @@ public class JwtUtil {
 
         secretKey = new SecretKeySpec(secret.getBytes(StandardCharsets.UTF_8),
                 Jwts.SIG.HS256.key().build().getAlgorithm());
+
         accessExpMs = access;
         refreshExpMs = refresh;
         tokenRepository = tokenRepo;
+
     }
 
     // JWT 토큰을 입력으로 받아 토큰의 subject 로부터 사용자 Email 추출하는 메서드
@@ -102,6 +114,7 @@ public class JwtUtil {
                 .header().add("typ", "JWT").and()
                 .subject(merchantDetails.getBusinessNumber())
                 .claim("id", merchantDetails.getId())
+                .claim("email", merchantDetails.getUsername())
                 .claim("role", authorities)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(Date.from(expiration))
@@ -129,7 +142,6 @@ public class JwtUtil {
                 .build()
         );
 
-
         return refreshToken;
     }
 
@@ -145,7 +157,6 @@ public class JwtUtil {
                 .build());
         return refresh;
     }
-
 
     public Claims parseToken(String token) {
         try {

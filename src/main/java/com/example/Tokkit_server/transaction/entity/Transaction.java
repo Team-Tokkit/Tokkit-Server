@@ -28,6 +28,9 @@ public class Transaction extends BaseTimeEntity {
     @Column(nullable = false)
     private String description;
 
+    @Column(name = "display_description")
+    private String displayDescription;
+
     @Enumerated(EnumType.STRING)
     private TransactionStatus status;
 
@@ -42,4 +45,5 @@ public class Transaction extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     private TransactionType type;
+
 }

@@ -51,7 +51,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 String email = claims.getSubject();
                 String role = claims.get("role", String.class);
 
-
                 CustomUserDetails userDetails = new CustomUserDetails(
                         id,
                         name,

@@ -58,4 +58,8 @@ public class VoucherOwnership extends BaseTimeEntity {
     public void delete() {
         this.status = VoucherOwnershipStatus.DELETED;
     }
+
+    public void expire() {
+        this.status = VoucherOwnershipStatus.EXPIRED;
+    }
 }
