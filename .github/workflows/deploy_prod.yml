@@ -1,0 +1,61 @@
+name:  ECR Push + CodeDeploy Trigger
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Generate application.yml from secret
+        run: |
+          mkdir -p src/main/resources
+          echo "${{ secrets.PROD_YML }}" > src/main/resources/application.yml
+
+      - name: Set up JDK
+        uses: actions/setup-java@v3
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Grant execute permission for gradlew
+        run: chmod +x ./gradlew
+
+      - name: Build Spring Boot JAR
+        run: ./gradlew clean build -x test
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          role-to-assume: arn:aws:iam::233777023703:role/tokkit-github-actions-ecr-role
+          aws-region: ap-northeast-2
+
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password --region ap-northeast-2 \
+          | docker login --username AWS --password-stdin 233777023703.dkr.ecr.ap-northeast-2.amazonaws.com
+
+      - name: Build & Push Docker Image to ECR
+        run: |
+          IMAGE_URI=233777023703.dkr.ecr.ap-northeast-2.amazonaws.com/tokkit-server
+          docker build -t $IMAGE_URI .
+          docker push $IMAGE_URI
+
+      - name: Trigger AWS CodeDeploy
+        run: |
+          aws deploy create-deployment \
+            --application-name tokkit-server \
+            --deployment-group-name tokkit-server-bluegreen \
+            --s3-location bucket=tokkit-codedeploy-bucket,key=deployments/app-server.zip,bundleType=zip \
+            --region ap-northeast-2
+      
