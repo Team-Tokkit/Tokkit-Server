@@ -24,6 +24,8 @@ repositories {
 }
 
 dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-logging'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
@@ -32,12 +34,54 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
-	// Swagger
-	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+	// JTS Point (공간 타입)을 JPA에서 인식하게 끔
+	implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
+	implementation 'org.locationtech.jts:jts-core:1.19.0' // JTS geometry
 
 	// Spring doc
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
+
+	// json
+	implementation 'org.json:json:20230227'
+
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+
+	// jwt
+	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
+	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
+
+	//validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// email
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+
+	// ocr
+	implementation 'commons-codec:commons-codec:1.15'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
+
+	// AWS S3
+	implementation "software.amazon.awssdk:s3:2.13.0"
+
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+
+	// Jackson
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	// Web3j (스마트컨트랙트 통신용)
+	implementation 'org.web3j:core:4.10.3'
+	implementation 'org.web3j:codegen:4.10.3'
 }
 
 tasks.named('test') {

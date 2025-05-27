@@ -1,0 +1,89 @@
+package com.example.Tokkit_server.voucher_ownership.repository;
+
+import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherOwnershipSearchRequest;
+import com.example.Tokkit_server.voucher_ownership.entity.VoucherOwnership;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.TypedQuery;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
+import org.springframework.util.StringUtils;
+
+import java.util.List;
+import java.util.Optional;
+
+@Repository
+public class VoucherOwnershipRepositoryImpl implements VoucherOwnershipRepositoryCustom {
+
+    @PersistenceContext
+    private EntityManager em;
+
+    @Override
+    public Page<VoucherOwnership> searchMyVoucher(VoucherOwnershipSearchRequest request, Long userId, Pageable pageable) {
+        StringBuilder jpql = new StringBuilder("SELECT vo FROM VoucherOwnership vo JOIN FETCH vo.voucher v WHERE vo.wallet.user.id = :userId");
+
+        jpql.append(" AND vo.status != 'DELETED'");
+
+        if (request.getStoreCategory() != null && !"ALL".equalsIgnoreCase(request.getStoreCategory().name())) {
+            jpql.append(" AND v.category.name = :category");
+        }
+
+        if (StringUtils.hasText(request.getSearchKeyword()) && !"ALL".equalsIgnoreCase(request.getSearchKeyword())) {
+            jpql.append(" AND LOWER(v.name) LIKE LOWER(CONCAT('%', :keyword, '%'))");
+        }
+
+        String sort = Optional.ofNullable(request.getSort()).orElse("recent");
+
+        switch (sort) {
+            case "amount":
+                jpql.append(" ORDER BY vo.remainingAmount DESC");
+                break;
+            case "expiry":
+                jpql.append(" ORDER BY v.validDate ASC");
+                break;
+            case "recent":
+            default:
+                jpql.append(" ORDER BY vo.createdAt DESC");
+                break;
+        }
+
+        TypedQuery<VoucherOwnership> query = em.createQuery(jpql.toString(), VoucherOwnership.class);
+//        query.setParameter("userId", request.getUserId());
+        query.setParameter("userId", userId);
+        if (request.getStoreCategory() != null && !"ALL".equalsIgnoreCase(request.getStoreCategory().name())) {
+            query.setParameter("category", request.getStoreCategory().name());
+        }
+
+        if (StringUtils.hasText(request.getSearchKeyword()) && !"ALL".equalsIgnoreCase(request.getSearchKeyword())) {
+            query.setParameter("keyword", request.getSearchKeyword());
+        }
+
+        int total = query.getResultList().size();
+
+        List<VoucherOwnership> result = query.setFirstResult((int) pageable.getOffset())
+                .setMaxResults(pageable.getPageSize())
+                .getResultList();
+
+        return new PageImpl<>(result, pageable, total);
+    }
+
+    @Override
+    public List<VoucherOwnership> findAllWithVoucherAndStoresByUserId(Long userId) {
+        return em.createQuery("""
+            SELECT vo FROM VoucherOwnership vo
+            JOIN FETCH vo.voucher v
+            LEFT JOIN FETCH v.voucherStores vs
+            LEFT JOIN FETCH vs.store s
+            JOIN vo.wallet w
+            JOIN w.user u
+            WHERE u.id = :userId
+        """, VoucherOwnership.class)
+                .setParameter("userId", userId)
+                .getResultList();
+    }
+
+}
+
+

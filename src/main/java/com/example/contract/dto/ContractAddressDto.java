@@ -1,0 +1,20 @@
+package com.example.contract.dto;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class ContractAddressDto {
+
+    @JsonProperty("TokkitToken")
+    private String TokkitToken;
+
+    private String network; // ex: "localhost" or "main net"
+}

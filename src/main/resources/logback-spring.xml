@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="30 seconds">
+
+    <!-- Spring Boot 컬러/예외 변환기 등록 -->
+    <conversionRule conversionWord="clr" converterClass="org.springframework.boot.logging.logback.ColorConverter"/>
+    <conversionRule conversionWord="wex" converterClass="org.springframework.boot.logging.logback.WhitespaceThrowableProxyConverter"/>
+    <conversionRule conversionWord="wEx" converterClass="org.springframework.boot.logging.logback.ExtendedWhitespaceThrowableProxyConverter"/>
+
+    <!-- 콘솔 로그 패턴 -->
+    <property name="CONSOLE_LOG_PATTERN"
+              value="%clr([%d{yyyy-MM-dd HH:mm:ss.SSS}]){faint} %clr([%X{traceId}]){cyan} %clr([%thread]){magenta} %clr(%-5level){yellow} %clr(%logger{36}){blue} - %msg%n%wex"/>
+
+    <!-- 콘솔 출력 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_LOG_PATTERN}</pattern>
+            <charset>UTF-8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 루트 로거에 콘솔만 연결 -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+</configuration>
