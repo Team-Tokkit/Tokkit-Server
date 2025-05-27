@@ -1,4 +1,4 @@
-name:  ECR Push + CodeDeploy Trigger
+name: ECR Push + CodeDeploy Trigger
 
 on:
   push:
@@ -58,4 +58,3 @@ jobs:
             --deployment-group-name tokkit-server-bluegreen \
             --s3-location bucket=tokkit-codedeploy-bucket,key=deployments/app-server.zip,bundleType=zip \
             --region ap-northeast-2
-      
