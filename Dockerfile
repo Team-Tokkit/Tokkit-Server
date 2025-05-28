@@ -1,12 +1,8 @@
-# Build Stage
-FROM gradle:8.5-jdk17 AS build
-WORKDIR /app
-COPY . .
-RUN gradle build -x test
+FROM openjdk:17
 
-# Run Stage
-FROM openjdk:17-jdk-slim
 WORKDIR /app
-COPY --from=build /app/build/libs/*.jar app.jar
-EXPOSE 8080
+
+ARG JAR_FILE=build/libs/*.jar
+COPY ${JAR_FILE} app.jar
+
 ENTRYPOINT ["java", "-jar", "app.jar"]
