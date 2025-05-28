@@ -11,9 +11,8 @@ public enum NotificationTemplate {
     // PAYMENT 알림
     PAYMENT_SUCCESS(NotificationCategory.PAYMENT, "결제 완료", "%d원이 결제되었습니다."),
     PAYMENT_REFUND(NotificationCategory.PAYMENT, "환불 완료", "%d원이 환불되었습니다."),
-
-    // VOUCHER 알림
-    VOUCHER_EXPIRED(NotificationCategory.VOUCHER, "바우처 만료", "[%s] 바우처가 만료되었습니다."),
+    VOUCHER_PURCHASED(NotificationCategory.PAYMENT, "바우처 구매 완료", "[%s] 바우처를 %d원에 구매하였습니다."),
+    VOUCHER_EXPIRED(NotificationCategory.PAYMENT, "바우처 만료", "[%s] 바우처가 만료되었습니다."),
 
     // TOKEN 알림
     TOKEN_CONVERTED(NotificationCategory.TOKEN, "토큰 전환 완료", "토큰이 성공적으로 전환되었습니다.");

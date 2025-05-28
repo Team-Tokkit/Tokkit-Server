@@ -111,6 +111,15 @@ public class WalletQueryService {
         }
         String txHash = receipt.getTransactionHash();
 
+        try {
+            BigInteger onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
+            if (!onChainBalance.equals(BigInteger.valueOf(wallet.getTokenBalance()))) {
+                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
+            }
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
+        }
+
         logAndSave(wallet, user.getId(), null,
             TransactionType.CONVERT,
             TransactionStatus.SUCCESS,
@@ -143,20 +152,30 @@ public class WalletQueryService {
         }
 
 
-        // 스마트컨트랙트에 burn 요청
-        String txHash;
+        // 스마트컨트랙트 burn
+        TransactionReceipt receipt;
         try {
-            TransactionReceipt receipt = tokkitTokenService.burn(wallet.getWalletAddress(), BigInteger.valueOf(request.getAmount()));
-            txHash = receipt.getTransactionHash();
+            receipt = tokkitTokenService.burn(wallet.getWalletAddress(), BigInteger.valueOf(request.getAmount()));
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.TOKEN_BURN_FAILED);
         }
+
+        String txHash = receipt.getTransactionHash();
 
 
         // 잔액 업데이트
         wallet.updateBalance(wallet.getDepositBalance() + request.getAmount(),
             wallet.getTokenBalance() - request.getAmount());
 
+
+        try {
+            BigInteger onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
+            if (!onChainBalance.equals(BigInteger.valueOf(wallet.getTokenBalance()))) {
+                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
+            }
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
+        }
 
 
         logAndSave(wallet, user.getId(), null,
