@@ -26,10 +26,7 @@ public class ContractController {
     @Operation(summary = "스마트 컨트랙트 주소 등록", description = "Hardhat에서 배포된 스마트컨트랙트 주소를 전달받아 메모리 및 DB에 저장합니다.")
 
     public ResponseEntity<Void> receiveContractAddress(@RequestBody ContractAddressDto dto) {
-        // 1. 메모리에 저장
-        contractAddressStorage.setTokkitTokenAddress(dto.getTokkitToken());
 
-        // 2. DB에도 저장
         contractAddressService.save("TokkitToken", dto.getTokkitToken(), dto.getNetwork());
 
         System.out.println("📥 Stored contract address: " + dto.getTokkitToken());
