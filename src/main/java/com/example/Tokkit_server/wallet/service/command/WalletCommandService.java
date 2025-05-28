@@ -4,6 +4,8 @@ import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.notification.enums.NotificationTemplate;
+import com.example.Tokkit_server.notification.service.NotificationService;
 import com.example.Tokkit_server.store.entity.Store;
 import com.example.Tokkit_server.store.repository.StoreRepository;
 import com.example.Tokkit_server.transaction.entity.Transaction;
@@ -29,6 +31,7 @@ import com.example.Tokkit_server.wallet.utils.AccountGenerator;
 import com.example.contract.service.TokkitTokenService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +47,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WalletCommandService {
 
     private final WalletRepository walletRepository;

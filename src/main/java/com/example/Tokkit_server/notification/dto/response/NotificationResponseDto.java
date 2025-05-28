@@ -14,6 +14,7 @@ public class NotificationResponseDto {
     private String title;
     private String content;
     private NotificationCategory category;
+    private String deleted;
     private LocalDateTime createdAt;
 
     public static NotificationResponseDto from(Notification notification) {
@@ -22,6 +23,7 @@ public class NotificationResponseDto {
                 .title(notification.getTitle())
                 .content(notification.getContent())
                 .category(notification.getCategory())
+                .deleted(notification.isDeleted() ? "deleted" : "active")
                 .createdAt(notification.getCreatedAt())
                 .build();
     }

@@ -13,6 +13,7 @@ public enum NotificationTemplate {
     PAYMENT_REFUND(NotificationCategory.PAYMENT, "환불 완료", "%d원이 환불되었습니다."),
 
     // VOUCHER 알림
+    VOUCHER_PURCHASED(NotificationCategory.VOUCHER, "바우처 구매 완료", "[%s] 바우처를 %d원에 구매하였습니다."),
     VOUCHER_EXPIRED(NotificationCategory.VOUCHER, "바우처 만료", "[%s] 바우처가 만료되었습니다."),
 
     // TOKEN 알림
