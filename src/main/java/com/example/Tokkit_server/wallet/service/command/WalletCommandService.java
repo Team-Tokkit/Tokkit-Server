@@ -29,6 +29,8 @@ import com.example.Tokkit_server.wallet.utils.AccountGenerator;
 import com.example.contract.service.TokkitTokenService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -44,6 +46,7 @@ import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WalletCommandService {
 
     private final WalletRepository walletRepository;
@@ -235,6 +238,30 @@ public class WalletCommandService {
         // 7. 수량 차감
         voucher.decreaseRemainingCount();
 
+        // 7.1 온체인 잔액 검증
+        try {
+
+            BigInteger onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
+            if (!onChainBalance.equals(BigInteger.valueOf(wallet.getTokenBalance()))) {
+                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
+            }
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
+        }
+
+        // 8. 토큰 소각
+        TransactionReceipt receipt;
+        try {
+            receipt = tokkitTokenService.burn(
+                wallet.getWalletAddress(),
+                BigInteger.valueOf(amount)
+            );
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.TOKEN_BURN_FAILED);
+        }
+
+        String txHash = receipt.getTransactionHash();
+
         // 8. 토큰 차감
         wallet.updateBalance(wallet.getDepositBalance(), wallet.getTokenBalance() - amount);
 
@@ -254,7 +281,7 @@ public class WalletCommandService {
         String displayDescription = voucher.getName();
 
         logAndSave(wallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-            (long) amount, logDescription, displayDescription);
+            (long) amount, logDescription, displayDescription,txHash);
 
 
         // 11. 응답 반환
@@ -326,6 +353,7 @@ public class WalletCommandService {
 
         String userDisplayDescription = store.getStoreName();
 
+
         //  9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
             request.getAmount(), userLogDescription, userDisplayDescription);
@@ -342,10 +370,10 @@ public class WalletCommandService {
         // 스마트 컨트랙트 적용
         TransactionReceipt receipt;
         try{
-            receipt = tokkitTokenService.payToMerchant(
+            receipt = tokkitTokenService.mint(
                 merchantWallet.getWalletAddress(),
-                BigInteger.valueOf(request.getAmount()),
-                "Voucher settlement from User ID : " + user.getId());
+                BigInteger.valueOf(request.getAmount())
+            );
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.TOKEN_TRANSFER_FAILED);
         }
@@ -403,6 +431,18 @@ public class WalletCommandService {
         if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
+
+
+        // 5.1 스마트컨트랙트 이전 상태 검증 (user)
+        try {
+            BigInteger userOnChainBalance = tokkitTokenService.getBalanceOf(userWallet.getWalletAddress());
+            if (!userOnChainBalance.equals(BigInteger.valueOf(userWallet.getTokenBalance()))) {
+                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
+            }
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
+        }
+
 
         // 스마트 컨트랙트 적용
         TransactionReceipt receipt;
