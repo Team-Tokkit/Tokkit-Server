@@ -58,6 +58,7 @@ public class TokkitTokenService {
      * 잔액 조회
      */
     public BigInteger getBalanceOf(String address) throws Exception {
+        log.info("🧾 [getBalanceOf] address to query = {}", address);
         return loadContract().balanceOf(address).send();
     }
 
@@ -81,4 +82,12 @@ public class TokkitTokenService {
     public String getName() throws Exception {
         return loadContract().name().send();
     }
+
+    /**
+     * Credentials 주소 조회
+     */
+    public String getOwnerAddress() {
+        return credentials.getAddress();
+    }
+
 }

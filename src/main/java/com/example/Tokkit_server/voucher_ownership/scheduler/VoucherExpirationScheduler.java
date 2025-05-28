@@ -23,7 +23,7 @@ public class VoucherExpirationScheduler {
         log.info("바우처 유효기간 만료 체크 시작");
 
         List<VoucherOwnership> expiredList =
-                voucherOwnershipRepository.findByStatusAndVoucher_ValidDateBefore(
+                voucherOwnershipRepository.findByStatusAndVoucherValidDateBeforeWithFetchJoin(
                         VoucherOwnershipStatus.AVAILABLE, LocalDateTime.now());
 
         expiredList.forEach(VoucherOwnership::expire);
