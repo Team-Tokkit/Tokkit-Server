@@ -21,8 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -68,15 +72,47 @@ public class NotificationServiceImpl implements NotificationService {
         }
     }
 
-
     @Transactional
     public SseEmitter subscribe(Long userId) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         sseEmitters.add(userId, emitter);
+        log.info("[SSE] 유저 {} 구독 등록됨", userId);
 
-        emitter.onCompletion(() -> sseEmitters.remove(userId));
-        emitter.onTimeout(() -> sseEmitters.remove(userId));
-        emitter.onError((e) -> sseEmitters.remove(userId));
+        try {
+            emitter.send(SseEmitter.event()
+                    .name("connect")
+                    .data("SSE 연결이 완료되었습니다."));
+        } catch (IOException e) {
+            emitter.completeWithError(e);
+            sseEmitters.remove(userId);
+        }
+
+        // 연결 유지용 ping
+        ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+        scheduler.scheduleAtFixedRate(() -> {
+            try {
+                emitter.send(SseEmitter.event()
+                        .name("ping")
+                        .data("keep-alive"));
+            } catch (Exception e) {
+                emitter.complete();
+            }
+        }, 30, 30, TimeUnit.SECONDS);
+
+        emitter.onCompletion(() -> {
+            sseEmitters.remove(userId);
+            scheduler.shutdown();
+        });
+
+        emitter.onTimeout(() -> {
+            sseEmitters.remove(userId);
+            scheduler.shutdown();
+        });
+
+        emitter.onError((e) -> {
+            sseEmitters.remove(userId);
+            scheduler.shutdown();
+        });
 
         return emitter;
     }
