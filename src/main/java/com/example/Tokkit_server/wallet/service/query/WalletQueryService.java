@@ -2,6 +2,8 @@ package com.example.Tokkit_server.wallet.service.query;
 
 import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
+import com.example.Tokkit_server.notification.enums.NotificationTemplate;
+import com.example.Tokkit_server.notification.service.NotificationService;
 import com.example.Tokkit_server.transaction.entity.Transaction;
 import com.example.Tokkit_server.transaction.enums.TransactionStatus;
 import com.example.Tokkit_server.transaction.enums.TransactionType;
@@ -36,12 +38,13 @@ public class WalletQueryService {
     private final PasswordEncoder passwordEncoder;
     private final TransactionLogService transactionLogService;
     private final TokkitTokenService tokkitTokenService;
+    private final NotificationService notificationService;
 
     /**
      * txHash 없는 기본형
      */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-        TransactionType type, TransactionStatus status, Long amount, String description) {
+        TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
         transactionLogService.logAndSave(
             Transaction.builder()
                 .wallet(wallet)
@@ -49,6 +52,7 @@ public class WalletQueryService {
                 .status(status)
                 .amount(amount)
                 .description(description)
+                .displayDescription(displayDescription)
                 .traceId(MDC.get("traceId"))
                 .build(),
             userId,
@@ -60,7 +64,7 @@ public class WalletQueryService {
      * txHash 있는 확장형
      */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-        TransactionType type, TransactionStatus status, Long amount, String description, String txHash) {
+        TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription, String txHash) {
         transactionLogService.logAndSave(
             Transaction.builder()
                 .wallet(wallet)
@@ -69,6 +73,7 @@ public class WalletQueryService {
                 .amount(amount)
                 .txHash(txHash)
                 .description(description)
+                .displayDescription(displayDescription)
                 .traceId(MDC.get("traceId"))
                 .build(),
             userId,
@@ -125,7 +130,15 @@ public class WalletQueryService {
             TransactionStatus.SUCCESS,
             request.getAmount(),
             "예금 ➝ 토큰 변환",
+            "예금 ➝ 토큰",
             txHash);
+
+        // 유저 예금 ➝ 토큰 변환 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.TOKEN_CONVERTED,
+                request.getAmount()
+        );
     }
 
 
@@ -182,7 +195,16 @@ public class WalletQueryService {
             TransactionType.CONVERT,
             TransactionStatus.SUCCESS,
             request.getAmount(),
-            "토큰 ➝ 예금 변환", txHash);
+            "토큰 ➝ 예금 변환",
+                "토큰 ➝ 예금",
+                txHash);
+
+        // 유저 토큰 ➝ 예금 변환 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.DEPOSIT_CONVERTED,
+                request.getAmount()
+        );
     }
 
 
@@ -201,7 +223,7 @@ public class WalletQueryService {
                 t.getId(),
                 t.getType(),
                 t.getAmount(),
-                t.getDescription(),
+                t.getDisplayDescription(),
                 t.getCreatedAt()))
             .toList();
     }
