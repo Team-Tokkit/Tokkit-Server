@@ -60,6 +60,7 @@ public class WalletCommandService {
     private final TransactionLogService transactionLogService;
     private final TokkitTokenService tokkitTokenService;
     private final StoreRepository storeRepository;
+    private final NotificationService notificationService;
 
     /**
      * txHash 없는 기본형
@@ -266,6 +267,13 @@ public class WalletCommandService {
         logAndSave(wallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
             (long) amount, logDescription, displayDescription,txHash);
 
+        // 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.VOUCHER_PURCHASED,
+                voucher.getName(),
+                amount
+        );
 
         // 11. 응답 반환
         return VoucherPurchaseResponse.builder()
@@ -370,6 +378,16 @@ public class WalletCommandService {
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
             request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
 
+        // 유저 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.VOUCHER_PAYMENT_SUCCESS,
+                voucher.getName(),
+                store.getStoreName(),
+                request.getAmount()
+        );
+
+        // TODO: 가맹점주 바우처 정산 알림 생성
 
         //  12. 응답 반환
         return VoucherPaymentResponse.builder()
@@ -465,6 +483,16 @@ public class WalletCommandService {
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
             request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
+
+        // 유저 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.TOKEN_PAYMENT_SUCCESS,
+                store.getStoreName(),
+                request.getAmount()
+        );
+
+        // TODO: 가맹점주 토큰 정산 알림 생성
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()

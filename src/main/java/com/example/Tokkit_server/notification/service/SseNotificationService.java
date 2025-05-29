@@ -18,7 +18,7 @@ public class SseNotificationService {
 
     private final SseEmitters sseEmitters;
 
-    public void sendSse(Long userId, String title, String content) {
+    public boolean sendSse(Long userId, String title, String content) {
         SseEmitter emitter = sseEmitters.get(userId);
         if (emitter != null) {
             try {
@@ -28,12 +28,15 @@ public class SseNotificationService {
                         .name("notification")
                         .data(json, MediaType.APPLICATION_JSON));
                 log.info("[SSE] 유저 {}에게 알림 전송 성공", userId);
+                return true;
             } catch (IOException e) {
                 sseEmitters.remove(userId);
                 log.error("[SSE] 전송 실패 - emitter 제거됨: {}", e.getMessage());
+                return false;
             }
         } else {
             log.warn("[SSE] emitter 없음 → 전송 실패 (userId: {})", userId); // 로그 추가
+            return false;
         }
     }
 }
