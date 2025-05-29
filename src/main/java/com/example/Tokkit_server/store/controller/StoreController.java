@@ -83,7 +83,7 @@ public class StoreController {
     }
 
     @GetMapping("/{storeId}/vouchers")
-    public ApiResponse<VoucherPageResponseDto> getAvailableVouchers(
+    public ApiResponse<VoucherPageResponseDto> getAvailabㄴleVouchers(
         @PathVariable Long storeId,
         @RequestParam Long userId,
         @PageableDefault(size = 5) Pageable pageable
