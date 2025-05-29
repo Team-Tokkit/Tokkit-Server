@@ -20,7 +20,8 @@ public class CorsConfig {
 				"http://localhost:8080",
 				"http://localhost:8800",
 				"https://www.tokkit.site",
-				"https://admin.tokkit.site"
+				"https://admin.tokkit.site",
+				"https://api.tokkit.site"
 		));
 		config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
 		config.setAllowedHeaders(List.of("*"));
