@@ -164,20 +164,13 @@ public class WalletCommandService {
     }
 
     /**
-     * 실시간 스마트컨트랙트 기준 지갑 잔액 조회
+     * 지갑 잔액 조회
      */
     public WalletBalanceResponse getWalletBalance(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
-        BigInteger onChainBalance;
-        try {
-            onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.TOKEN_BALANCE_QUERY_FAILED);
-        }
-
-        return new WalletBalanceResponse(wallet.getDepositBalance(), onChainBalance.longValue(), wallet.getUser().getName(), wallet.getAccountNumber());
+        return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getUser().getName(), wallet.getAccountNumber());
     }
 
     /**
@@ -238,17 +231,6 @@ public class WalletCommandService {
 
         // 7. 수량 차감
         voucher.decreaseRemainingCount();
-
-        // 7.1 온체인 잔액 검증
-        try {
-
-            BigInteger onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
-            if (!onChainBalance.equals(BigInteger.valueOf(wallet.getTokenBalance()))) {
-                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
-            }
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
-        }
 
         // 8. 토큰 소각
         TransactionReceipt receipt;
@@ -431,17 +413,6 @@ public class WalletCommandService {
         // 5. 간편 비밀번호  검증
         if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
-        }
-
-
-        // 5.1 스마트컨트랙트 이전 상태 검증 (user)
-        try {
-            BigInteger userOnChainBalance = tokkitTokenService.getBalanceOf(userWallet.getWalletAddress());
-            if (!userOnChainBalance.equals(BigInteger.valueOf(userWallet.getTokenBalance()))) {
-                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
-            }
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
         }
 
 
