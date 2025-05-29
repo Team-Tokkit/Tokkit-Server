@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @RestController
@@ -68,4 +69,12 @@ public class MerchantWalletController {
     public ApiResponse<TransactionDetailResponse> getTransactionDetail(@PathVariable Long id) {
         return ApiResponse.onSuccess(queryService.getTransactionDetail(id));
     }
+
+    @GetMapping("/onchain-token-balance")
+    @Operation(summary = "온체인 토큰 잔액 조회", description = "가맹점주의 지갑 주소 기준으로 스마트 컨트랙트 상 실제 토큰 잔액을 조회합니다.")
+    public ApiResponse<String> getOnChainTokenBalance(@AuthenticationPrincipal CustomMerchantDetails merchantDetails) {
+        BigInteger onChainBalance = queryService.getOnChainTokenBalance(merchantDetails.getId());
+        return ApiResponse.onSuccess(onChainBalance.toString() + " TKT");
+    }
+
 }

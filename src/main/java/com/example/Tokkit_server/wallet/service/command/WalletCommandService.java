@@ -60,6 +60,7 @@ public class WalletCommandService {
     private final TransactionLogService transactionLogService;
     private final TokkitTokenService tokkitTokenService;
     private final StoreRepository storeRepository;
+    private final NotificationService notificationService;
 
     /**
      * txHash 없는 기본형
@@ -164,20 +165,13 @@ public class WalletCommandService {
     }
 
     /**
-     * 실시간 스마트컨트랙트 기준 지갑 잔액 조회
+     * 지갑 잔액 조회
      */
     public WalletBalanceResponse getWalletBalance(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
             .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
-        BigInteger onChainBalance;
-        try {
-            onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.TOKEN_BALANCE_QUERY_FAILED);
-        }
-
-        return new WalletBalanceResponse(wallet.getDepositBalance(), onChainBalance.longValue(), wallet.getUser().getName(), wallet.getAccountNumber());
+        return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getUser().getName(), wallet.getAccountNumber());
     }
 
     /**
@@ -239,17 +233,6 @@ public class WalletCommandService {
         // 7. 수량 차감
         voucher.decreaseRemainingCount();
 
-        // 7.1 온체인 잔액 검증
-        try {
-
-            BigInteger onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
-            if (!onChainBalance.equals(BigInteger.valueOf(wallet.getTokenBalance()))) {
-                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
-            }
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
-        }
-
         // 8. 토큰 소각
         TransactionReceipt receipt;
         try {
@@ -284,6 +267,13 @@ public class WalletCommandService {
         logAndSave(wallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
             (long) amount, logDescription, displayDescription,txHash);
 
+        // 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.VOUCHER_PURCHASED,
+                voucher.getName(),
+                amount
+        );
 
         // 11. 응답 반환
         return VoucherPurchaseResponse.builder()
@@ -388,6 +378,16 @@ public class WalletCommandService {
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
             request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
 
+        // 유저 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.VOUCHER_PAYMENT_SUCCESS,
+                voucher.getName(),
+                store.getStoreName(),
+                request.getAmount()
+        );
+
+        // TODO: 가맹점주 바우처 정산 알림 생성
 
         //  12. 응답 반환
         return VoucherPaymentResponse.builder()
@@ -431,17 +431,6 @@ public class WalletCommandService {
         // 5. 간편 비밀번호  검증
         if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
-        }
-
-
-        // 5.1 스마트컨트랙트 이전 상태 검증 (user)
-        try {
-            BigInteger userOnChainBalance = tokkitTokenService.getBalanceOf(userWallet.getWalletAddress());
-            if (!userOnChainBalance.equals(BigInteger.valueOf(userWallet.getTokenBalance()))) {
-                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
-            }
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
         }
 
 
@@ -494,6 +483,16 @@ public class WalletCommandService {
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
             request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
+
+        // 유저 알림 생성
+        notificationService.sendNotification(
+                user,
+                NotificationTemplate.TOKEN_PAYMENT_SUCCESS,
+                store.getStoreName(),
+                request.getAmount()
+        );
+
+        // TODO: 가맹점주 토큰 정산 알림 생성
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()

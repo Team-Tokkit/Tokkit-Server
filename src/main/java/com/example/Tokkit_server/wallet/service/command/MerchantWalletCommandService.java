@@ -11,10 +11,13 @@ import com.example.Tokkit_server.wallet.dto.response.MerchantWalletBalanceRespon
 import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
 import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.repository.WalletRepository;
+import com.example.contract.service.TokkitTokenService;
+
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.stereotype.Service;
 
+import java.math.BigInteger;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -55,6 +58,7 @@ public class MerchantWalletCommandService {
 
         return new MerchantWalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getMerchant().getStore().getStoreName(), wallet.getAccountNumber());
     }
+
 
     /**
      * 일일 매출 조회

@@ -39,7 +39,6 @@ public class NotificationServiceImpl implements NotificationService {
     private final SseEmitters sseEmitters;
     private final EmailNotificationService emailNotificationService; // 이메일 전송 전용 서비스
     private final SseNotificationService sseNotificationService;
-    private final NotificationContentFormatter formatter; // 템플릿에서 제목/내용 추출 헬퍼
 
     private static final Long DEFAULT_TIMEOUT = 60L * 60 * 1000;
 
@@ -59,17 +58,22 @@ public class NotificationServiceImpl implements NotificationService {
 
         notificationRepository.save(notification);
 
-        // SSE 전송
-        sseNotificationService.sendSse(user.getId(), title, content);
-
-        // 이메일 설정 확인
-        boolean isEmailEnabled = notificationSettingRepository
-                .findByUserAndCategory(user, template.getCategory())
-                .isEnabled();
-
-        if (isEmailEnabled) {
-            emailNotificationService.sendEmail(user.getEmail(), title, content);
+        if (template.isSendSse()) {
+            boolean success = sseNotificationService.sendSse(user.getId(), title, content);
+            if (success) notification.markAsSentSse();
         }
+
+        if (template.isSendEmail()) {
+            boolean isEmailEnabled = notificationSettingRepository
+                    .findByUserAndCategory(user, template.getCategory())
+                    .isEnabled();
+            if (isEmailEnabled) {
+                boolean success = emailNotificationService.sendEmail(user.getEmail(), title, content);
+                if (success) notification.markAsSentMail();
+            }
+        }
+
+        notificationRepository.save(notification);
     }
 
     @Transactional
@@ -86,6 +90,8 @@ public class NotificationServiceImpl implements NotificationService {
             emitter.completeWithError(e);
             sseEmitters.remove(userId);
         }
+
+        userRepository.findById(userId).ifPresent(this::sendUnsentNotifications);
 
         // 연결 유지용 ping
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
@@ -154,25 +160,35 @@ public class NotificationServiceImpl implements NotificationService {
     @Transactional
     @Override
     public void sendUnsentNotifications(User user) {
-        // 1. 보내지 않은 알림 가져오기
-        List<Notification> unsentNotifications = notificationRepository.findByUserAndSentFalseAndDeletedFalse(user);
+        List<Notification> unsentNotifications = notificationRepository.findByUserAndDeletedFalse(user);
 
         for (Notification notification : unsentNotifications) {
-            // 2. SSE로 알림 전송
-            sseNotificationService.sendSse(user.getId(), notification.getTitle(), notification.getContent());
 
-            // 3. 이메일 전송 여부 확인
-            NotificationCategorySetting setting = notificationSettingRepository.findByUserAndCategory(user, notification.getCategory());
-            if (setting != null && setting.isEnabled()) {
-                emailNotificationService.sendEmail(user.getEmail(), notification.getTitle(), notification.getContent());
+            // 1. SSE 전송 (아직 안보냈고 카테고리 설정이 SYSTEM 또는 토큰 등 SSE 대상이라면)
+            if (!notification.isSentSse()) {
+                boolean success = sseNotificationService.sendSse(user.getId(), notification.getTitle(), notification.getContent());
+                if (success) notification.markAsSentSse();
             }
 
-            // 4. 알림을 보낸 것으로 표시
-            notification.markAsSent();
+            // 2. 이메일 전송 (아직 안보냈고 사용자가 해당 카테고리 이메일 수신 동의한 경우)
+            if (!notification.isSentMail()) {
+                NotificationCategorySetting setting = notificationSettingRepository
+                        .findByUserAndCategory(user, notification.getCategory());
+
+                if (setting != null && setting.isEnabled()) {
+                    boolean success = emailNotificationService.sendEmail(
+                            user.getEmail(),
+                            notification.getTitle(),
+                            notification.getContent()
+                    );
+                    if (success) notification.markAsSentMail();
+                }
+            }
         }
 
         notificationRepository.saveAll(unsentNotifications);
     }
+
 
     @Transactional(readOnly = true)
     public List<NotificationResponseDto> getAllNotifications(User user) {

@@ -31,16 +31,22 @@ public class Notification extends BaseTimeEntity {
     private boolean deleted;
 
     @Column(nullable = false)
-    private boolean sent;
+    private boolean sentSse;
+
+    @Column(nullable = false)
+    private boolean sentMail;
 
     // soft delete 용 메서드
     public void softDelete() {
         this.deleted = true;
     }
 
-    // 알림 발송 여부 확인용 메서드
-    public void markAsSent() {
-        this.sent = true;
+    // SSE 알림 발송 여부 확인용 메서드
+    public void markAsSentSse() {
+        this.sentSse = true;
     }
+
+    // Mail 알림 발송 여부 확인용 메서드
+    public void markAsSentMail() { this.sentMail = true; }
 
 }
