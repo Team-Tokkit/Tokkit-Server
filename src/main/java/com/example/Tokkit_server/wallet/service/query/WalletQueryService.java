@@ -111,14 +111,6 @@ public class WalletQueryService {
         }
         String txHash = receipt.getTransactionHash();
 
-        try {
-            BigInteger onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
-            if (!onChainBalance.equals(BigInteger.valueOf(wallet.getTokenBalance()))) {
-                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
-            }
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
-        }
 
         logAndSave(wallet, user.getId(), null,
             TransactionType.CONVERT,
@@ -167,15 +159,6 @@ public class WalletQueryService {
         wallet.updateBalance(wallet.getDepositBalance() + request.getAmount(),
             wallet.getTokenBalance() - request.getAmount());
 
-
-        try {
-            BigInteger onChainBalance = tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
-            if (!onChainBalance.equals(BigInteger.valueOf(wallet.getTokenBalance()))) {
-                throw new GeneralException(ErrorStatus.BALANCE_MISMATCH);
-            }
-        } catch (Exception e) {
-            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
-        }
 
 
         logAndSave(wallet, user.getId(), null,

@@ -14,12 +14,15 @@ import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
 import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
 import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.repository.WalletRepository;
+import com.example.contract.service.TokkitTokenService;
+
 import lombok.RequiredArgsConstructor;
 import org.slf4j.MDC;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigInteger;
 import java.util.List;
 
 @Service
@@ -30,6 +33,7 @@ public class MerchantWalletQueryService {
     private final MerchantRepository merchantRepository;
     private final PasswordEncoder passwordEncoder;
     private final TransactionLogService transactionLogService;
+    private final TokkitTokenService tokkitTokenService;
 
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
                             TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
@@ -120,4 +124,20 @@ public class MerchantWalletQueryService {
                 transaction.getTxHash()
         );
     }
+
+    /**
+     * 온체인 기반 잔액 조회
+     */
+    public BigInteger getOnChainTokenBalance(Long merchantId) {
+        Wallet wallet = walletRepository.findByMerchant_Id(merchantId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
+
+        try {
+            return tokkitTokenService.getBalanceOf(wallet.getWalletAddress());
+        } catch (Exception e) {
+            throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
+        }
+    }
+
+
 }
