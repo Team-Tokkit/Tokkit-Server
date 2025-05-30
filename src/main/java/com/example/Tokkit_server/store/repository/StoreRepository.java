@@ -19,7 +19,7 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
            "FROM VoucherStore vs JOIN vs.store s " +
            "WHERE vs.voucher.id = :voucherId")
     Page<StoreResponse> findByVoucherId(@Param("voucherId") Long voucherId, Pageable pageable);
-
+/*
 
     @Query(value = """
     SELECT 
@@ -48,7 +48,37 @@ public interface StoreRepository extends JpaRepository<Store, Long> {
             @Param("radius") double radius,
             @Param("category") String category,
             @Param("keyword") String keyword
-    );
+    );*/
+@Query(value = """
+    SELECT 
+        s.id AS id,
+        s.store_name AS storeName,
+        s.road_address AS roadAddress,
+        s.new_zipcode AS newZipcode,
+        s.latitude AS latitude,
+        s.longitude AS longitude,
+        s.store_category AS storeCategory,
+        ST_Distance_Sphere(POINT(s.longitude, s.latitude), POINT(:lng, :lat)) AS distance
+    FROM wallet w
+    JOIN voucher_ownership vo ON w.id = vo.wallet_id
+    JOIN voucher_store vs ON vo.voucher_id = vs.voucher_id
+    JOIN store s ON vs.store_id = s.id
+    WHERE w.user_id = :userId
+      AND s.latitude BETWEEN :lat - (:radius / 111320) AND :lat + (:radius / 111320)
+      AND s.longitude BETWEEN :lng - (:radius / (111320 * COS(RADIANS(:lat)))) AND :lng + (:radius / (111320 * COS(RADIANS(:lat))))
+      AND (:category IS NULL OR s.store_category = :category)
+      AND (:keyword IS NULL OR s.store_name LIKE CONCAT('%', :keyword, '%') OR s.road_address LIKE CONCAT('%', :keyword, '%'))
+    HAVING distance <= :radius
+    ORDER BY distance
+    """, nativeQuery = true)
+List<Object[]> findNearbyStoresRaw(
+    @Param("userId") Long userId,
+    @Param("lat") double lat,
+    @Param("lng") double lng,
+    @Param("radius") double radius,
+    @Param("category") String category,
+    @Param("keyword") String keyword
+);
 
 
     Optional<Store> findByIdAndMerchantId(Long storeId, Long merchantId);

@@ -2,16 +2,23 @@ package com.example.Tokkit_server.store.controller;
 
 import com.example.Tokkit_server.global.apiPayload.ApiResponse;
 import com.example.Tokkit_server.store.dto.response.KakaoMapSearchResponse;
+import com.example.Tokkit_server.store.dto.response.StoreBasicInfoResponseDto;
 import com.example.Tokkit_server.store.dto.response.StoreInfoResponse;
 import com.example.Tokkit_server.store.dto.response.StoreSimpleResponse;
+import com.example.Tokkit_server.store.dto.response.VoucherPageResponseDto;
 import com.example.Tokkit_server.store.service.StoreService;
 import com.example.Tokkit_server.store.service.command.StoreCommandService;
+import com.example.Tokkit_server.store.service.query.StoreQueryService;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -27,6 +34,7 @@ public class StoreController {
 
     private final StoreCommandService storeCommandService;
     private final StoreService storeService;
+    private final StoreQueryService storeQueryService;
 
     @GetMapping("/nearby")
     @Operation(
@@ -68,5 +76,18 @@ public class StoreController {
     public ApiResponse<StoreSimpleResponse> getStoreSimpleInfo(@RequestParam Long storeId) {
         StoreSimpleResponse response = storeService.getSimpleStoreInfo(storeId);
         return ApiResponse.onSuccess(response);
+    }
+    @GetMapping("/{storeId}")
+    public ApiResponse<StoreBasicInfoResponseDto> getStoreInfo(@PathVariable Long storeId) {
+        return ApiResponse.onSuccess(storeQueryService.getStoreInfo(storeId));
+    }
+
+    @GetMapping("/{storeId}/vouchers")
+    public ApiResponse<VoucherPageResponseDto> getAvailabㄴleVouchers(
+        @PathVariable Long storeId,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @PageableDefault(size = 5) Pageable pageable
+    ) {
+        return ApiResponse.onSuccess(storeQueryService.getAvailableVouchers(storeId, userDetails.getId(), pageable));
     }
 }
