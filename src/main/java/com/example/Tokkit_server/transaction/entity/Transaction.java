@@ -44,6 +44,7 @@ public class Transaction extends BaseTimeEntity {
     private Wallet wallet;
 
     @Enumerated(EnumType.STRING)
+    @Column(name = "type", nullable = false, length = 50)
     private TransactionType type;
 
 }
