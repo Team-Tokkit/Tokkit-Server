@@ -22,6 +22,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Getter
@@ -57,10 +58,33 @@ public class Wallet extends BaseTimeEntity {
 	@Column(nullable = false)
 	private WalletType walletType;
 
+	@Column(nullable = false)
+	private boolean autoConvertEnabled = false; // 자동 전환 on/off
+
+	@Column(nullable = true)
+	private Integer autoConvertDayOfMonth; // 1 ~ 31
+
+	@Column(nullable = true)
+	private Integer autoConvertHour;       // 0 ~ 23
+
+	@Column
+	private Integer autoConvertMinute; // 0 ~ 59
+
+	@Column(nullable = true)
+	private Long autoConvertAmount;        // 전환금액
+
 
 	public void updateBalance(Long deposit, Long token) {
 		this.depositBalance = deposit;
 		this.tokenBalance = token;
+	}
+
+	public void updateAutoConvertSetting(boolean enabled, int dayOfMonth, int hour, int minute, long amount) {
+		this.autoConvertEnabled = enabled;
+		this.autoConvertDayOfMonth = dayOfMonth;
+		this.autoConvertHour = hour;
+		this.autoConvertMinute = minute;
+		this.autoConvertAmount = amount;
 	}
 
 	/**
