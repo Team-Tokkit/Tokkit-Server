@@ -34,7 +34,7 @@ public class StoreQueryServiceImpl implements StoreQueryService {
 	@Override
 	public VoucherPageResponseDto getAvailableVouchers(Long storeId, Long userId, Pageable pageable) {
 
-		storeRepository.findById(storeId).orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
+		getStoreInfo(storeId);
 
 		userRepository.findById(userId).orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
