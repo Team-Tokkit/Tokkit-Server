@@ -85,9 +85,9 @@ public class StoreController {
     @GetMapping("/{storeId}/vouchers")
     public ApiResponse<VoucherPageResponseDto> getAvailabㄴleVouchers(
         @PathVariable Long storeId,
-        @RequestParam Long userId,
+        @AuthenticationPrincipal CustomUserDetails userDetails,
         @PageableDefault(size = 5) Pageable pageable
     ) {
-        return ApiResponse.onSuccess(storeQueryService.getAvailableVouchers(storeId, userId, pageable));
+        return ApiResponse.onSuccess(storeQueryService.getAvailableVouchers(storeId, userDetails.getId(), pageable));
     }
 }
