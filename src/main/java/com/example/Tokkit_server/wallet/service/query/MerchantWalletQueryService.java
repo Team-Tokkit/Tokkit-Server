@@ -4,6 +4,8 @@ import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
 import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.notification.enums.NotificationTemplate;
+import com.example.Tokkit_server.notification.service.MerchantNotificationService;
 import com.example.Tokkit_server.transaction.entity.Transaction;
 import com.example.Tokkit_server.transaction.enums.TransactionStatus;
 import com.example.Tokkit_server.transaction.enums.TransactionType;
@@ -34,6 +36,7 @@ public class MerchantWalletQueryService {
     private final PasswordEncoder passwordEncoder;
     private final TransactionLogService transactionLogService;
     private final TokkitTokenService tokkitTokenService;
+    private final MerchantNotificationService merchantNotificationService;
 
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
                             TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
@@ -86,6 +89,13 @@ public class MerchantWalletQueryService {
                 "토큰 ➝ 예금 변환",
                 "토큰 ➝ 예금"
                 );
+
+        // 가맹점주 토큰  ➝ 예금 변환 알림 생성
+        merchantNotificationService.sendMerchantNotification(
+                merchant,
+                NotificationTemplate.DEPOSIT_CONVERTED,
+                request.getAmount()
+        );
     }
 
     /**
@@ -138,6 +148,4 @@ public class MerchantWalletQueryService {
             throw new GeneralException(ErrorStatus.BALANCE_VERIFICATION_FAILED);
         }
     }
-
-
 }

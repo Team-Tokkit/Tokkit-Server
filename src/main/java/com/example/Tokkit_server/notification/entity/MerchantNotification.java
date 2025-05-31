@@ -3,7 +3,6 @@ package com.example.Tokkit_server.notification.entity;
 import com.example.Tokkit_server.global.entity.BaseTimeEntity;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.notification.enums.NotificationCategory;
-import com.example.Tokkit_server.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
