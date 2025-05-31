@@ -145,27 +145,6 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Transactional
-    public void updateSetting(Long userId, List<NotificationCategoryUpdateRequestDto> updateReqDtos) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
-        List<NotificationCategorySetting> settings = notificationSettingRepository.findByUser(user);
-
-        if (settings.isEmpty()) {
-            throw new GeneralException(ErrorStatus.NOTIFICATION_SETTING_NOT_FOUND);
-        }
-
-        Map<NotificationCategory, Boolean> updateMap = updateReqDtos.stream()
-                .collect(Collectors.toMap(NotificationCategoryUpdateRequestDto::getCategory, NotificationCategoryUpdateRequestDto::isEnabled));
-
-        for (NotificationCategorySetting setting : settings) {
-            if (updateMap.containsKey(setting.getCategory())) {
-                setting.update(updateMap.get(setting.getCategory()));
-            }
-        }
-    }
-
-    @Transactional
     @Override
     public void sendUnsentNotifications(User user) {
         List<Notification> unsentNotifications = notificationRepository.findByUserAndDeletedFalse(user);
@@ -221,18 +200,6 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.findByUserAndCategoryAndDeletedFalse(user, category)
                 .stream()
                 .map(NotificationResponseDto::from)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<NotificationCategorySettingResponseDto> getSettings(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
-        List<NotificationCategorySetting> settings = notificationSettingRepository.findByUser(user);
-
-        return settings.stream()
-                .map(NotificationCategorySettingResponseDto::from)
                 .collect(Collectors.toList());
     }
 }
