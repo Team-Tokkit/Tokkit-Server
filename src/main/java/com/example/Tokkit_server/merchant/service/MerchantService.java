@@ -11,6 +11,8 @@ import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.entity.MerchantEmailValidation;
 import com.example.Tokkit_server.merchant.repository.MerchantEmailValidationRepository;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
+import com.example.Tokkit_server.notification.entity.MerchantNotificationCategorySetting;
+import com.example.Tokkit_server.notification.enums.NotificationCategory;
 import com.example.Tokkit_server.ocr.service.KakaoAddressSearchService;
 import com.example.Tokkit_server.ocr.utils.KakaoGeoResult;
 import com.example.Tokkit_server.region.entity.Region;
@@ -103,6 +105,15 @@ public class MerchantService {
         // 8. Wallet 생성
         Wallet wallet = walletCommandService.createInitialWalletForMerchant(merchant.getId());
         merchant.setWallet(wallet);
+
+        // 9. 알림 설정
+        for (NotificationCategory category : NotificationCategory.values()) {
+            MerchantNotificationCategorySetting setting = MerchantNotificationCategorySetting.builder()
+                    .merchant(merchant)
+                    .category(category)
+                    .enabled(true)
+                    .build();
+        }
 
         return MerchantRegisterResponseDto.from(merchant);
     }

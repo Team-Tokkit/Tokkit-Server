@@ -1,0 +1,30 @@
+package com.example.Tokkit_server.notification.dto.response;
+
+import com.example.Tokkit_server.notification.entity.MerchantNotification;
+import com.example.Tokkit_server.notification.enums.NotificationCategory;
+import lombok.Builder;
+import lombok.Getter;
+
+import java.time.LocalDateTime;
+
+@Getter
+@Builder
+public class MerchantNotificationResponseDto {
+    private Long id;
+    private String title;
+    private String content;
+    private NotificationCategory category;
+    private String deleted;
+    private LocalDateTime createdAt;
+
+    public static MerchantNotificationResponseDto from(MerchantNotification notification) {
+        return MerchantNotificationResponseDto.builder()
+                .id(notification.getId())
+                .title(notification.getTitle())
+                .content(notification.getContent())
+                .category(notification.getCategory())
+                .deleted(notification.isDeleted() ? "deleted" : "active")
+                .createdAt(notification.getCreatedAt())
+                .build();
+    }
+}

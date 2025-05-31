@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.merchant.auth;
 
+import com.example.Tokkit_server.merchant.entity.Merchant;
 import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -59,4 +60,14 @@ public class CustomMerchantDetails implements UserDetails {
 
     @Override
     public boolean isEnabled() { return true; }
+
+    public Merchant toMerchant() {
+        return Merchant.builder()
+                .id(this.id)
+                .businessNumber(this.businessNumber)
+                .email(this.email)
+                .password(this.password)
+                .roles(this.roles)
+                .build();
+    }
 }
