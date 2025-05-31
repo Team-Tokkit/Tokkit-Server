@@ -41,4 +41,21 @@ public interface VoucherOwnershipRepository extends JpaRepository<VoucherOwnersh
         @Param("now") LocalDateTime now
     );
 
+    @Query("""
+			SELECT vo FROM VoucherOwnership vo
+			JOIN vo.voucher v
+			JOIN v.voucherStores vs
+			WHERE vo.wallet.user.id = :userId
+			  AND vs.store.id = :storeId
+			  AND vo.status = 'AVAILABLE'
+			  AND vo.remainingAmount > 0
+			  AND v.validDate >= CURRENT_TIMESTAMP
+			ORDER BY  vo.remainingAmount DESC,v.validDate ASC
+		""")
+    Page<VoucherOwnership> findAvailableVouchersByUserAndStore(
+        @Param("userId") Long userId,
+
+        @Param("storeId") Long storeId,
+        Pageable pageable
+    );
 }

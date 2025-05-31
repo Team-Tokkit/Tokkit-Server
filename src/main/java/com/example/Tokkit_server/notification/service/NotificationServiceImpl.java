@@ -17,7 +17,9 @@ import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.user.utils.SseEmitters;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
@@ -76,7 +78,6 @@ public class NotificationServiceImpl implements NotificationService {
         notificationRepository.save(notification);
     }
 
-    @Transactional
     public SseEmitter subscribe(Long userId) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         sseEmitters.add(userId, emitter);
@@ -91,9 +92,10 @@ public class NotificationServiceImpl implements NotificationService {
             sseEmitters.remove(userId);
         }
 
-        userRepository.findById(userId).ifPresent(this::sendUnsentNotifications);
+        // 트랜잭션 점유 방지를 위해 비동기로 분리된 메서드 호출
+        userRepository.findById(userId).ifPresent(this::sendUnsentNotificationsAsync);
 
-        // 연결 유지용 ping
+        // Ping 유지
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             try {
@@ -123,6 +125,12 @@ public class NotificationServiceImpl implements NotificationService {
         return emitter;
     }
 
+    @Async
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void sendUnsentNotificationsAsync(User user) {
+        sendUnsentNotifications(user);
+    }
+
     @Transactional
     public void deleteNotification(Long notificationId, User user) {
         Notification notification = notificationRepository.findByIdAndUser(notificationId, user)
@@ -134,27 +142,6 @@ public class NotificationServiceImpl implements NotificationService {
 
         notification.softDelete();
         notificationRepository.save(notification);
-    }
-
-    @Transactional
-    public void updateSetting(Long userId, List<NotificationCategoryUpdateRequestDto> updateReqDtos) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
-        List<NotificationCategorySetting> settings = notificationSettingRepository.findByUser(user);
-
-        if (settings.isEmpty()) {
-            throw new GeneralException(ErrorStatus.NOTIFICATION_SETTING_NOT_FOUND);
-        }
-
-        Map<NotificationCategory, Boolean> updateMap = updateReqDtos.stream()
-                .collect(Collectors.toMap(NotificationCategoryUpdateRequestDto::getCategory, NotificationCategoryUpdateRequestDto::isEnabled));
-
-        for (NotificationCategorySetting setting : settings) {
-            if (updateMap.containsKey(setting.getCategory())) {
-                setting.update(updateMap.get(setting.getCategory()));
-            }
-        }
     }
 
     @Transactional
@@ -213,18 +200,6 @@ public class NotificationServiceImpl implements NotificationService {
         return notificationRepository.findByUserAndCategoryAndDeletedFalse(user, category)
                 .stream()
                 .map(NotificationResponseDto::from)
-                .collect(Collectors.toList());
-    }
-
-    @Transactional(readOnly = true)
-    public List<NotificationCategorySettingResponseDto> getSettings(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
-        List<NotificationCategorySetting> settings = notificationSettingRepository.findByUser(user);
-
-        return settings.stream()
-                .map(NotificationCategorySettingResponseDto::from)
                 .collect(Collectors.toList());
     }
 }
