@@ -14,6 +14,7 @@ import com.example.Tokkit_server.transaction.enums.TransactionStatus;
 import com.example.Tokkit_server.transaction.enums.TransactionType;
 import com.example.Tokkit_server.transaction.repository.TransactionRepository;
 import com.example.Tokkit_server.transaction.service.query.TransactionLogService;
+import com.example.Tokkit_server.transaction.utils.TransactionDisplayFormatter;
 import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.voucher.entity.Voucher;
@@ -346,8 +347,7 @@ public class WalletCommandService {
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
 
-        String userDisplayDescription = store.getStoreName();
-
+        String userDisplayDescription = TransactionDisplayFormatter.userVoucherPayment(user.getName(), store.getStoreName(), voucher.getName());
 
         //  9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
@@ -376,7 +376,7 @@ public class WalletCommandService {
 
         // Merchant Description 생성
         String merchantLogDescription = "바우처 정산 수령 - User ID: " + user.getId();
-        String merchantDisplayDescription = user.getName();
+        String merchantDisplayDescription = TransactionDisplayFormatter.merchantVoucherSettlement(voucher.getName(), user.getName());
 
         //  11. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
@@ -483,7 +483,7 @@ public class WalletCommandService {
         Store store = storeRepository.findByMerchantId(toMerchant.getId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
 
-        String userDisplayDescription = store.getStoreName();
+        String userDisplayDescription = TransactionDisplayFormatter.userTokenPayment(store.getStoreName());
 
         // 8. 유저 거래 내역 저장
         logAndSave(userWallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
@@ -491,7 +491,7 @@ public class WalletCommandService {
 
         // Merchant Description 생성
         String merchantLogDescription = "토큰 직접 결제 수령 - User ID: " + user.getId();
-        String merchantDisplayDescription = user.getName();
+        String merchantDisplayDescription = TransactionDisplayFormatter.merchantTokenSettlement(user.getName());
 
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
