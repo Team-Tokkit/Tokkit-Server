@@ -110,7 +110,7 @@ public class AutoTokenConvertScheduler {
                     TransactionStatus.SUCCESS,
                     amount,
                     "정기 자동 예금 → 토큰 전환",
-                    "자동 충전 실행",
+                    "자동 충전",
                     receipt.getTransactionHash()
                 );
 

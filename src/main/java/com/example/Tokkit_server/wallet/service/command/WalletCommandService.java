@@ -107,8 +107,8 @@ public class WalletCommandService {
     // 유저 - 전자 지갑 생성
     @Transactional
     public Wallet createInitialWalletForUser(Long userId) {
-        if (walletRepository.existsByUserId(userId)) {
-            return walletRepository.findByUserId(userId)
+        if (walletRepository.existsByUser_Id(userId)) {
+            return walletRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
         }
 
@@ -137,8 +137,8 @@ public class WalletCommandService {
     // 가맹점주 - 전자 지갑 생성
     @Transactional
     public Wallet createInitialWalletForMerchant(Long merchantId) {
-        if (walletRepository.existsByMerchantId(merchantId)) {
-            return walletRepository.findByMerchantId(merchantId)
+        if (walletRepository.existsByMerchant_Id(merchantId)) {
+            return walletRepository.findByMerchant_Id(merchantId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
         }
 
