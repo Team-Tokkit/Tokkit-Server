@@ -5,6 +5,7 @@ import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.notification.enums.NotificationTemplate;
+import com.example.Tokkit_server.notification.service.MerchantNotificationService;
 import com.example.Tokkit_server.notification.service.NotificationService;
 import com.example.Tokkit_server.store.entity.Store;
 import com.example.Tokkit_server.store.repository.StoreRepository;
@@ -61,6 +62,7 @@ public class WalletCommandService {
     private final TokkitTokenService tokkitTokenService;
     private final StoreRepository storeRepository;
     private final NotificationService notificationService;
+    private final MerchantNotificationService merchantNotificationService;
 
     /**
      * txHash 없는 기본형
@@ -107,7 +109,7 @@ public class WalletCommandService {
     // 유저 - 전자 지갑 생성
     @Transactional
     public Wallet createInitialWalletForUser(Long userId) {
-        if (walletRepository.existsByUser_Id(userId)) {
+        if (walletRepository.existsByUserId(userId)) {
             return walletRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
         }
@@ -138,7 +140,7 @@ public class WalletCommandService {
     // 가맹점주 - 전자 지갑 생성
     @Transactional
     public Wallet createInitialWalletForMerchant(Long merchantId) {
-        if (walletRepository.existsByMerchant_Id(merchantId)) {
+        if (walletRepository.existsByMerchantId(merchantId)) {
             return walletRepository.findByMerchant_Id(merchantId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
         }
@@ -389,7 +391,16 @@ public class WalletCommandService {
                 request.getAmount()
         );
 
-        // TODO: 가맹점주 바우처 정산 알림 생성
+        // 가맹점주 바우처 정산 알림 생성
+        Merchant merchant = merchantRepository.findById(request.getMerchantId())
+                        .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+        merchantNotificationService.sendMerchantNotification(
+                merchant,
+                NotificationTemplate.MERCHANT_VOUCHER_SETTLED,
+                user.getName(),
+                voucher.getName(),
+                request.getAmount()
+        );
 
         //  12. 응답 반환
         return VoucherPaymentResponse.builder()
@@ -494,7 +505,13 @@ public class WalletCommandService {
                 request.getAmount()
         );
 
-        // TODO: 가맹점주 토큰 정산 알림 생성
+        // 가맹점주 토큰 정산 알림 생성
+        merchantNotificationService.sendMerchantNotification(
+                merchant,
+                NotificationTemplate.MERCHANT_TOKEN_SETTLED,
+                user.getName(),
+                request.getAmount()
+        );
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()
