@@ -126,6 +126,7 @@ public class WalletCommandService {
                 .walletType(WalletType.USER)
                 .accountNumber(AccountGenerator.generateAccountNumber())
                 .walletAddress(walletAddress)
+                .autoConvertEnabled(false)
                 .build();
 
             return walletRepository.save(wallet);
@@ -156,6 +157,7 @@ public class WalletCommandService {
                 .walletType(WalletType.MERCHANT)
                 .accountNumber(AccountGenerator.generateAccountNumber())
                 .walletAddress(walletAddress)
+                .autoConvertEnabled(false)
                 .build();
 
             return walletRepository.save(wallet);
