@@ -11,6 +11,7 @@ import com.example.Tokkit_server.transaction.repository.TransactionRepository;
 import com.example.Tokkit_server.transaction.service.query.TransactionLogService;
 import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.user.repository.UserRepository;
+import com.example.Tokkit_server.wallet.dto.request.AutoConvertSettingRequest;
 import com.example.Tokkit_server.wallet.dto.request.DepositToTokenRequest;
 import com.example.Tokkit_server.wallet.dto.request.TokenToDepositRequest;
 import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
@@ -25,7 +26,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
-
 import java.math.BigInteger;
 import java.util.List;
 
@@ -225,6 +225,22 @@ public class WalletQueryService {
             transaction.getDisplayDescription(),
             transaction.getCreatedAt(),
             transaction.getTxHash()
+        );
+    }
+
+    /**
+     * 변환 예약 등록
+     */
+    @Transactional
+    public void updateAutoConvertSetting(Long userId, AutoConvertSettingRequest request) {
+        Wallet wallet = walletRepository.findByUser_Id(userId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+        wallet.updateAutoConvertSetting(
+            request.isEnabled(),
+            request.getDayOfMonth(),
+            request.getHour(),
+            request.getMinute(),
+            request.getAmount()
         );
     }
 }
