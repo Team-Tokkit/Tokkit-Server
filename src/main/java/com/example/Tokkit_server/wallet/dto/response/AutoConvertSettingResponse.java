@@ -11,5 +11,6 @@ public class AutoConvertSettingResponse {
     private boolean enabled;
     private int dayOfMonth;
     private int hour;
+    private int minute;
     private long amount;
 }
