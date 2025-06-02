@@ -5,6 +5,7 @@ import com.example.Tokkit_server.merchant.auth.CustomMerchantDetails;
 import com.example.Tokkit_server.wallet.dto.request.TokenToDepositRequest;
 import com.example.Tokkit_server.wallet.dto.response.*;
 import com.example.Tokkit_server.wallet.service.command.MerchantWalletCommandService;
+import com.example.Tokkit_server.wallet.service.query.BlockchainQueryService;
 import com.example.Tokkit_server.wallet.service.query.MerchantWalletQueryService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -23,6 +24,7 @@ public class MerchantWalletController {
 
     private final MerchantWalletCommandService commandService;
     private final MerchantWalletQueryService queryService;
+    private final BlockchainQueryService blockchainQueryService;
 
     @GetMapping("/balance")
     @Operation(summary = "잔액 조회", description = "사용자 ID로 잔액 조회")
@@ -68,6 +70,12 @@ public class MerchantWalletController {
     @Operation(summary = "거래 상세 조회", description = "특정 거래 상세 정보를 조회합니다.")
     public ApiResponse<TransactionDetailResponse> getTransactionDetail(@PathVariable Long id) {
         return ApiResponse.onSuccess(queryService.getTransactionDetail(id));
+    }
+
+    @GetMapping("/tx/{txHash}")
+    @Operation(summary = "txHash 상세 조회", description = "특정 거래에 대해 블록체인 상세 정보를 조회합니다.")
+    public ApiResponse<TxDetailResponse> getTxDetail(@PathVariable String txHash) {
+        return ApiResponse.onSuccess(blockchainQueryService.getTxHashDetail(txHash));
     }
 
     @GetMapping("/onchain-token-balance")
