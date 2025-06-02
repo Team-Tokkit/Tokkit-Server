@@ -14,6 +14,7 @@ import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.wallet.dto.request.AutoConvertSettingRequest;
 import com.example.Tokkit_server.wallet.dto.request.DepositToTokenRequest;
 import com.example.Tokkit_server.wallet.dto.request.TokenToDepositRequest;
+import com.example.Tokkit_server.wallet.dto.response.AutoConvertSettingResponse;
 import com.example.Tokkit_server.wallet.dto.response.TransactionDetailResponse;
 import com.example.Tokkit_server.wallet.dto.response.TransactionHistoryResponse;
 import com.example.Tokkit_server.wallet.entity.Wallet;
@@ -242,5 +243,24 @@ public class WalletQueryService {
             request.getMinute(),
             request.getAmount()
         );
+
     }
+
+    /**
+     * 변환 예약 상태 확인
+     */
+    public AutoConvertSettingResponse getAutoConvertSetting(Long userId) {
+        Wallet wallet = walletRepository.findByUserId(userId)
+            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+
+        return new AutoConvertSettingResponse(
+            wallet.isAutoConvertEnabled(),
+            wallet.getAutoConvertDayOfMonth(),
+            wallet.getAutoConvertHour(),
+            wallet.getAutoConvertMinute(),
+            wallet.getAutoConvertAmount()
+        );
+    }
+
+
 }

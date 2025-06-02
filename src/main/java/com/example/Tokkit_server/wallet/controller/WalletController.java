@@ -126,4 +126,13 @@ public class WalletController {
         return ApiResponse.onSuccess(null);
     }
 
+
+    @GetMapping("/auto-convert")
+    @Operation(summary = "자동 전환 설정 조회", description = "자동 전환 설정 상태를 반환합니다.")
+    public ApiResponse<AutoConvertSettingResponse> getAutoConvertSetting(
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ApiResponse.onSuccess(queryService.getAutoConvertSetting(userDetails.getId()));
+    }
+
 }
