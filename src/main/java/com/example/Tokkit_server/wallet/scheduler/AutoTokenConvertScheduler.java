@@ -7,6 +7,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
+import com.example.Tokkit_server.notification.enums.NotificationTemplate;
+import com.example.Tokkit_server.notification.service.NotificationService;
+import com.example.Tokkit_server.user.entity.User;
 import org.slf4j.MDC;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -33,6 +36,7 @@ public class AutoTokenConvertScheduler {
     private final TokkitTokenService tokkitTokenService;
     private final TransactionLogService transactionLogService;
     private final RedisTemplate<String, String> redisTemplate;
+    private final NotificationService notificationService;
 
     /**
      * txHash 있는 확장형
@@ -116,6 +120,15 @@ public class AutoTokenConvertScheduler {
 
                 log.info("자동 전환 완료: userId={}, amount={}, txHash={}",
                     wallet.getUser().getId(), amount, receipt.getTransactionHash());
+
+                User user = wallet.getUser();
+                log.info("[AUTO-CONVERT] 알림 전송 시도 - userId={}", user.getId());
+
+                notificationService.sendNotification(
+                        user,
+                        NotificationTemplate.TOKEN_AUTO_CONVERTED,
+                        amount
+                );
 
             } catch (Exception e) {
                 log.error("자동 전환 실패: userId={}", wallet.getUser().getId(), e);
