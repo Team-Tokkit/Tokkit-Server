@@ -122,6 +122,8 @@ public class AutoTokenConvertScheduler {
                     wallet.getUser().getId(), amount, receipt.getTransactionHash());
 
                 User user = wallet.getUser();
+                log.info("[AUTO-CONVERT] 알림 전송 시도 - userId={}", user.getId());
+
                 notificationService.sendNotification(
                         user,
                         NotificationTemplate.TOKEN_AUTO_CONVERTED,

@@ -46,11 +46,10 @@ public class NotificationServiceImpl implements NotificationService {
 
     @Transactional
     public void sendNotification(User user, NotificationTemplate template, Object... args) {
-        // 제목과 내용 생성
         String title = template.getTitle();
         String content = String.format(template.getContentTemplate(), args);
+        log.info("[SSE] sendNotification 호출됨 - userId={}, title={}", user.getId(), title);
 
-        // Notification 생성 및 저장
         Notification notification = Notification.builder()
                 .user(user)
                 .category(template.getCategory())
@@ -60,28 +59,50 @@ public class NotificationServiceImpl implements NotificationService {
 
         notificationRepository.save(notification);
 
+        // SSE 전송
         if (template.isSendSse()) {
+            log.info("[NOTI] SSE 전송 시도 - userId={}, title={}", user.getId(), title);
             boolean success = sseNotificationService.sendSse(user.getId(), title, content);
-            if (success) notification.markAsSentSse();
+            if (success) {
+                log.info("[NOTI] SSE 전송 성공 - userId={}, title={}", user.getId(), title);
+                notification.markAsSentSse();
+            } else {
+                log.warn("[NOTI] SSE 전송 실패 - userId={}, emitter 없음 또는 전송 실패", user.getId());
+            }
+        } else {
+            log.info("[NOTI] 템플릿 설정상 SSE 미전송 - template={}", template.name());
         }
 
+        // 이메일 전송
         if (template.isSendEmail()) {
             boolean isEmailEnabled = notificationSettingRepository
                     .findByUserAndCategory(user, template.getCategory())
                     .isEnabled();
+
             if (isEmailEnabled) {
                 boolean success = emailNotificationService.sendEmail(user.getEmail(), title, content);
-                if (success) notification.markAsSentMail();
+                if (success) {
+                    log.info("[NOTI] 이메일 전송 성공 - userId={}, email={}", user.getId(), user.getEmail());
+                    notification.markAsSentMail();
+                } else {
+                    log.warn("[NOTI] 이메일 전송 실패 - userId={}, email={}", user.getId(), user.getEmail());
+                }
+            } else {
+                log.info("[NOTI] 유저가 해당 카테고리 이메일 수신 거부 - userId={}, category={}", user.getId(), template.getCategory());
             }
         }
 
+        // 최종 저장
         notificationRepository.save(notification);
     }
 
     public SseEmitter subscribe(Long userId) {
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         sseEmitters.add(userId, emitter);
+
         log.info("[SSE] 유저 {} 구독 등록됨", userId);
+        log.info("[SSE] 현재 emitter 등록 수: {}", sseEmitters.size());
+        log.info("[SSE] 현재 등록된 emitter key 목록: {}", sseEmitters.keySet());
 
         try {
             emitter.send(SseEmitter.event()
@@ -90,12 +111,12 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (IOException e) {
             emitter.completeWithError(e);
             sseEmitters.remove(userId);
+            log.warn("[SSE] connect 전송 실패로 emitter 제거됨 - userId={}", userId);
         }
 
-        // 트랜잭션 점유 방지를 위해 비동기로 분리된 메서드 호출
         userRepository.findById(userId).ifPresent(this::sendUnsentNotificationsAsync);
 
-        // Ping 유지
+        // ping 유지용 스케줄러
         ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
         scheduler.scheduleAtFixedRate(() -> {
             try {
@@ -103,23 +124,29 @@ public class NotificationServiceImpl implements NotificationService {
                         .name("ping")
                         .data("keep-alive"));
             } catch (Exception e) {
+                log.warn("[SSE] ping 전송 실패 - emitter 제거됨: userId={}, error={}", userId, e.getMessage());
                 emitter.complete();
+                sseEmitters.remove(userId);
+                scheduler.shutdown();
             }
         }, 30, 30, TimeUnit.SECONDS);
 
         emitter.onCompletion(() -> {
             sseEmitters.remove(userId);
             scheduler.shutdown();
+            log.info("[SSE] emitter 완료 처리됨 - userId={}", userId);
         });
 
         emitter.onTimeout(() -> {
             sseEmitters.remove(userId);
             scheduler.shutdown();
+            log.warn("[SSE] emitter 타임아웃 - userId={}", userId);
         });
 
         emitter.onError((e) -> {
             sseEmitters.remove(userId);
             scheduler.shutdown();
+            log.error("[SSE] emitter 에러 발생 - userId={}, error={}", userId, e.getMessage());
         });
 
         return emitter;
@@ -128,7 +155,11 @@ public class NotificationServiceImpl implements NotificationService {
     @Async
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void sendUnsentNotificationsAsync(User user) {
-        sendUnsentNotifications(user);
+        try {
+            sendUnsentNotifications(user);
+        } catch (Exception e) {
+            log.error("[SSE] 미발송 알림 전송 실패: userId={}, error={}", user.getId(), e.getMessage());
+        }
     }
 
     @Transactional
@@ -148,16 +179,29 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void sendUnsentNotifications(User user) {
         List<Notification> unsentNotifications = notificationRepository.findByUserAndDeletedFalse(user);
+        log.info("[NOTI] 유저 {}의 미전송 알림 {}건 조회됨", user.getId(), unsentNotifications.size());
 
         for (Notification notification : unsentNotifications) {
+            log.debug("[NOTI] 알림 id={}, title={}, sentSse={}, sentMail={}",
+                    notification.getId(),
+                    notification.getTitle(),
+                    notification.isSentSse(),
+                    notification.isSentMail());
 
-            // 1. SSE 전송 (아직 안보냈고 카테고리 설정이 SYSTEM 또는 토큰 등 SSE 대상이라면)
+            // 1. SSE 전송
             if (!notification.isSentSse()) {
                 boolean success = sseNotificationService.sendSse(user.getId(), notification.getTitle(), notification.getContent());
-                if (success) notification.markAsSentSse();
+                if (success) {
+                    log.info("[NOTI] SSE 전송 성공 - 알림 id={}, userId={}", notification.getId(), user.getId());
+                    notification.markAsSentSse();
+                } else {
+                    log.warn("[NOTI] SSE 전송 실패 - 알림 id={}, userId={}", notification.getId(), user.getId());
+                }
+            } else {
+                log.debug("[NOTI] SSE 이미 전송됨 - 알림 id={}, userId={}", notification.getId(), user.getId());
             }
 
-            // 2. 이메일 전송 (아직 안보냈고 사용자가 해당 카테고리 이메일 수신 동의한 경우)
+            // 2. 이메일 전송
             if (!notification.isSentMail()) {
                 NotificationCategorySetting setting = notificationSettingRepository
                         .findByUserAndCategory(user, notification.getCategory());
@@ -168,8 +212,17 @@ public class NotificationServiceImpl implements NotificationService {
                             notification.getTitle(),
                             notification.getContent()
                     );
-                    if (success) notification.markAsSentMail();
+                    if (success) {
+                        log.info("[NOTI] 이메일 전송 성공 - 알림 id={}, userId={}, email={}", notification.getId(), user.getId(), user.getEmail());
+                        notification.markAsSentMail();
+                    } else {
+                        log.warn("[NOTI] 이메일 전송 실패 - 알림 id={}, userId={}, email={}", notification.getId(), user.getId(), user.getEmail());
+                    }
+                } else {
+                    log.info("[NOTI] 이메일 수신 설정 안됨 - 알림 id={}, category={}, userId={}", notification.getId(), notification.getCategory(), user.getId());
                 }
+            } else {
+                log.debug("[NOTI] 이메일 이미 전송됨 - 알림 id={}, userId={}", notification.getId(), user.getId());
             }
         }
 

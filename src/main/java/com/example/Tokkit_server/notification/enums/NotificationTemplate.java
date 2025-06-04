@@ -10,7 +10,7 @@ public enum NotificationTemplate {
 
     // TOKEN 알림
     TOKEN_CONVERTED(NotificationCategory.TOKEN, "토큰 전환 완료", "예금 %d원이 토큰으로 전환되었습니다.", false, true),
-    TOKEN_AUTO_CONVERTED(NotificationCategory.TOKEN, "토큰 자동 전환 완료", "예금 %d원이 토큰으로 전환되었습니다.", false, true),
+    TOKEN_AUTO_CONVERTED(NotificationCategory.TOKEN, "토큰 자동 전환 완료", "예금 %d원이 토큰으로 전환되었습니다.", true, true),
     DEPOSIT_CONVERTED(NotificationCategory.TOKEN, "예금 전환 완료", "토큰 %d TKT가 예금으로 전환되었습니다.", false, true),
     /**
      * USER 알림
