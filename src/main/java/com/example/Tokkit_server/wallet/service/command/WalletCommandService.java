@@ -5,6 +5,7 @@ import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.merchant.entity.Merchant;
 import com.example.Tokkit_server.merchant.repository.MerchantRepository;
 import com.example.Tokkit_server.notification.enums.NotificationTemplate;
+import com.example.Tokkit_server.notification.service.MerchantNotificationService;
 import com.example.Tokkit_server.notification.service.NotificationService;
 import com.example.Tokkit_server.store.entity.Store;
 import com.example.Tokkit_server.store.repository.StoreRepository;
@@ -13,6 +14,7 @@ import com.example.Tokkit_server.transaction.enums.TransactionStatus;
 import com.example.Tokkit_server.transaction.enums.TransactionType;
 import com.example.Tokkit_server.transaction.repository.TransactionRepository;
 import com.example.Tokkit_server.transaction.service.query.TransactionLogService;
+import com.example.Tokkit_server.transaction.utils.TransactionDisplayFormatter;
 import com.example.Tokkit_server.user.entity.User;
 import com.example.Tokkit_server.user.repository.UserRepository;
 import com.example.Tokkit_server.voucher.entity.Voucher;
@@ -61,6 +63,7 @@ public class WalletCommandService {
     private final TokkitTokenService tokkitTokenService;
     private final StoreRepository storeRepository;
     private final NotificationService notificationService;
+    private final MerchantNotificationService merchantNotificationService;
 
     /**
      * txHash 없는 기본형
@@ -108,7 +111,7 @@ public class WalletCommandService {
     @Transactional
     public Wallet createInitialWalletForUser(Long userId) {
         if (walletRepository.existsByUserId(userId)) {
-            return walletRepository.findByUserId(userId)
+            return walletRepository.findByUser_Id(userId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
         }
 
@@ -126,6 +129,7 @@ public class WalletCommandService {
                 .walletType(WalletType.USER)
                 .accountNumber(AccountGenerator.generateAccountNumber())
                 .walletAddress(walletAddress)
+                .autoConvertEnabled(false)
                 .build();
 
             return walletRepository.save(wallet);
@@ -138,7 +142,7 @@ public class WalletCommandService {
     @Transactional
     public Wallet createInitialWalletForMerchant(Long merchantId) {
         if (walletRepository.existsByMerchantId(merchantId)) {
-            return walletRepository.findByMerchantId(merchantId)
+            return walletRepository.findByMerchant_Id(merchantId)
                 .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
         }
 
@@ -156,6 +160,7 @@ public class WalletCommandService {
                 .walletType(WalletType.MERCHANT)
                 .accountNumber(AccountGenerator.generateAccountNumber())
                 .walletAddress(walletAddress)
+                .autoConvertEnabled(false)
                 .build();
 
             return walletRepository.save(wallet);
@@ -342,8 +347,7 @@ public class WalletCommandService {
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
 
-        String userDisplayDescription = store.getStoreName();
-
+        String userDisplayDescription = TransactionDisplayFormatter.userVoucherPayment(user.getName(), store.getStoreName(), voucher.getName());
 
         //  9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
@@ -372,7 +376,7 @@ public class WalletCommandService {
 
         // Merchant Description 생성
         String merchantLogDescription = "바우처 정산 수령 - User ID: " + user.getId();
-        String merchantDisplayDescription = user.getName();
+        String merchantDisplayDescription = TransactionDisplayFormatter.merchantVoucherSettlement(voucher.getName(), user.getName());
 
         //  11. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
@@ -387,7 +391,16 @@ public class WalletCommandService {
                 request.getAmount()
         );
 
-        // TODO: 가맹점주 바우처 정산 알림 생성
+        // 가맹점주 바우처 정산 알림 생성
+        Merchant merchant = merchantRepository.findById(request.getMerchantId())
+                        .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+        merchantNotificationService.sendMerchantNotification(
+                merchant,
+                NotificationTemplate.MERCHANT_VOUCHER_SETTLED,
+                user.getName(),
+                voucher.getName(),
+                request.getAmount()
+        );
 
         //  12. 응답 반환
         return VoucherPaymentResponse.builder()
@@ -470,7 +483,7 @@ public class WalletCommandService {
         Store store = storeRepository.findByMerchantId(toMerchant.getId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
 
-        String userDisplayDescription = store.getStoreName();
+        String userDisplayDescription = TransactionDisplayFormatter.userTokenPayment(store.getStoreName());
 
         // 8. 유저 거래 내역 저장
         logAndSave(userWallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
@@ -478,7 +491,7 @@ public class WalletCommandService {
 
         // Merchant Description 생성
         String merchantLogDescription = "토큰 직접 결제 수령 - User ID: " + user.getId();
-        String merchantDisplayDescription = user.getName();
+        String merchantDisplayDescription = TransactionDisplayFormatter.merchantTokenSettlement(user.getName());
 
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
@@ -492,7 +505,13 @@ public class WalletCommandService {
                 request.getAmount()
         );
 
-        // TODO: 가맹점주 토큰 정산 알림 생성
+        // 가맹점주 토큰 정산 알림 생성
+        merchantNotificationService.sendMerchantNotification(
+                merchant,
+                NotificationTemplate.MERCHANT_TOKEN_SETTLED,
+                user.getName(),
+                request.getAmount()
+        );
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()

@@ -33,7 +33,7 @@ public class MerchantWalletCommandService {
     private final TransactionLogService transactionLogService;
 
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-                            TransactionType type, TransactionStatus status, Long amount, String description) {
+                            TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
         transactionLogService.logAndSave(
                 Transaction.builder()
                         .wallet(wallet)
@@ -42,6 +42,7 @@ public class MerchantWalletCommandService {
                         .amount(amount)
                         .txHash(null)
                         .description(description)
+                        .displayDescription(displayDescription)
                         .traceId(MDC.get("traceId"))
                         .build(),
                 userId,
@@ -64,7 +65,7 @@ public class MerchantWalletCommandService {
      * 일일 매출 조회
      */
     public Long getDailyIncome(Long merchantId) {
-        Optional<Wallet> wallet = walletRepository.findByMerchantId(merchantId);
+        Optional<Wallet> wallet = walletRepository.findByMerchant_Id(merchantId);
 
         LocalDateTime startOfDay = LocalDate.now().atStartOfDay();
         LocalDateTime endOfDay = LocalDate.now().atTime(LocalTime.MAX);

@@ -14,10 +14,7 @@ public interface NotificationService {
     void sendNotification(User user, NotificationTemplate template, Object... args);
     SseEmitter subscribe(Long userId);
     void deleteNotification(Long notificationId, User user);
-    void updateSetting(Long userId, List<NotificationCategoryUpdateRequestDto> updateReqDtos);
-
     void sendUnsentNotifications(User user);
     List<NotificationResponseDto> getAllNotifications(User user);
     List<NotificationResponseDto> getNotificationsByCategory(User user, NotificationCategory category);
-    List<NotificationCategorySettingResponseDto> getSettings(Long userId);
 }

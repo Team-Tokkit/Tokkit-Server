@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.wallet.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -20,4 +21,6 @@ public interface WalletRepository extends JpaRepository<Wallet, Long> {
     boolean existsByUserId(Long userId);
 
     boolean existsByMerchantId(Long merchantId);
+
+    List<Wallet> findByAutoConvertEnabledTrue();
 }

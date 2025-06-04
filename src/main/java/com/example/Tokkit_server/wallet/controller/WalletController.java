@@ -1,11 +1,14 @@
 package com.example.Tokkit_server.wallet.controller;
 
 import com.example.Tokkit_server.global.apiPayload.ApiResponse;
+import com.example.Tokkit_server.global.apiPayload.code.status.ErrorStatus;
+import com.example.Tokkit_server.global.apiPayload.exception.GeneralException;
 import com.example.Tokkit_server.global.util.IdempotencyManager;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import com.example.Tokkit_server.voucher_ownership.dto.request.VoucherPaymentRequest;
 import com.example.Tokkit_server.wallet.dto.request.*;
 import com.example.Tokkit_server.wallet.dto.response.*;
+import com.example.Tokkit_server.wallet.entity.Wallet;
 import com.example.Tokkit_server.wallet.service.command.WalletCommandService;
 import com.example.Tokkit_server.wallet.service.query.BlockchainQueryService;
 import com.example.Tokkit_server.wallet.service.query.WalletQueryService;
@@ -112,6 +115,24 @@ public class WalletController {
         @AuthenticationPrincipal CustomUserDetails userDetails,
         @RequestParam Long storeId) {
         return ApiResponse.onSuccess(commandService.getPaymentOptions(userDetails.getId(), storeId));
+    }
+
+    @PutMapping("/auto-convert")
+    @Operation(summary = "자동 전환 설정", description = "예금 → 토큰 자동 전환 설정을 저장합니다.")
+    public ApiResponse<Void> updateAutoConvertSetting(
+        @AuthenticationPrincipal CustomUserDetails userDetails,
+        @RequestBody AutoConvertSettingRequest request)
+    {queryService.updateAutoConvertSetting(userDetails.getId(), request);
+        return ApiResponse.onSuccess(null);
+    }
+
+
+    @GetMapping("/auto-convert")
+    @Operation(summary = "자동 전환 설정 조회", description = "자동 전환 설정 상태를 반환합니다.")
+    public ApiResponse<AutoConvertSettingResponse> getAutoConvertSetting(
+        @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        return ApiResponse.onSuccess(queryService.getAutoConvertSetting(userDetails.getId()));
     }
 
 }

@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.notification.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -7,6 +8,7 @@ import com.example.Tokkit_server.notification.entity.Notification;
 import com.example.Tokkit_server.notification.enums.NotificationCategory;
 import com.example.Tokkit_server.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -23,4 +25,8 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     Optional<Notification> findByIdAndUser(Long id, User user);
 
     List<Notification> findByUserAndDeletedFalse(User user);
+
+    @Modifying
+    @Query("UPDATE Notification n SET n.deleted = true WHERE n.deleted = false AND n.createdAt < :cutoff")
+    int softDeleteOldNotifications(@Param("cutoff") LocalDateTime cutoff);
 }
