@@ -1,6 +1,7 @@
 package com.example.Tokkit_server.global.config;
 
 import com.example.Tokkit_server.api_request_log.repository.ApiRequestLogRepository;
+import com.example.Tokkit_server.global.filter.RateLimitFilter;
 import com.example.Tokkit_server.global.filter.TraceIdFilter;
 import com.example.Tokkit_server.login_log.filter.LogoutLoggingFilter;
 import com.example.Tokkit_server.login_log.repository.LoginLogRepository;
@@ -29,6 +30,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.context.SecurityContextPersistenceFilter;
 import org.springframework.web.cors.CorsConfigurationSource;
 
 import java.util.List;
@@ -58,6 +60,7 @@ public class SecurityConfig {
             ApplicationEventPublisher applicationEventPublisher,
             LoginLogRepository userLoginLogRepository,
             @Qualifier("apiConfigurationSource") CorsConfigurationSource corsConfigurationSource, ApiRequestLogRepository logRepository
+
     ) {
         this.customUserDetailsService = customUserDetailsService;
         this.customMerchantDetailsService = customMerchantDetailsService;
@@ -91,7 +94,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(1)
-    public SecurityFilterChain userSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain userSecurityFilterChain(HttpSecurity http, RateLimitFilter rateLimitFilter) throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(customUserDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
@@ -127,8 +130,8 @@ public class SecurityConfig {
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated())
 
-                .addFilterBefore(new TraceIdFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
+            .addFilterBefore(rateLimitFilter, SecurityContextPersistenceFilter.class)
+            .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(userLoginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new JwtAuthenticationFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .build();
@@ -136,7 +139,7 @@ public class SecurityConfig {
 
     @Bean
     @Order(2)
-    public SecurityFilterChain merchantSecurityFilterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain merchantSecurityFilterChain(HttpSecurity http, RateLimitFilter rateLimitFilter) throws Exception {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
         provider.setUserDetailsService(customMerchantDetailsService);
         provider.setPasswordEncoder(passwordEncoder());
@@ -172,8 +175,9 @@ public class SecurityConfig {
                                 ).permitAll()
                         .requestMatchers(allowedUrls).permitAll()
                         .anyRequest().authenticated())
-                .addFilterBefore(new TraceIdFilter(), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
+
+            .addFilterBefore(rateLimitFilter, SecurityContextPersistenceFilter.class)
+            .addFilterBefore(new LogoutLoggingFilter(userLoginLogRepository,jwtUtil), UsernamePasswordAuthenticationFilter.class)
                 .addFilterAt(merchantLoginFilter, UsernamePasswordAuthenticationFilter.class)
                 .addFilterAfter(new MerchantJwtAuthenticationFilter(jwtUtil, merchantRepository), UsernamePasswordAuthenticationFilter.class)
                 .build();

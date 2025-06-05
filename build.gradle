@@ -75,6 +75,9 @@ dependencies {
 	// Redis
 	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+	//Bucket4j
+	implementation 'com.bucket4j:bucket4j-core:8.9.0'
+	implementation 'com.bucket4j:bucket4j-redis:8.9.0'
 
 	// Jackson
 	implementation 'com.fasterxml.jackson.core:jackson-databind'
