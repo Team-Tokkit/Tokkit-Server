@@ -1,5 +1,6 @@
 package com.example.Tokkit_server.global.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -19,8 +20,10 @@ public class RedisConfig {
 
     // Redis 연결 설정 (Lettuce 사용)
     @Bean
-    public RedisConnectionFactory redisConnectionFactory() {
-        return new LettuceConnectionFactory();
+    public RedisConnectionFactory redisConnectionFactory(
+        @Value("${spring.redis.host}") String host,
+        @Value("${spring.redis.port}") int port) {
+        return new LettuceConnectionFactory(host, port);
     }
 
     // RedisTemplate 등록 → IdempotencyManager가 이걸 주입받아서 사용
