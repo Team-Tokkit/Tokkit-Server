@@ -21,8 +21,8 @@ public class RedisConfig {
     // Redis 연결 설정 (Lettuce 사용)
     @Bean
     public RedisConnectionFactory redisConnectionFactory(
-        @Value("${spring.jpa.redis.host}") String host,
-        @Value("${spring.jpa.redis.port}") int port) {
+        @Value("${spring.redis.host}") String host,
+        @Value("${spring.redis.port}") int port) {
         return new LettuceConnectionFactory(host, port);
     }
 
