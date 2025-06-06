@@ -3,6 +3,8 @@ package com.example.Tokkit_server.system_error_log.service;
 import com.example.Tokkit_server.system_error_log.entity.SystemErrorLog;
 import com.example.Tokkit_server.system_error_log.enums.Severity;
 import com.example.Tokkit_server.system_error_log.repository.SystemErrorLogRepository;
+import com.example.Tokkit_server.unified_log.dto.request.UnifiedLogSaveDto;
+import com.example.Tokkit_server.unified_log.service.command.UnifiedLogCommandService;
 import com.example.Tokkit_server.user.utils.JwtUtil;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,7 @@ import java.util.Optional;
 public class SystemErrorLogService {
 
     private final SystemErrorLogRepository systemErrorLogRepository;
+    private final UnifiedLogCommandService unifiedLogCommandService;
     private final JwtUtil jwtUtil;
 
     public void logError(Exception e, HttpServletRequest request, String traceId) {
@@ -42,6 +45,7 @@ public class SystemErrorLogService {
                 .build();
 
         systemErrorLogRepository.save(logEntity);
+        unifiedLogCommandService.save(UnifiedLogSaveDto.fromSystemErrorLog(logEntity));
     }
 
     private UserOrMerchant extractUserOrMerchantIdFromRequest(HttpServletRequest request) {

@@ -3,6 +3,9 @@ package com.example.Tokkit_server.api_request_log.interceptor;
 import com.example.Tokkit_server.api_request_log.entity.ApiRequestLog;
 import com.example.Tokkit_server.api_request_log.repository.ApiRequestLogRepository;
 import com.example.Tokkit_server.global.util.LoggingUtils;
+import com.example.Tokkit_server.unified_log.dto.request.UnifiedLogSaveDto;
+import com.example.Tokkit_server.unified_log.service.command.UnifiedLogCommandService;
+
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +27,7 @@ import java.time.LocalDateTime;
 public class ApiLoggingInterceptor implements HandlerInterceptor {
 
     private final ApiRequestLogRepository logRepository;
+    private final UnifiedLogCommandService unifiedLogCommandService;
 
     // 요청 시작 시간 기록 (responseTime 계산용)
     private static final String START_TIME_ATTR = "apiLogStartTime";
@@ -87,6 +91,7 @@ public class ApiLoggingInterceptor implements HandlerInterceptor {
                 .build();
 
         logRepository.save(logEntity);
+        unifiedLogCommandService.save(UnifiedLogSaveDto.fromApiRequestLog(logEntity));
 
         log.info("[API LOG][{}] {} {} status={} userId={} merchantId={} {}ms",
                 traceId, request.getMethod(), endpoint, status, userId, merchantId, responseTimeMs);
