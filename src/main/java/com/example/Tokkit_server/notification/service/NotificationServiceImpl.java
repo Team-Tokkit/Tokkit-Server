@@ -97,6 +97,15 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     public SseEmitter subscribe(Long userId) {
+        // 1. 기존 emitter가 있으면 제거
+        SseEmitter previous = sseEmitters.get(userId);
+        if (previous != null) {
+            previous.complete();
+            sseEmitters.remove(userId);
+            log.info("[SSE] 기존 emitter 제거됨 - userId={}", userId);
+        }
+
+        // 2. 새 emitter 등록
         SseEmitter emitter = new SseEmitter(DEFAULT_TIMEOUT);
         sseEmitters.add(userId, emitter);
 
