@@ -69,7 +69,7 @@ public class AutoTokenConvertScheduler {
     @Scheduled(fixedRate = 60000) // 매 분 실행 (스프링 쪽에서 이걸 스캔한다는 뜻)
     @Transactional
     public void runMonthlyAutoConversion() {
-        MDC.put("traceId", UUID.randomUUID().toString());
+        // MDC.put("traceId", UUID.randomUUID().toString());
         LocalDateTime now = LocalDateTime.now();
         int nowDay = now.getDayOfMonth();
         int nowHour = now.getHour();
