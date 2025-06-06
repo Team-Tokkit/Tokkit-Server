@@ -4,6 +4,8 @@ import com.example.Tokkit_server.login_log.enums.Event;
 import com.example.Tokkit_server.login_log.entity.LoginLog;
 import com.example.Tokkit_server.login_log.repository.LoginLogRepository;
 import com.example.Tokkit_server.merchant.auth.CustomMerchantDetails;
+import com.example.Tokkit_server.unified_log.dto.request.UnifiedLogSaveDto;
+import com.example.Tokkit_server.unified_log.service.command.UnifiedLogCommandService;
 import com.example.Tokkit_server.user.auth.CustomUserDetails;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +29,7 @@ import static org.springframework.web.context.request.RequestContextHolder.curre
 public class LoginLogListener {
 
     private final LoginLogRepository logRepository;
+    private final UnifiedLogCommandService unifiedLogCommandService;
 
     private HttpServletRequest getCurrentRequest() {
         return ((ServletRequestAttributes) currentRequestAttributes()).getRequest();
@@ -52,16 +55,20 @@ public class LoginLogListener {
 
         log.info("[LOGIN SUCCESS][traceId={}] userId={} merchantId={} ip={}", traceId, userId, merchantId, ip);
 
-        logRepository.save(LoginLog.builder()
-                .userId(userId)
-                .merchantId(merchantId)
-                .event(Event.LOGIN)
-                .timestamp(LocalDateTime.now())
-                .userAgent(userAgent)
-                .success(true)
-                .traceId(traceId)
-                .ipAddress(ip)
-                .build());
+
+        LoginLog loginLog = LoginLog.builder()
+            .userId(userId)
+            .merchantId(merchantId)
+            .event(Event.LOGIN)
+            .timestamp(LocalDateTime.now())
+            .userAgent(userAgent)
+            .success(true)
+            .traceId(traceId)
+            .ipAddress(ip)
+            .build();
+
+        logRepository.save(loginLog);
+        unifiedLogCommandService.save(UnifiedLogSaveDto.fromLoginLog(loginLog));
     }
 
     @EventListener
@@ -72,16 +79,20 @@ public class LoginLogListener {
 
         log.warn("[LOGIN FAIL][traceId={}] ip={} reason={}", traceId, ip, event.getException().getMessage());
 
-        logRepository.save(LoginLog.builder()
-                .userId(null)
-                .merchantId(null)
-                .event(Event.LOGIN)
-                .timestamp(LocalDateTime.now())
-                .userAgent(userAgent)
-                .success(false)
-                .reason(event.getException().getMessage())
-                .traceId(traceId)
-                .ipAddress(ip)
-                .build());
+        LoginLog loginLog = LoginLog.builder()
+            .userId(null)
+            .merchantId(null)
+            .event(Event.LOGIN)
+            .timestamp(LocalDateTime.now())
+            .userAgent(userAgent)
+            .success(false)
+            .reason(event.getException().getMessage())
+            .traceId(traceId)
+            .ipAddress(ip)
+            .build();
+
+        logRepository.save(loginLog);
+        unifiedLogCommandService.save(UnifiedLogSaveDto.fromLoginLog(loginLog));
+
     }
 }
