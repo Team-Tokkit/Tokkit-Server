@@ -22,8 +22,6 @@ public interface VoucherOwnershipRepository extends JpaRepository<VoucherOwnersh
         SELECT vo
         FROM VoucherOwnership vo
         JOIN FETCH vo.voucher v
-        LEFT JOIN FETCH v.voucherStores vs
-        LEFT JOIN FETCH vs.store s
         WHERE vo.wallet.user.id = :userId
     """)
     List<VoucherOwnership> findAllWithVoucherAndStoresByUserId(@Param("userId") Long userId);
