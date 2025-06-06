@@ -24,59 +24,69 @@ repositories {
 }
 
 dependencies {
-	// Spring Core
 	implementation 'org.springframework.boot:spring-boot-starter-logging'
-	implementation 'org.springframework.boot:spring-boot-starter-web'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'org.springframework.boot:spring-boot-starter-mail'
-
-	// Database
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	compileOnly 'org.projectlombok:lombok'
 	runtimeOnly 'com.mysql:mysql-connector-j'
+	annotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 
-	// Redis
-	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+	// swagger
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
 
-	// Swagger (최신 버전만)
+
+	// JTS Point (공간 타입)을 JPA에서 인식하게 끔
+	implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
+	implementation 'org.locationtech.jts:jts-core:1.19.0' // JTS geometry
+
+	// Spring doc
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
 
-	// Spatial (위치정보)
-	implementation 'org.hibernate:hibernate-spatial:6.4.4.Final'
-	implementation 'org.locationtech.jts:jts-core:1.19.0'
-
-	// JSON & Jackson (중복 제거 후 유지할 것만)
+	// json
 	implementation 'org.json:json:20230227'
-	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
-	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2' // Redis 직렬화 시 필요
 
-	// JWT
+	// Spring Security
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	testImplementation 'org.springframework.security:spring-security-test'
+
+
+	// jwt
 	implementation 'io.jsonwebtoken:jjwt-api:0.12.3'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.12.3'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.12.3'
 
-	// Email 인증용
+	//validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// email
+	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-mail', version: '3.0.5'
+
+	// ocr
 	implementation 'commons-codec:commons-codec:1.15'
+	implementation 'com.fasterxml.jackson.core:jackson-databind:2.15.2'
+	implementation 'com.fasterxml.jackson.core:jackson-core:2.15.2'
 
 	// AWS S3
 	implementation "software.amazon.awssdk:s3:2.13.0"
 
-	// Bucket4j RateLimiter
+	// Redis
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	//Bucket4j
 	implementation 'com.bucket4j:bucket4j-core:8.9.0'
 	implementation 'com.bucket4j:bucket4j-redis:8.9.0'
 
-	// Web3j (스마트컨트랙트 연동)
+	// Jackson
+	implementation 'com.fasterxml.jackson.core:jackson-databind'
+	implementation 'com.fasterxml.jackson.core:jackson-annotations'
+	implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+
+	// Web3j (스마트컨트랙트 통신용)
 	implementation 'org.web3j:core:4.10.3'
 	implementation 'org.web3j:codegen:4.10.3'
-
-	// Lombok
-	compileOnly 'org.projectlombok:lombok'
-	annotationProcessor 'org.projectlombok:lombok'
-
-	// Test
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.security:spring-security-test'
-	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
 }
 
 tasks.named('test') {
