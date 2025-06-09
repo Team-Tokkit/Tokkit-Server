@@ -69,68 +69,67 @@ public class WalletCommandService {
      * txHash 없는 기본형
      */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-        TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription) {
+            TransactionType type, TransactionStatus status, Long amount, String description,
+            String displayDescription) {
         transactionLogService.logAndSave(
-            Transaction.builder()
-                .wallet(wallet)
-                .type(type)
-                .status(status)
-                .amount(amount)
-                .description(description)
-                .displayDescription(displayDescription)
-                .traceId(MDC.get("traceId"))
-                .build(),
-            userId,
-            merchantId
-        );
+                Transaction.builder()
+                        .wallet(wallet)
+                        .type(type)
+                        .status(status)
+                        .amount(amount)
+                        .description(description)
+                        .displayDescription(displayDescription)
+                        .traceId(MDC.get("traceId"))
+                        .build(),
+                userId,
+                merchantId);
     }
 
     /**
      * txHash 있는 확장형
      */
     private void logAndSave(Wallet wallet, Long userId, Long merchantId,
-        TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription, String txHash) {
+            TransactionType type, TransactionStatus status, Long amount, String description, String displayDescription,
+            String txHash) {
         transactionLogService.logAndSave(
-            Transaction.builder()
-                .wallet(wallet)
-                .type(type)
-                .status(status)
-                .amount(amount)
-                .txHash(txHash)
-                .description(description)
-                .displayDescription(displayDescription)
-                .traceId(MDC.get("traceId"))
-                .build(),
-            userId,
-            merchantId
-        );
+                Transaction.builder()
+                        .wallet(wallet)
+                        .type(type)
+                        .status(status)
+                        .amount(amount)
+                        .txHash(txHash)
+                        .description(description)
+                        .displayDescription(displayDescription)
+                        .traceId(MDC.get("traceId"))
+                        .build(),
+                userId,
+                merchantId);
     }
-
 
     // 유저 - 전자 지갑 생성
     @Transactional
     public Wallet createInitialWalletForUser(Long userId) {
         if (walletRepository.existsByUserId(userId)) {
             return walletRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
         }
 
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 스마트컨트랙트 지갑 주소 생성
         try {
             String walletAddress = "0xf39fd6e51aad88f6f4ce6ab8827279cfffb92266";
 
             Wallet wallet = Wallet.builder()
-                .user(user)
-                .depositBalance(1000000L)
-                .tokenBalance(0L)
-                .walletType(WalletType.USER)
-                .accountNumber(AccountGenerator.generateAccountNumber())
-                .walletAddress(walletAddress)
-                .autoConvertEnabled(false)
-                .build();
+                    .user(user)
+                    .depositBalance(1000000L)
+                    .tokenBalance(0L)
+                    .walletType(WalletType.USER)
+                    .accountNumber(AccountGenerator.generateAccountNumber())
+                    .walletAddress(walletAddress)
+                    .autoConvertEnabled(false)
+                    .build();
 
             return walletRepository.save(wallet);
         } catch (Exception e) {
@@ -143,25 +142,25 @@ public class WalletCommandService {
     public Wallet createInitialWalletForMerchant(Long merchantId) {
         if (walletRepository.existsByMerchantId(merchantId)) {
             return walletRepository.findByMerchant_Id(merchantId)
-                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
+                    .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
         }
 
         Merchant merchant = merchantRepository.findById(merchantId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
         try {
 
             String walletAddress = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8";
 
             Wallet wallet = Wallet.builder()
-                .merchant(merchant)
-                .depositBalance(1000000L)
-                .tokenBalance(0L)
-                .walletType(WalletType.MERCHANT)
-                .accountNumber(AccountGenerator.generateAccountNumber())
-                .walletAddress(walletAddress)
-                .autoConvertEnabled(false)
-                .build();
+                    .merchant(merchant)
+                    .depositBalance(1000000L)
+                    .tokenBalance(0L)
+                    .walletType(WalletType.MERCHANT)
+                    .accountNumber(AccountGenerator.generateAccountNumber())
+                    .walletAddress(walletAddress)
+                    .autoConvertEnabled(false)
+                    .build();
 
             return walletRepository.save(wallet);
         } catch (Exception e) {
@@ -174,9 +173,10 @@ public class WalletCommandService {
      */
     public WalletBalanceResponse getWalletBalance(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
-        return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(), wallet.getUser().getName(), wallet.getAccountNumber());
+        return new WalletBalanceResponse(wallet.getDepositBalance(), wallet.getTokenBalance(),
+                wallet.getUser().getName(), wallet.getAccountNumber());
     }
 
     /**
@@ -185,34 +185,33 @@ public class WalletCommandService {
 
     public List<TransactionHistoryResponse> getTransactionHistory(Long userId) {
         Wallet wallet = walletRepository.findByUser_Id(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         List<Transaction> transactions = transactionRepository.findByWalletIdOrderByCreatedAtDesc(wallet.getId());
 
         return transactions.stream()
-            .map(t -> new TransactionHistoryResponse(
-                t.getId(),
-                t.getType(),
-                t.getAmount(),
-                t.getDisplayDescription(),
-                t.getCreatedAt()
-            )).toList();
+                .map(t -> new TransactionHistoryResponse(
+                        t.getId(),
+                        t.getType(),
+                        t.getAmount(),
+                        t.getDisplayDescription(),
+                        t.getCreatedAt()))
+                .toList();
     }
 
     /**
      * 토큰으로 바우처 구입
      */
     @Transactional
-    public VoucherPurchaseResponse purchaseVoucher(Long userId,VoucherPurchaseRequest request) {
+    public VoucherPurchaseResponse purchaseVoucher(Long userId, VoucherPurchaseRequest request) {
 
         // 1. 사용자 Wallet 조회
         Wallet wallet = walletRepository.findByUser_Id(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
-
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         // 2. 사용자 조회 (간편 비밀번호 검증을 위해)
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 3. 간편 비밀번호 검증
         if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
@@ -221,7 +220,7 @@ public class WalletCommandService {
 
         // 4. 바우처 엔티티 조회
         Voucher voucher = voucherRepository.findById(request.getVoucherId())
-            .orElseThrow(() -> new GeneralException(ErrorStatus.VOUCHER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.VOUCHER_NOT_FOUND));
 
         int amount = voucher.getPrice(); // 서버에서 금액 조회
 
@@ -242,9 +241,8 @@ public class WalletCommandService {
         TransactionReceipt receipt;
         try {
             receipt = tokkitTokenService.burn(
-                wallet.getWalletAddress(),
-                BigInteger.valueOf(amount)
-            );
+                    wallet.getWalletAddress(),
+                    BigInteger.valueOf(amount));
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.TOKEN_BURN_FAILED);
         }
@@ -254,14 +252,13 @@ public class WalletCommandService {
         // 8. 토큰 차감
         wallet.updateBalance(wallet.getDepositBalance(), wallet.getTokenBalance() - amount);
 
-
         // 9. VoucherOwnership(바우처 소유권) 생성
         VoucherOwnership ownership = VoucherOwnership.builder()
-            .voucher(voucher)
-            .remainingAmount((long) amount)
-            .wallet(wallet)
-            .status(VoucherOwnershipStatus.AVAILABLE)
-            .build();
+                .voucher(voucher)
+                .remainingAmount((long) amount)
+                .wallet(wallet)
+                .status(VoucherOwnershipStatus.AVAILABLE)
+                .build();
 
         VoucherOwnership savedOwnership = voucherOwnershipRepository.save(ownership);
 
@@ -270,40 +267,36 @@ public class WalletCommandService {
         String displayDescription = voucher.getName();
 
         logAndSave(wallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-            (long) amount, logDescription, displayDescription,txHash);
+                (long) amount, logDescription, displayDescription, txHash);
 
         // 알림 생성
         notificationService.sendNotification(
                 user,
                 NotificationTemplate.VOUCHER_PURCHASED,
                 voucher.getName(),
-                amount
-        );
+                amount);
 
         // 11. 응답 반환
         return VoucherPurchaseResponse.builder()
-            .ownershipId(savedOwnership.getId())
-            .message("바우처 구매 완료")
-            .build();
+                .ownershipId(savedOwnership.getId())
+                .message("바우처 구매 완료")
+                .build();
 
     }
 
-
     /**
-     * QR 코드로 넘어온 정보 인증  & 바우처로 결제
+     * QR 코드로 넘어온 정보 인증 & 바우처로 결제
      */
     @Transactional
-    public VoucherPaymentResponse payWithVoucher(Long userId,VoucherPaymentRequest request) {
+    public VoucherPaymentResponse payWithVoucher(Long userId, VoucherPaymentRequest request) {
 
-        //  1. 사용자 조회
+        // 1. 사용자 조회
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
-
-        //  2. 바우처 소유권 확인
+        // 2. 바우처 소유권 확인
         VoucherOwnership ownership = voucherOwnershipRepository.findById(request.getVoucherOwnershipId())
-            .orElseThrow(() -> new GeneralException(ErrorStatus.VOUCHER_OWNERSHIP_NOT_FOUND));
-
+                .orElseThrow(() -> new GeneralException(ErrorStatus.VOUCHER_OWNERSHIP_NOT_FOUND));
 
         if (!ownership.getWallet().getUser().getId().equals(user.getId())) {
             throw new GeneralException(ErrorStatus.VOUCHER_NOT_OWNED_BY_USER); // 내 소유 아님
@@ -316,20 +309,20 @@ public class WalletCommandService {
             throw new GeneralException(ErrorStatus.VOUCHER_EXPIRED); // 기간 만료
         }
 
-        //  4. 사용처(merchantId) 확인
+        // 4. 사용처(merchantId) 확인
         if (!voucher.getMerchant().getId().equals(request.getMerchantId())) {
             throw new GeneralException(ErrorStatus.VOUCHER_MERCHANT_NOT_MATCH); // 바우처 사용처 불일치
         }
 
-        //  5. 바우처 사용 가능 매장인지 확인
+        // 5. 바우처 사용 가능 매장인지 확인
         boolean usableStore = voucher.getVoucherStores().stream()
-            .anyMatch(vs -> vs.getStore().getId().equals(request.getStoreId()));
+                .anyMatch(vs -> vs.getStore().getId().equals(request.getStoreId()));
 
         if (!usableStore) {
             throw new GeneralException(ErrorStatus.VOUCHER_STORE_NOT_USABLE);
         }
 
-        //  6. 잔액 확인
+        // 6. 잔액 확인
         if (ownership.getRemainingAmount() < request.getAmount()) {
             throw new GeneralException(ErrorStatus.INSUFFICIENT_BALANCE);
         }
@@ -339,7 +332,7 @@ public class WalletCommandService {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
 
-        //  8. 잔액 차감
+        // 8. 잔액 차감
         ownership.useAmount(request.getAmount());
 
         // User Description 생성
@@ -347,28 +340,27 @@ public class WalletCommandService {
         Store store = storeRepository.findById(request.getStoreId())
                 .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_NOT_FOUND));
 
-        String userDisplayDescription = TransactionDisplayFormatter.userVoucherPayment(user.getName(), store.getStoreName(), voucher.getName());
+        String userDisplayDescription = TransactionDisplayFormatter.userVoucherPayment(user.getName(),
+                store.getStoreName(), voucher.getName());
 
-        //  9. 사용자 거래 기록 생성
+        // 9. 사용자 거래 기록 생성
         logAndSave(ownership.getWallet(), user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-            request.getAmount(), userLogDescription, userDisplayDescription);
+                request.getAmount(), userLogDescription, userDisplayDescription);
 
-        //  10. 가맹점주 Wallet 정산
-        Wallet merchantWallet = walletRepository.findByMerchant_Id(request.getMerchantId()).orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
-
+        // 10. 가맹점주 Wallet 정산
+        Wallet merchantWallet = walletRepository.findByMerchant_Id(request.getMerchantId())
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
 
         merchantWallet.updateBalance(
-            merchantWallet.getDepositBalance(),
-            merchantWallet.getTokenBalance() + request.getAmount());
-
+                merchantWallet.getDepositBalance(),
+                merchantWallet.getTokenBalance() + request.getAmount());
 
         // 스마트 컨트랙트 적용
         TransactionReceipt receipt;
-        try{
+        try {
             receipt = tokkitTokenService.mint(
-                merchantWallet.getWalletAddress(),
-                BigInteger.valueOf(request.getAmount())
-            );
+                    merchantWallet.getWalletAddress(),
+                    BigInteger.valueOf(request.getAmount()));
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.TOKEN_TRANSFER_FAILED);
         }
@@ -376,11 +368,12 @@ public class WalletCommandService {
 
         // Merchant Description 생성
         String merchantLogDescription = "바우처 정산 수령 - User ID: " + user.getId();
-        String merchantDisplayDescription = TransactionDisplayFormatter.merchantVoucherSettlement(voucher.getName(), user.getName());
+        String merchantDisplayDescription = TransactionDisplayFormatter.merchantVoucherSettlement(voucher.getName(),
+                user.getName());
 
-        //  11. 가맹점주 거래 기록 저장
+        // 11. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, request.getMerchantId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-            request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
+                request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
 
         // 유저 알림 생성
         notificationService.sendNotification(
@@ -388,73 +381,65 @@ public class WalletCommandService {
                 NotificationTemplate.VOUCHER_PAYMENT_SUCCESS,
                 voucher.getName(),
                 store.getStoreName(),
-                request.getAmount()
-        );
+                request.getAmount());
 
         // 가맹점주 바우처 정산 알림 생성
         Merchant merchant = merchantRepository.findById(request.getMerchantId())
-                        .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
         merchantNotificationService.sendMerchantNotification(
                 merchant,
                 NotificationTemplate.MERCHANT_VOUCHER_SETTLED,
                 user.getName(),
                 voucher.getName(),
-                request.getAmount()
-        );
+                request.getAmount());
 
-        //  12. 응답 반환
+        // 12. 응답 반환
         return VoucherPaymentResponse.builder()
-            .paymentTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME))
-            .amount(request.getAmount())
-            .remainingAmount(ownership.getRemainingAmount())
-            .message("결제 성공")
-            .build();
+                .paymentTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME))
+                .amount(request.getAmount())
+                .remainingAmount(ownership.getRemainingAmount())
+                .message("결제 성공")
+                .build();
     }
 
-
     /**
-     * QR 코드로 넘어온 정보 인증  & 토큰으로 결제
+     * QR 코드로 넘어온 정보 인증 & 토큰으로 결제
      */
     @Transactional
-    public DirectPaymentResponse payDirectlyWithToken(Long userId,DirectPaymentRequest request) {
+    public DirectPaymentResponse payDirectlyWithToken(Long userId, DirectPaymentRequest request) {
 
         // 1. 사용자 조회
         User user = userRepository.findById(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
-
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_NOT_FOUND));
 
         // 2. 사용자 지갑 조회
         Wallet userWallet = walletRepository.findByUser_Id(user.getId())
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         // 3. 토큰 잔액 확인
         if (userWallet.getTokenBalance() < request.getAmount()) {
             throw new GeneralException(ErrorStatus.INSUFFICIENT_TOKEN_BALANCE);
         }
 
-
         // 4. 가맹점주 조회 및 지갑 조회
         Merchant merchant = merchantRepository.findById(request.getMerchantId())
-            .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_NOT_FOUND));
 
         Wallet merchantWallet = walletRepository.findByMerchant_Id(merchant.getId())
-            .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.MERCHANT_WALLET_NOT_FOUND));
 
-
-        // 5. 간편 비밀번호  검증
+        // 5. 간편 비밀번호 검증
         if (!user.matchSimplePassword(request.getSimplePassword(), passwordEncoder)) {
             throw new GeneralException(ErrorStatus.INVALID_SIMPLE_PASSWORD);
         }
-
 
         // 스마트 컨트랙트 적용
         TransactionReceipt receipt;
         try {
 
             receipt = tokkitTokenService.transfer(
-                merchantWallet.getWalletAddress(),
-                BigInteger.valueOf(request.getAmount())
-            );
+                    merchantWallet.getWalletAddress(),
+                    BigInteger.valueOf(request.getAmount()));
         } catch (Exception e) {
             throw new GeneralException(ErrorStatus.TOKEN_TRANSFER_FAILED);
         }
@@ -463,16 +448,13 @@ public class WalletCommandService {
 
         // 6. 사용자 토큰 차감
         userWallet.updateBalance(
-            userWallet.getDepositBalance(),
-            userWallet.getTokenBalance() - request.getAmount()
-        );
-
+                userWallet.getDepositBalance(),
+                userWallet.getTokenBalance() - request.getAmount());
 
         // 7. 가맹점주 토큰 증가
         merchantWallet.updateBalance(
-            merchantWallet.getDepositBalance(),
-            merchantWallet.getTokenBalance() + request.getAmount()
-        );
+                merchantWallet.getDepositBalance(),
+                merchantWallet.getTokenBalance() + request.getAmount());
 
         // User Description 생성
         String userLogDescription = "토큰 직접 결제 - Merchant ID: " + merchant.getId();
@@ -487,7 +469,7 @@ public class WalletCommandService {
 
         // 8. 유저 거래 내역 저장
         logAndSave(userWallet, user.getId(), null, TransactionType.PURCHASE, TransactionStatus.SUCCESS,
-            request.getAmount(), userLogDescription, userDisplayDescription, txHash);
+                request.getAmount(), userLogDescription, userDisplayDescription, txHash);
 
         // Merchant Description 생성
         String merchantLogDescription = "토큰 직접 결제 수령 - User ID: " + user.getId();
@@ -495,31 +477,29 @@ public class WalletCommandService {
 
         // 9. 가맹점주 거래 기록 저장
         logAndSave(merchantWallet, null, merchant.getId(), TransactionType.RECEIVE, TransactionStatus.SUCCESS,
-            request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
+                request.getAmount(), merchantLogDescription, merchantDisplayDescription, txHash);
 
         // 유저 알림 생성
         notificationService.sendNotification(
                 user,
                 NotificationTemplate.TOKEN_PAYMENT_SUCCESS,
                 store.getStoreName(),
-                request.getAmount()
-        );
+                request.getAmount());
 
         // 가맹점주 토큰 정산 알림 생성
         merchantNotificationService.sendMerchantNotification(
                 merchant,
                 NotificationTemplate.MERCHANT_TOKEN_SETTLED,
                 user.getName(),
-                request.getAmount()
-        );
+                request.getAmount());
 
         // 10. 응답 반환
         return DirectPaymentResponse.builder()
-            .paymentTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME))
-            .amount(request.getAmount())
-            .remainingTokenBalance(userWallet.getTokenBalance())
-            .message("토큰 직접 결제 성공")
-            .build();
+                .paymentTime(LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_TIME))
+                .amount(request.getAmount())
+                .remainingTokenBalance(userWallet.getTokenBalance())
+                .message("토큰 직접 결제 성공")
+                .build();
     }
 
     /**
@@ -530,16 +510,16 @@ public class WalletCommandService {
 
         // 1. 사용자 지갑의 토큰 잔액
         Wallet wallet = walletRepository.findByUser_Id(userId)
-            .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
+                .orElseThrow(() -> new GeneralException(ErrorStatus.USER_WALLET_NOT_FOUND));
 
         result.add(PaymentOptionResponse.builder()
-            .type("TOKEN")
-            .name("토큰으로 결제")
-            .balance(wallet.getTokenBalance())
-            .expireDate(null)
-            .usable(true)
-            .storeCategory("TOKEN") // 토큰은 별도 카테고리
-            .build());
+                .type("TOKEN")
+                .name("토큰으로 결제")
+                .balance(wallet.getTokenBalance())
+                .expireDate(null)
+                .usable(true)
+                .storeCategory("TOKEN") // 토큰은 별도 카테고리
+                .build());
 
         // 2. 바우처 소유권 조회
         List<VoucherOwnership> ownerships = voucherOwnershipRepository.findAllWithVoucherAndStoresByUserId(userId);
@@ -549,21 +529,21 @@ public class WalletCommandService {
             Voucher v = o.getVoucher();
 
             boolean usableStore = v.getVoucherStores().stream()
-                .anyMatch(vs -> vs.getStore().getId().equals(storeId));
+                    .anyMatch(vs -> vs.getStore().getId().equals(storeId));
 
             if (!usableStore || v.getValidDate().isBefore(LocalDateTime.now()) || o.getRemainingAmount() <= 0) {
                 continue;
             }
 
             result.add(PaymentOptionResponse.builder()
-                .type("VOUCHER")
-                .voucherOwnershipId(o.getId())
-                .name(v.getName())
-                .balance(o.getRemainingAmount())
-                .expireDate(v.getValidDate().toLocalDate().toString())
-                .usable(true)
-                .storeCategory(v.getStoreCategory().name())
-                .build());
+                    .type("VOUCHER")
+                    .voucherOwnershipId(o.getId())
+                    .name(v.getName())
+                    .balance(o.getRemainingAmount())
+                    .expireDate(v.getValidDate().toLocalDate().toString())
+                    .usable(true)
+                    .storeCategory(v.getStoreCategory().name())
+                    .build());
         }
 
         return result;

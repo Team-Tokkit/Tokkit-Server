@@ -57,4 +57,9 @@ jobs:
             --application-name tokkit-server \
             --deployment-group-name tokkit-server-bluegreen \
             --s3-location bucket=tokkit-codedeploy-bucket,key=deployments/app-server.zip,bundleType=zip \
-            --region ap-northeast-2
+            --region ap-northeast-2 \
+            --auto-rollback-configuration enabled=true,events=DEPLOYMENT_FAILURE \
+            --deployment-style-configuration deploymentOption=WITH_TRAFFIC_CONTROL,deploymentType=BLUE_GREEN \
+            --load-balancer-info targetGroupPairInfo={prodTrafficRoute={listenerArns=[arn:aws:elasticloadbalancing:ap-northeast-2:233777023703:listener/app/tokkit-alb/1234567890abcdef/1234567890abcdef]},targetGroups=[{name=tokkit-tg-1},{name=tokkit-tg-2}]} \
+            --ec2-tag-filters Key=Environment,Value=Production,Type=KEY_AND_VALUE \
+            --service-role-arn arn:aws:iam::233777023703:role/tokkit-codedeploy-service-role
