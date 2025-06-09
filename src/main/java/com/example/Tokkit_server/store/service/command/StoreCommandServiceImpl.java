@@ -26,32 +26,40 @@ public class StoreCommandServiceImpl implements StoreCommandService {
             Double lng,
             Integer radius,
             String storeCategory,
-            String keyword
-    ) {
+            String keyword) {
         if (lat == null || lat < -90 || lat > 90) {
+            throw new GeneralException(ErrorStatus.INVALID_LATITUDE);
+        }
+        if (lng == null || lng < -180 || lng > 180) {
             throw new GeneralException(ErrorStatus.INVALID_LATITUDE);
         }
         if (radius == null || radius < 1) {
             throw new GeneralException(ErrorStatus.INVALID_RADIUS);
         }
-        StoreCategory category = null;
 
+        String categoryEnum = null;
         if (storeCategory != null) {
-            category = Arrays.stream(StoreCategory.values())
-                    .filter(cat -> cat.getKoreanName().equals(storeCategory))
-                    .findFirst()
-                    .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_CATEGORY_NOT_FOUND));
+            try {
+                // 먼저 enum 이름으로 변환 시도
+                StoreCategory category = StoreCategory.valueOf(storeCategory);
+                categoryEnum = category.name();
+            } catch (IllegalArgumentException e) {
+                // 실패하면 한글 이름으로 변환 시도
+                StoreCategory category = Arrays.stream(StoreCategory.values())
+                        .filter(cat -> cat.getKoreanName().equals(storeCategory))
+                        .findFirst()
+                        .orElseThrow(() -> new GeneralException(ErrorStatus.STORE_CATEGORY_NOT_FOUND));
+                categoryEnum = category.name();
+            }
         }
-
 
         List<Object[]> results = storeRepository.findNearbyStoresRaw(
                 userId,
                 lat,
                 lng,
                 radius,
-                category != null ? category.name() : null,
-                keyword
-        );
+                categoryEnum,
+                keyword);
 
         return results.stream()
                 .map(row -> new KakaoMapSearchResponse(
@@ -62,8 +70,7 @@ public class StoreCommandServiceImpl implements StoreCommandService {
                         ((Double) row[4]),
                         ((Double) row[5]),
                         ((Double) row[7]),
-                        row[6] != null ? StoreCategory.valueOf((String) row[6]) : null
-                ))
+                        row[6] != null ? StoreCategory.valueOf((String) row[6]) : null))
                 .collect(Collectors.toList());
     }
 }
